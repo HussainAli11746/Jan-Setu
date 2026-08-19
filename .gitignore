@@ -1,0 +1,33 @@
+# Node
+node_modules/
+*.log
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Frontend build
+frontend/dist/
+
+# Database
+*.sql.bak
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.sln

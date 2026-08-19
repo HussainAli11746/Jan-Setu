@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;700&display=swap');
+
+@layer base {
+  :root {
+    --saffron: #E8601C;
+    --saffron-light: #FEF0E8;
+    --saffron-mid: #F97C3C;
+    --india-green: #0A6B3C;
+    --india-green-light: #E8F5EE;
+    --navy: #1A2A6C;
+    --navy-light: #EEF1FB;
+    --warm-bg: #FAFAF8;
+    --card-bg: #FFFFFF;
+    --border: #E5E2DC;
+    --text-primary: #1C1917;
+    --text-secondary: #57534E;
+    --text-muted: #A8A29E;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--warm-bg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #D6D3CD; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #A8A29E; }
+}
+
+@layer components {
+  .tricolor-bar {
+    height: 3px;
+    background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33% 66.66%, #138808 66.66%);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-all;
+    background: var(--saffron);
+    border: 1.5px solid transparent;
+  }
+  .btn-primary:hover {
+    background: #D04F0F;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(232, 96, 28, 0.3);
+  }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text-secondary);
+  }
+  .btn-secondary:hover { background: #F5F4F1; border-color: #C5C1BB; color: var(--text-primary); }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .scheme-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--saffron);
+    border-radius: 0 10px 10px 0;
+    transition: box-shadow 0.15s;
+  }
+  .scheme-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  }
+
+  .input-field {
+    @apply w-full bg-white text-sm outline-none transition-all;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text-primary);
+  }
+  .input-field:focus {
+    border-color: var(--saffron);
+    box-shadow: 0 0 0 3px rgba(232,96,28,0.1);
+  }
+  .input-field::placeholder { color: var(--text-muted); }
+
+  .step-pill {
+    @apply flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full transition-colors;
+  }
+  .step-pill.done { background: var(--india-green-light); color: var(--india-green); }
+  .step-pill.active { background: var(--saffron-light); color: var(--saffron); }
+  .step-pill.pending { background: #F2F1EE; color: var(--text-muted); }
+
+  .badge-match {
+    @apply text-xs font-bold px-2 py-0.5 rounded;
+    background: var(--india-green-light);
+    color: var(--india-green);
+    border: 1px solid #C0DDD0;
+  }
+
+  .pulse-ring {
+    animation: pulse-ring 1.5s ease-out infinite;
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(0.85); opacity: 0.7; }
+    70% { transform: scale(1.15); opacity: 0; }
+    100% { transform: scale(1.15); opacity: 0; }
+  }
+
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    animation: typing-bounce 1.2s ease-in-out infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typing-bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+  }
+}
