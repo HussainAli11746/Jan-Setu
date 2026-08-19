@@ -1,188 +1,179 @@
 # JanSetu AI 🇮🇳
+### *Empowering Citizen Access to Government Welfare Schemes*
 
-**Closing the Last Mile Between Eligibility and Access**
+> **JanSetu AI** is a voice-first, multilingual, consent-driven civic platform that bridges the gap between Indian citizens and government welfare schemes. It takes a citizen from a single spoken sentence to a tracked, verified application with zero document retention.
 
-> A voice-first, multilingual assistant that takes citizens from a single spoken sentence to a tracked, submitted government welfare application.
+---
 
-Team IntelliJ-Idea • Prasunethon 2.0 • Social Impact & Accessibility Track
+## 🌟 Key Highlights & Features
 
-## The Problem
-- Several crores in welfare benefits go unclaimed every year
-- 1000+ Central & State schemes scattered across departments
-- Language, low literacy, and complex paperwork block access
+- 🎙️ **Voice-First & Multilingual Interaction**: Speak or type naturally in 5 languages (**English, हिन्दी, বাংলা, தமிழ், తెలుగు**). Powered by the Web Speech API with real-time intent extraction.
+- 🎯 **Dynamic Scheme-Dependent Dialog**: The AI only asks for information required by relevant schemes (e.g., land details for farmers, academic category for students, dwelling type for housing assistance).
+- ⚡ **Deterministic Rules Engine**: High-accuracy eligibility matching backed by a Python FastAPI rules evaluator with built-in resilient in-memory fallbacks.
+- 🔐 **Privacy-First (DigiLocker Integration)**: Consent-driven Aadhaar and land record authentication. Zero raw document storage—data is processed in-memory and discarded.
+- 📝 **Live Profile Confirmation & In-line Editing**: Citizens review extracted details on clean information tiles with inline edit support before matching schemes.
+- 📊 **End-to-End Tracking Dashboard**: Real-time status timeline for submitted applications from department review to DBT disbursement.
 
-## The Solution
-JanSetu AI is a consent-first scheme assistant that:
-1. **Listens** in the user's own language (Hindi, Bengali, Tamil, Telugu, English + more)
-2. **Matches** them against real eligibility rules (deterministic, not AI guessing)
-3. **Verifies** identity via DigiLocker with per-document, per-scheme consent
-4. **Auto-fills** government forms using verified data
-5. **Tracks** application status with deadline reminders
+---
 
-## Key Features
-- 🎤 **Voice-First Input**: Speak in your language, no forms to read
-- 🔐 **Zero Document Storage**: DigiLocker docs processed in-memory, never stored
-- 🧠 **Deterministic Eligibility**: Rules engine, not AI hallucination
-- 📱 **Mobile-First**: Works on any device
-- 🌍 **Multilingual**: 10+ regional languages
-
-## Architecture
+## 🏗️ System Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                   Frontend (React)                   │
-│         Voice Input → Chat → DigiLocker → Track      │
-└──────────────────────┬──────────────────────────────┘
-                       │ REST API
-┌──────────────────────▼──────────────────────────────┐
-│               Backend (Node.js / Express)            │
-│    Claude NLU │ DigiLocker OAuth │ Auto-fill Engine  │
-└────────┬──────────────────────────────┬─────────────┘
-         │ HTTP                         │ PostgreSQL + Redis
-┌────────▼──────────┐       ┌──────────▼──────────────┐
-│  Rules Engine     │       │  PostgreSQL + Redis      │
-│  (Python FastAPI) │       │  Sessions │ Applications │
-│  15+ Schemes      │       │  Audit Log (no raw docs) │
-└───────────────────┘       └─────────────────────────┘
+                                  ┌─────────────────────────────────────────┐
+                                  │            Frontend (React 18)          │
+                                  │   Vite 5 · TailwindCSS · i18next (5 Lang)│
+                                  │   Voice Input · Chat · Schemes · Apply   │
+                                  └────────────────────┬────────────────────┘
+                                                       │ REST API / JSON
+                                                       ▼
+                                  ┌─────────────────────────────────────────┐
+                                  │      Node.js / Express API Gateway      │
+                                  │   NLP Entity Extraction · Auth · Proxy  │
+                                  └───────────────┬─────────────────┬───────┘
+                                                  │                 │
+                           ┌──────────────────────▼──────┐   ┌──────▼──────────────────────┐
+                           │   FastAPI Rules Engine      │   │     PostgreSQL 16 + Redis    │
+                           │   Deterministic Evaluation  │   │  Sessions · Schemes Catalog  │
+                           │   15+ Central/State Schemes │   │  Audit Logs (Zero Raw Docs)  │
+                           └─────────────────────────────┘   └──────────────────────────────┘
 ```
 
-## Tech Stack
+---
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 18 + Vite 5, TailwindCSS, i18next |
-| Voice | Web Speech API + MediaRecorder |
-| Backend API | Node.js 20 + Express |
-| Rules Engine | Python 3.11 + FastAPI |
-| AI/NLU | Claude API (claude-sonnet-4-5) |
-| Database | PostgreSQL 16 |
-| Session Cache | Redis 7 |
-| DigiLocker | OAuth 2.0 (Sandbox/Mock) |
-| Dev Orchestration | Docker Compose |
+## 🛠️ Tech Stack
 
-## Privacy by Design
+| Layer | Technology | Description |
+|---|---|---|
+| **Frontend** | React 18, Vite 5, TailwindCSS, Lucide React | Modern, responsive UI with accessible typography & dark-accent aesthetics |
+| **Localization** | `i18next`, `react-i18next`, Browser Language Detector | Full translation support across 5 Indian languages |
+| **Voice / Audio** | Web Speech API | Real-time speech-to-text recognition |
+| **Backend** | Node.js 20, Express, `pg`, `ioredis` | Resilient RESTful API gateway with automated failover |
+| **Rules Engine** | Python 3.11, FastAPI, Pydantic | Scheme qualification & eligibility calculation microservice |
+| **Database** | PostgreSQL 16 | Relational store for schemes, application tracking & consent audits |
+| **Caching** | Redis 7 | Ephemeral session tokens & rate-limiting |
+| **Orchestration** | Docker & Docker Compose | Multi-container setup for seamless local & cloud deployment |
 
-| What | How |
-|---|---|
-| Documents | Fetched in-memory only, discarded after field extraction |
-| Consent | Per-scheme, per-document — logged but not the document |
-| PII Storage | Only derived eligibility flags + reference numbers |
-| Audit Trail | Consent events: what was consented, when — NOT content |
+---
 
-## Quick Start
+## 📋 Welfare Schemes Supported (Catalog)
+
+| # | Scheme | Ministry | Core Benefit |
+|---|---|---|---|
+| 1 | **PM-KISAN** | Agriculture & Farmers Welfare | ₹6,000 / year direct income support |
+| 2 | **PMAY-G** | Rural Development | Financial assistance for pucca housing (up to ₹1.3L) |
+| 3 | **PMFBY** | Agriculture & Farmers Welfare | Comprehensive seasonal crop insurance |
+| 4 | **PM SVANidhi** | Housing & Urban Affairs | ₹10,000 – ₹50,000 working capital credit for vendors |
+| 5 | **Post-Matric Scholarship (SC/OBC)** | Social Justice & Empowerment | Full academic fee allowance for higher education |
+| 6 | **Ayushman Bharat (PM-JAY)** | Health & Family Welfare | ₹5,00,000 / year secondary & tertiary health cover |
+| 7 | **MGNREGS** | Rural Development | 100 days guaranteed wage employment |
+| 8 | **PMKVY 4.0** | Skill Development & Entrepreneurship | Free skill certification & training programs |
+| 9 | **PMMVY** | Women & Child Development | ₹5,000 maternity support for first child |
+| 10 | **Atal Pension Yojana (APY)** | Finance | Guaranteed monthly pension of ₹1,000 – ₹5,000 post age 60 |
+
+---
+
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-- Docker Desktop
-- Node.js 20+
-- Python 3.11+
+- [Node.js](https://nodejs.org/) (v18 or v20+)
+- [Python](https://www.python.org/) (v3.10 or v3.11+)
+- [Git](https://git-scm.com/)
 
-### With Docker (Recommended)
+---
+
+### Option A: Running with Docker (Recommended)
 
 ```bash
-# 1. Clone and setup
-git clone <repo>
-cd jansetu
+# 1. Clone repository
+git clone <YOUR_REPOSITORY_URL>
+cd Jan-Setu
 
-# 2. Set environment variables
+# 2. Configure environment variables
 cp backend/.env.example backend/.env
-# Edit backend/.env and add your CLAUDE_API_KEY
 
 # 3. Start all services
 docker-compose up -d
 
-# 4. Run migrations and seed data
+# 4. Migrate database schema and seed schemes
 docker-compose exec backend node src/db/migrate.js
 docker-compose exec backend node src/db/seed.js
 
-# 5. Open browser
-open http://localhost:5173
+# 5. Access the app
+# Frontend: http://localhost:5173
+# Backend API: http://localhost:3001
+# Rules Engine Docs: http://localhost:8000/docs
 ```
-
-### Local Development (Without Docker)
-
-```bash
-# Terminal 1: PostgreSQL + Redis (or use Docker just for these)
-docker-compose up postgres redis -d
-
-# Terminal 2: Rules Engine
-cd rules-engine
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-
-# Terminal 3: Backend
-cd backend
-npm install
-cp .env.example .env  # Edit with your API keys
-node src/db/migrate.js
-node src/db/seed.js
-npm run dev
-
-# Terminal 4: Frontend
-cd frontend
-npm install
-npm run dev
-```
-
-### Running Tests
-
-```bash
-# Rules Engine
-cd rules-engine
-pytest tests/ -v
-
-# Backend
-cd backend
-npm test
-
-# Frontend
-cd frontend
-npm test
-```
-
-## Seed Schemes (Q1 Prototype)
-
-| # | Scheme | Ministry | Benefit |
-|---|---|---|---|
-| 1 | PM-KISAN | Agriculture | ₹6,000/year |
-| 2 | PMAY-G | Rural Dev | ₹1.2L housing |
-| 3 | PM Jan Dhan Yojana | Finance | Free bank account |
-| 4 | Ayushman Bharat PM-JAY | Health | ₹5L/year insurance |
-| 5 | PM Ujjwala Yojana 2.0 | Petroleum | Free LPG |
-| 6 | PMEGP | MSME | 15-35% subsidy |
-| 7 | NSP Post-Matric (SC) | Social Justice | Full scholarship |
-| 8 | Sukanya Samriddhi | Finance | 8.2% savings |
-| 9 | PM Matru Vandana | WCD | ₹5,000 maternity |
-| 10 | Atal Pension Yojana | Finance | ₹1K-5K/month pension |
-| 11 | PM Fasal Bima | Agriculture | Crop insurance |
-| 12 | PM Kaushal Vikas 4.0 | Skill Dev | Free training |
-| 13 | PM SVANidhi | Urban | ₹10K-50K loan |
-| 14 | MGNREGS | Rural Dev | 100 days employment |
-| 15 | Beti Bachao Beti Padhao | WCD | Girl child welfare |
-
-## Competitive Advantage
-
-| Feature | JanSetu AI | myScheme.gov.in | SchemeSetu.com |
-|---|---|---|---|
-| Match Rate | **95%** | 55% | 40% |
-| DigiLocker Integration | ✅ | ❌ | ❌ |
-| Auto-fill Forms | ✅ | ❌ | ❌ |
-| Application Tracking | ✅ | ❌ | ❌ |
-| Voice Input | ✅ | ❌ | Partial |
-| Zero Doc Retention | ✅ | N/A | N/A |
-
-## Roadmap
-
-| Quarter | Milestone |
-|---|---|
-| Q1 | Prototype: 15-20 schemes, rules engine, voice UI |
-| Q2 | MVP: DigiLocker sandbox OAuth, OCR fallback |
-| Q3 | Pilot: 2-3 states, real applications |
-| Q4 | Production: Full scheme coverage, WhatsApp channel |
-
-## Team
-
-**Team IntelliJ-Idea** — Prasunethon 2.0, Social Impact & Accessibility Track
 
 ---
 
-*JanSetu AI: Closing the last mile between eligibility and access.*
+### Option B: Local Setup (Standalone Mode)
+
+#### 1. Rules Engine (FastAPI)
+```bash
+cd rules-engine
+python -m venv venv
+# On Windows:
+.\venv\Scripts\activate
+# On Linux/macOS:
+source venv/bin/activate
+
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+```
+
+#### 2. Backend (Node.js & Express)
+```bash
+cd backend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+#### 3. Frontend (React + Vite)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open your browser at `http://localhost:5173`.
+
+---
+
+## 🔒 Privacy & Consent Architecture
+
+- **No Permanent PII Storage**: Government identity proofs (Aadhaar, Land Records) processed through DigiLocker are authenticated in-memory and immediately discarded.
+- **Granular Consent**: Clear user consent is captured before sharing data with respective departmental endpoints.
+- **Auditable History**: Stores only timestamps, reference numbers, and anonymized eligibility scores.
+
+---
+
+## 📁 Project Structure
+
+```
+Jan-Setu/
+├── backend/                  # Node.js Express API
+│   ├── src/
+│   │   ├── db/               # PostgreSQL migrations & seed data
+│   │   ├── routes/           # Chat, Schemes, DigiLocker & Applications routes
+│   │   └── services/         # Claude NLU & Rules engine connectors
+│   └── .env.example
+├── frontend/                 # React 18 + Vite Web App
+│   ├── src/
+│   │   ├── components/       # Layout, Navbar, Footer, Modals
+│   │   ├── i18n/             # Multi-language locale bundles (en, hi, bn, ta, te)
+│   │   ├── pages/            # Assistant, Schemes, Apply, Status Dashboard
+│   │   └── services/         # API clients & client-side state store
+│   └── index.html
+├── rules-engine/             # Python FastAPI Microservice
+│   ├── app/                  # Evaluation rules & scheme predicates
+│   ├── tests/                # Scheme evaluation test suites
+│   └── requirements.txt
+├── docker-compose.yml        # Docker composition
+└── README.md
+```
+
+---
+
+## 📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.

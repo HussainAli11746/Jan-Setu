@@ -1,97 +1,117 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
+import { ChevronDown, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Menu, X } from 'lucide-react';
-import LanguageSelector from '../UI/LanguageSelector';
 
-const Navbar = () => {
-  const { t } = useTranslation();
-  const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
+export default function Navbar() {
+  const { t, i18n } = useTranslation();
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
 
-  const navLinks = [
-    { path: '/', label: t('nav.home') },
-    { path: '/track/demo-123', label: t('nav.track') },
-    { path: '/about', label: t('nav.about') },
+  const languages = [
+    { code: 'en', label: 'English' },
+    { code: 'hi', label: 'हिंदी (Hindi)' },
+    { code: 'bn', label: 'বাংলা (Bengali)' },
+    { code: 'ta', label: 'தமிழ் (Tamil)' },
+    { code: 'te', label: 'తెలుగు (Telugu)' },
   ];
 
+  const currentLang = languages.find(l => (i18n.language || 'en').startsWith(l.code)) || languages[0];
+
+  const handleLanguageChange = (code) => {
+    i18n.changeLanguage(code);
+    localStorage.setItem('i18nextLng', code);
+    setLangDropdownOpen(false);
+  };
+
   return (
-    <header className="bg-white sticky top-0 z-50" style={{ borderBottom: '1px solid #E5E2DC' }}>
-      {/* Tricolor accent bar */}
-      <div className="tricolor-bar" />
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200/80 transition-all">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        
+        {/* Brand Logo */}
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <div className="w-8 h-8 rounded-lg bg-[#0F172A] flex items-center justify-center text-white font-bold text-xs shadow-sm group-hover:scale-105 transition-transform">
+            <span className="text-orange-500 font-extrabold">J</span>
+            <span className="text-white font-extrabold">S</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[15px] font-bold text-[#0F172A] leading-none tracking-tight">JanSetu</span>
+            <span className="text-[9px] font-semibold text-slate-400 tracking-wider uppercase mt-0.5">AI Assistant</span>
+          </div>
+        </Link>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-14">
+        {/* Navigation Links */}
+        <nav className="flex items-center gap-6 sm:gap-8">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `text-[13px] font-semibold transition-colors pb-1 ${
+                isActive ? 'text-[#0F172A] border-b-2 border-[#0F172A]' : 'text-slate-600 hover:text-slate-900'
+              }`
+            }
+          >
+            {t('nav.home', 'Home')}
+          </NavLink>
 
-          {/* Wordmark */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div
-              className="w-8 h-8 rounded flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg, #E8601C 0%, #D04F0F 100%)' }}
-            >
-              JS
-            </div>
-            <div className="leading-tight">
-              <span className="block text-sm font-bold tracking-tight text-warm-900">JanSetu</span>
-              <span className="block text-[10px] font-medium uppercase tracking-widest" style={{ color: '#A8A29E' }}>AI Assistant</span>
-            </div>
-          </Link>
+          <NavLink
+            to="/applications"
+            className={({ isActive }) =>
+              `text-[13px] font-semibold transition-colors pb-1 ${
+                isActive ? 'text-[#0F172A] border-b-2 border-[#0F172A]' : 'text-slate-600 hover:text-slate-900'
+              }`
+            }
+          >
+            {t('nav.applications', 'My Applications')}
+          </NavLink>
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-sm font-medium transition-colors pb-0.5 ${
-                  location.pathname === link.path
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-warm-500 hover:text-warm-900'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <div style={{ width: 1, height: 20, background: '#E5E2DC' }} />
-            <LanguageSelector />
-          </nav>
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              `text-[13px] font-semibold transition-colors pb-1 ${
+                isActive ? 'text-[#0F172A] border-b-2 border-[#0F172A]' : 'text-slate-600 hover:text-slate-900'
+              }`
+            }
+          >
+            {t('nav.about', 'About')}
+          </NavLink>
 
-          {/* Mobile: language + menu */}
-          <div className="flex items-center gap-3 md:hidden">
-            <LanguageSelector compact />
+          {/* Language Selector Dropdown */}
+          <div className="relative">
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-1.5 rounded text-warm-500 hover:text-warm-800 hover:bg-warm-100 transition-colors"
+              onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+              className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-700 hover:text-slate-900 bg-slate-100/80 px-2.5 py-1.5 rounded-md transition-all hover:bg-slate-200/80 cursor-pointer"
+              aria-expanded={langDropdownOpen}
             >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              <span>{currentLang.label.split(' ')[0]}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
             </button>
-          </div>
-        </div>
-      </div>
 
-      {/* Mobile menu */}
-      {isOpen && (
-        <div className="md:hidden border-t" style={{ borderColor: '#E5E2DC', background: '#FAFAF8' }}>
-          <div className="px-4 py-3 space-y-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
-                className={`flex items-center px-3 py-2.5 rounded text-sm font-medium transition-colors ${
-                  location.pathname === link.path
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-warm-600 hover:bg-warm-100 hover:text-warm-900'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {langDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-1">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => handleLanguageChange(lang.code)}
+                    className={`w-full text-left px-3.5 py-2 text-xs font-medium transition-colors flex items-center justify-between cursor-pointer ${
+                      currentLang.code === lang.code
+                        ? 'bg-orange-50 text-orange-600 font-semibold'
+                        : 'text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span>{lang.label}</span>
+                    {currentLang.code === lang.code && <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      )}
+
+          {/* User Profile Avatar */}
+          <div className="w-8 h-8 rounded-full bg-[#0A1A3A] flex items-center justify-center text-white shadow-sm cursor-pointer hover:bg-slate-800 transition-colors">
+            <User className="w-4 h-4" />
+          </div>
+        </nav>
+      </div>
     </header>
   );
-};
-
-export default Navbar;
+}

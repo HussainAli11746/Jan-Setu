@@ -11,10 +11,10 @@ async def match_schemes(request: MatchRequest):
 
 @router.get('/schemes')
 async def list_schemes():
-    return {'schemes': list(SCHEMES.keys()), 'total': len(SCHEMES)}
+    return [{'id': k, **v} for k, v in SCHEMES.items()]
 
 @router.get('/schemes/{scheme_id}')
 async def get_scheme(scheme_id: str):
     if scheme_id in SCHEMES:
-        return SCHEMES[scheme_id]
+        return {'id': scheme_id, **SCHEMES[scheme_id]}
     return {"error": "Scheme not found"}

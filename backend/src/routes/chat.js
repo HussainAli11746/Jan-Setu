@@ -8,57 +8,84 @@ import { v4 as uuidv4 } from 'uuid';
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
+// Resilient in-memory session cache
+const memorySessions = new Map();
+
 router.post('/', async (req, res, next) => {
   try {
-    let { sessionId, message, language = 'en' } = req.body;
-    let session;
+    let { sessionId, message, language = 'en', profile: clientProfile = {}, lastAskedField = null } = req.body;
     let step = 1;
     let history = [];
 
-    if (sessionId) {
+    if (!sessionId) {
+      sessionId = uuidv4();
+    }
+
+    // Retrieve previous profile from in-memory cache or DB
+    let currentProfile = memorySessions.get(sessionId) || clientProfile || {};
+
+    try {
       const result = await pool.query('SELECT * FROM user_sessions WHERE session_id = $1', [sessionId]);
       if (result.rows.length > 0) {
-        session = result.rows[0];
-        step = session.current_step;
+        currentProfile = { ...result.rows[0].user_profile, ...currentProfile };
+        step = result.rows[0].current_step || step;
+      } else {
+        await pool.query(
+          'INSERT INTO user_sessions (session_id, language, current_step, user_profile) VALUES ($1, $2, $3, $4) ON CONFLICT (session_id) DO NOTHING',
+          [sessionId, language, 1, currentProfile]
+        );
       }
+    } catch (dbErr) {
+      console.warn("Database user_sessions sync warning:", dbErr.message);
     }
 
-    if (!session) {
-      sessionId = uuidv4();
-      const result = await pool.query(
-        'INSERT INTO user_sessions (session_id, language, current_step) VALUES ($1, $2, $3) RETURNING *',
-        [sessionId, language, 1]
-      );
-      session = result.rows[0];
-    }
-
-    const currentProfile = session.user_profile || {};
-    const newProfileData = await extractUserProfile(message, language, history);
+    // Extract newly provided entities with context of lastAskedField
+    const newProfileData = await extractUserProfile(message, language, history, lastAskedField);
     const mergedProfile = { ...currentProfile, ...newProfileData };
 
+    // Update memory session cache
+    memorySessions.set(sessionId, mergedProfile);
+
     let matchedSchemes = [];
-    if (Object.keys(mergedProfile).length > 2) {
-      matchedSchemes = await matchSchemes(mergedProfile);
-      if (matchedSchemes.length > 0) {
-        step = Math.max(step, 2);
+    if (Object.keys(mergedProfile).length >= 2) {
+      try {
+        matchedSchemes = await matchSchemes(mergedProfile);
+        if (matchedSchemes.length > 0) {
+          step = Math.max(step, 2);
+        }
+      } catch (err) {
+        console.warn("Scheme matching failed:", err.message);
       }
     }
 
-    await pool.query(
-      'UPDATE user_sessions SET user_profile = $1, current_step = $2, matched_scheme_ids = $3, updated_at = NOW() WHERE session_id = $4',
-      [mergedProfile, step, matchedSchemes.map(s => s.id), sessionId]
-    );
+    try {
+      await pool.query(
+        'UPDATE user_sessions SET user_profile = $1, current_step = $2, matched_scheme_ids = $3, updated_at = NOW() WHERE session_id = $4',
+        [mergedProfile, step, matchedSchemes.map(s => s.id), sessionId]
+      );
+    } catch (dbErr) {
+      // Ignored
+    }
 
-    const reply = await generateResponse(message, mergedProfile, matchedSchemes, language, step);
+    const responseObj = await generateResponse(message, mergedProfile, matchedSchemes, language, step, lastAskedField);
 
-    res.json({ reply, step, schemes: step >= 2 ? matchedSchemes : [], sessionId });
+    res.json({
+      reply: typeof responseObj === 'string' ? responseObj : responseObj.reply,
+      isComplete: responseObj.isComplete || false,
+      nextField: responseObj.nextField || null,
+      missingFields: responseObj.missingFields || [],
+      relevantSchemes: responseObj.relevantSchemes || [],
+      profile: mergedProfile,
+      step,
+      schemes: matchedSchemes,
+      sessionId
+    });
   } catch (error) {
     next(error);
   }
 });
 
 router.post('/transcribe', upload.single('audio'), (req, res) => {
-  // Mock transcription
   res.json({ text: 'मैं उत्तर प्रदेश का किसान हूं, मेरी आय 80,000 रुपये सालाना है' });
 });
 

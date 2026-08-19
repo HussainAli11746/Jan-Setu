@@ -5,7 +5,12 @@ import pool from '../db/pool.js';
 import { generateAuthUrl, handleCallback, extractDocumentFields, getRequiredDocs } from '../services/digilocker.js';
 
 const router = express.Router();
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+  lazyConnect: true,
+  retryStrategy: () => null,
+  maxRetriesPerRequest: 1
+});
+redis.on('error', () => {});
 
 router.post('/initiate', async (req, res, next) => {
   try {

@@ -4,7 +4,12 @@ import pool from '../db/pool.js';
 import { fillFormFields } from '../services/autoFill.js';
 
 const router = express.Router();
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+  lazyConnect: true,
+  retryStrategy: () => null,
+  maxRetriesPerRequest: 1
+});
+redis.on('error', () => {});
 
 const generateReferenceNumber = () => {
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
