@@ -1,12 +1,84 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-let client;
-if (process.env.CLAUDE_API_KEY && process.env.CLAUDE_API_KEY !== 'your_claude_api_key_here') {
-  client = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY });
+let geminiModel;
+if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your_gemini_api_key_here') {
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  geminiModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 }
+
+// ── Off-topic detection ──────────────────────────────────────────────────────
+const RELEVANT_KEYWORDS = [
+  // Occupations & situations
+  'farmer','kisan','kheti','krishi','agriculture','farming','crop',
+  'student','padhai','vidhyarthi','college','school','studying',
+  'vendor','thela','hawker','rehri','shopkeeper','dukan',
+  'laborer','majdoor','daily wage','shramik','worker','construction',
+  'unemployed','berozgar','housing','house','awas','makan','shelter',
+  // Schemes & government
+  'scheme','yojana','pm kisan','pmfby','pmay','svanidhi','mgnregs',
+  'scholarship','subsidy','benefit','government','sarkaar',
+  'welfare','social','assistance','eligibility','apply','application',
+  'sarkar','pradhan mantri','mukhyamantri','ration','bpl','apl',
+  // Profile fields
+  'income','aay','annual','salary','land','zameen','acres','bigha',
+  'caste','jati','sc','st','obc','general','rajya','district',
+  'rural','urban','pucca','kutcha','family','parivar','members',
+  'occupation','job','kaam','rozgar','pension','widow','divyang',
+  // Platform greetings/intent
+  'namaste','namaskar','help','madad','jan setu','jansetu',
+  'scheme','yojana','form','document','aadhaar','ration card',
+];
+
+// Phrases that are clearly off-topic — checked BEFORE keyword matching
+const OFF_TOPIC_PATTERNS = [
+  /mother.*name|father.*name|brother.*name|sister.*name/i,
+  /\b(cricket|football|movie|film|song|music|actor|actress|celebrity)\b/i,
+  /\b(recipe|cook|food|restaurant|hotel)\b/i,
+  /\b(weather|temperature|rain|today.*news)\b/i,
+  /\b(joke|funny|laugh|comedy)\b/i,
+  /\b(girlfriend|boyfriend|love|marriage|wedding)\b/i,
+  /\b(stock|crypto|bitcoin|share market|trading)\b/i,
+  /\b(game|gaming|pubg|fortnite|chess)\b/i,
+  /\b(password|hack|login.*issue|email.*problem)\b/i,
+];
+
+/**
+ * Returns true when the message appears to be about government welfare,
+ * schemes, the user's profile, or general platform interaction.
+ *
+ * Single-token replies (e.g. "Bihar", "OBC", "5000", "yes", "6lpa")
+ * are always treated as valid profile answers and bypass all checks.
+ * Multi-word messages are checked against off-topic patterns first,
+ * then must contain at least one relevant keyword.
+ */
+const isRelevantMessage = (message = '') => {
+  const lower = message.toLowerCase().trim();
+
+  // Single-token replies: no spaces → always a profile answer
+  // e.g. "Bihar", "OBC", "5000", "6lpa", "yes", "no", "rural", "SC"
+  if (/^\S+$/.test(lower)) return true;
+
+  // Explicitly off-topic patterns → reject immediately
+  if (OFF_TOPIC_PATTERNS.some((p) => p.test(lower))) return false;
+
+  // Multi-word message: must contain at least one relevant keyword
+  return RELEVANT_KEYWORDS.some((kw) => lower.includes(kw));
+};
+
+/** Polite off-topic response in the user's language. */
+const getOffTopicReply = (language = 'en') => {
+  const msgs = {
+    hi: 'कृपया Jan-Setu से संबंधित प्रश्न पूछें। मैं केवल सरकारी योजनाओं और आपकी पात्रता में सहायता कर सकता हूं।',
+    bn: 'অনুগ্রহ করে Jan-Setu সম্পর্কিত প্রশ্ন করুন। আমি শুধুমাত্র সরকারি প্রকল্প এবং আপনার যোগ্যতা বিষয়ে সাহায্য করতে পারি।',
+    ta: 'Jan-Setu தொடர்பான கேள்விகளை மட்டுமே கேளுங்கள். அரசு திட்டங்கள் மற்றும் தகுதி குறித்து மட்டுமே உதவ முடியும்.',
+    te: 'దయచేసి Jan-Setu సంబంధిత ప్రశ్నలు మాత్రమే అడగండి. ప్రభుత్వ పథకాలు మరియు అర్హత విషయంలో మాత్రమే సహాయం చేయగలను.',
+    en: 'Please ask questions related to Jan-Setu and government welfare schemes only. I can only help with scheme eligibility and your profile.',
+  };
+  return msgs[language] || msgs['en'];
+};
 
 // Convert written numbers to digits
 const wordToNumber = (text) => {
@@ -267,7 +339,7 @@ export const getDynamicMissingAttributes = (profile = {}) => {
 export const extractUserProfile = async (message, language = 'en', conversationHistory = [], lastAskedField = null) => {
   const parsed = parseTextEntities(message, lastAskedField);
 
-  if (client) {
+  if (geminiModel) {
     const prompt = `You are JanSetu AI. Extract ONLY the attributes EXPLICITLY mentioned in the user message.
 Last asked field: "${lastAskedField || 'none'}".
 User Message: "${message}"
@@ -277,18 +349,15 @@ Return valid JSON with only explicitly mentioned keys from:
 { occupation, income_annual, state, land_ownership, family_size, caste, has_pucca_house, residence_type }`;
 
     try {
-      const response = await client.messages.create({
-        model: 'claude-3-haiku-20240307',
-        max_tokens: 500,
-        messages: [{ role: 'user', content: prompt }]
-      });
-      const jsonMatch = response.content[0].text.match(/\{[\s\S]*\}/);
+      const result = await geminiModel.generateContent(prompt);
+      const text = result.response.text();
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const llmParsed = JSON.parse(jsonMatch[0]);
         return { ...parsed, ...llmParsed };
       }
     } catch (error) {
-      console.warn("Claude API fallback to rule parser:", error.message);
+      console.warn("Gemini API fallback to rule parser:", error.message);
     }
   }
 
@@ -296,10 +365,21 @@ Return valid JSON with only explicitly mentioned keys from:
 };
 
 export const generateResponse = async (userMessage, profile, schemes, language = 'en', step = 1, lastAskedField = null) => {
+  // ── Off-topic guard ─────────────────────────────────────────────────────────
+  if (!isRelevantMessage(userMessage)) {
+    return {
+      reply: getOffTopicReply(language),
+      nextField: lastAskedField,
+      missingFields: [],
+      relevantSchemes: [],
+      isComplete: false
+    };
+  }
+
   const { relevantSchemes, missingRequired } = getDynamicMissingAttributes(profile);
 
-  // If Claude client is available
-  if (client) {
+  // If Gemini model is available
+  if (geminiModel) {
     const prompt = `You are JanSetu AI, an empathetic Indian civic assistant.
 Language: ${language}.
 Current Verified Profile: ${JSON.stringify(profile)}.
@@ -312,23 +392,20 @@ Instructions:
 1. If missing REQUIRED criteria exist, ask ONLY for the first missing criterion: "${missingRequired[0]}".
 2. Do NOT ask about criteria irrelevant to the identified schemes (e.g. do NOT ask farmers about caste, do NOT ask students about land).
 3. If missing REQUIRED criteria is empty, confirm that you have collected the necessary details for their relevant schemes and invite them to review their information.
+4. If the user's message is completely unrelated to government schemes or welfare, politely say: "Please ask questions related to Jan-Setu and government welfare schemes."
 Keep response brief, natural, and helpful in ${language}.`;
 
     try {
-      const response = await client.messages.create({
-        model: 'claude-3-haiku-20240307',
-        max_tokens: 300,
-        messages: [{ role: 'user', content: prompt }]
-      });
+      const result = await geminiModel.generateContent(prompt);
       return {
-        reply: response.content[0].text,
+        reply: result.response.text(),
         nextField: missingRequired[0] || null,
         missingFields: missingRequired,
         relevantSchemes,
         isComplete: missingRequired.length === 0
       };
     } catch (error) {
-      console.warn("Claude API generateResponse fallback:", error.message);
+      console.warn("Gemini API generateResponse fallback:", error.message);
     }
   }
 
