@@ -5,10 +5,39 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [situationText, setSituationText] = useState('');
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const currentLang = (i18n.language || 'en').slice(0, 2);
+
+  const localizedBrowse = {
+    hi: 'मैन्युअल रूप से योजनाएं देखें',
+    bn: 'ম্যানুয়ালি প্রকল্প খুঁজুন',
+    ta: 'திட்டங்களை உலாவவும்',
+    te: 'పథకాలను మాన్యువల్‌గా చూడండి',
+    en: 'Browse Schemes manually',
+  };
+
+  const localizedStart = {
+    hi: isAuthenticated ? 'जन-सेतु सहायक खोलें' : 'जन-सेतु के साथ शुरू करें',
+    bn: isAuthenticated ? 'জন-সেতু সহকারী খুলুন' : 'জন-সেতুর সাথে শুরু করুন',
+    ta: isAuthenticated ? 'ஜன-சேது உதவியாளர்' : 'ஜன-சேது உடன் தொடங்குக',
+    te: isAuthenticated ? 'జన-సేతు అసిస్టెంట్' : 'జన-సేతుతో ప్రారంభించండి',
+    en: isAuthenticated ? 'Open JanSetu Assistant' : 'Start with JanSetu',
+  };
+
+  const localizedHeroBtn = {
+    hi: isAuthenticated ? 'AI सहायक खोलें' : 'निःशुल्क शुरू करें',
+    bn: isAuthenticated ? 'AI সহকারী খুলুন' : 'বিনামূল্যে শুরু করুন',
+    ta: isAuthenticated ? 'AI உதவியாளர்' : 'இலவசமாக தொடங்குக',
+    te: isAuthenticated ? 'AI అసిస్టెంట్' : 'ఉచితంగా ప్రారంభించండి',
+    en: isAuthenticated ? 'Open Assistant' : 'Get Started Free',
+  };
+
+  const browseManualText = localizedBrowse[currentLang] || localizedBrowse['en'];
+  const startBtnText = localizedStart[currentLang] || localizedStart['en'];
+  const heroBtnText = localizedHeroBtn[currentLang] || localizedHeroBtn['en'];
 
   const goToAssistant = () => {
     navigate(isAuthenticated ? '/assistant' : '/register-wall');
@@ -28,46 +57,46 @@ export default function Home() {
         {/* AI Badge */}
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDE9FE]/80 border border-[#DDD6FE] text-[#6D28D9] text-xs font-semibold mb-6 shadow-2xs">
           <Sparkles className="w-3.5 h-3.5 text-[#7C3AED]" />
-          <span>{t('home.ai_badge', 'AI-Powered Civic Assistant')}</span>
+          <span>{t('home.ai_badge', 'AI-Powered Citizen Assistant')}</span>
         </div>
 
         {/* Hero Title */}
-        <h1 className="text-4xl sm:text-5xl lg:text-5.5xl font-extrabold text-[#0B132B] tracking-tight leading-[1.15] max-w-3xl mb-5">
-          {t('home.hero_title_1', 'Find government schemes')} <br className="hidden sm:block" />
-          <span className="text-[#0B132B]">{t('home.hero_title_2', 'made for you.')}</span>
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] mb-5">
+          {t('home.hero_title_1', 'Find Government Schemes')}{' '}
+          <span className="bg-gradient-to-r from-[#F97316] via-orange-500 to-[#EA580C] bg-clip-text text-transparent">
+            {t('home.hero_title_2', 'Built For You.')}
+          </span>
         </h1>
 
-        {/* Hero Subtitle */}
-        <p className="text-slate-600 text-sm sm:text-base max-w-xl mb-9 leading-relaxed font-normal">
-          {t('home.hero_subtitle', 'Tell us about your situation in your own words. JanSetu finds schemes you may be eligible for and helps you apply seamlessly.')}
+        {/* Subtitle */}
+        <p className="text-slate-600 text-sm sm:text-base max-w-2xl leading-relaxed mb-8">
+          {t('home.hero_subtitle', 'Describe your situation in your own words. JanSetu matches you with eligible welfare programs and guides your application step-by-step.')}
         </p>
 
-        {/* Hero Search Box with Orange Action */}
-        <div
-          onClick={goToAssistant}
-          className="w-full max-w-2xl bg-white rounded-2xl p-2 sm:p-2.5 shadow-lg border border-slate-200/90 flex flex-col sm:flex-row items-center gap-2 mb-6 transition-all hover:border-orange-400 focus-within:ring-2 focus-within:ring-orange-500/20 focus-within:border-orange-500 cursor-pointer"
-        >
-          <div className="flex items-center gap-3 w-full px-3 py-1 cursor-pointer">
+        {/* Quick Search / Voice Input Bar */}
+        <div className="w-full max-w-xl bg-white p-2 rounded-2xl border border-slate-200/90 shadow-lg flex flex-col sm:flex-row items-center gap-2 mb-4">
+          <div className="flex items-center gap-3 px-3 py-2 w-full">
             <MessageSquare className="w-4 h-4 text-slate-400 shrink-0" />
             <input
               type="text"
-              readOnly
-              onClick={goToAssistant}
-              placeholder={t('home.input_placeholder', 'Describe your situation...')}
-              className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden cursor-pointer"
+              value={situationText}
+              onChange={(e) => setSituationText(e.target.value)}
+              placeholder={t('home.input_placeholder', 'Describe your situation (e.g. farmer with 2 acres...)')}
+              className="w-full text-xs sm:text-sm text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleStart(e);
+              }}
             />
           </div>
-          
+
           <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
               goToAssistant();
             }}
             className="w-full sm:w-auto shrink-0 bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white font-bold text-xs sm:text-[13px] px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
           >
             <Mic className="w-4 h-4" />
-            <span>{t('home.btn_story', isAuthenticated ? 'Open Assistant' : 'Get Started Free')}</span>
+            <span>{heroBtnText}</span>
           </button>
         </div>
 
@@ -77,7 +106,7 @@ export default function Home() {
             onClick={() => navigate('/schemes')}
             className="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 shadow-2xs hover:border-slate-300 transition-all flex items-center gap-2 cursor-pointer"
           >
-            <span>{t('home.browse_manual', 'Browse Schemes manually')}</span>
+            <span>{browseManualText}</span>
             <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
           </button>
         </div>
@@ -291,13 +320,13 @@ export default function Home() {
               className="w-full sm:w-auto bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-xs sm:text-[13px] px-7 py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-orange-500/25 transition-all cursor-pointer"
             >
               <Mic className="w-4 h-4" />
-              <span>{t('home.start_with_jansetu', isAuthenticated ? 'Open JanSetu Assistant' : 'Start with JanSetu')}</span>
+              <span>{startBtnText}</span>
             </button>
             <button
               onClick={() => navigate('/schemes')}
               className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-[13px] px-6 py-3.5 rounded-xl border border-white/20 transition-all cursor-pointer"
             >
-              <span>{t('home.browse_manual', 'Browse Schemes manually')}</span>
+              <span>{browseManualText}</span>
             </button>
           </div>
         </div>

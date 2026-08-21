@@ -166,7 +166,7 @@ export default function SchemesPage() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
 
-  const currentLang = i18n.language || 'en';
+  const currentLang = (i18n.language || 'en').slice(0, 2);
   const tPage = SCHEMES_PAGE_I18N[currentLang] || SCHEMES_PAGE_I18N['en'];
 
   const categories = [

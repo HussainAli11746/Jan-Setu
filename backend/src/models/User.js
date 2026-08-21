@@ -34,6 +34,22 @@ const userSchema = new mongoose.Schema({
     employmentStatus: { type: String, default: null },
     onboardingComplete: { type: Boolean, default: false },
   },
+  // Bookmarked / Saved Schemes
+  savedSchemes: [
+    {
+      id: { type: String, required: true },
+      name: { type: String, required: true },
+      shortName: { type: String },
+      ministry: { type: String },
+      category: { type: String },
+      description: { type: String },
+      benefit: { type: String },
+      eligibility: [String],
+      requiredDocs: [String],
+      applyUrl: { type: String },
+      savedAt: { type: Date, default: Date.now },
+    }
+  ],
 }, { timestamps: true });
 
 // Hash password before save

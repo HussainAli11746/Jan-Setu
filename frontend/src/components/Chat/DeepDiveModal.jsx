@@ -1,20 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { X, ExternalLink, CheckCircle2, FileText, AlertCircle, Bookmark, BookmarkCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
 export default function DeepDiveModal({ scheme, onClose, colors }) {
   const { i18n } = useTranslation();
-  const lang = i18n.language || 'en';
+  const lang = (i18n.language || 'en').slice(0, 2);
+  const { isSchemeSaved, saveScheme, removeSavedScheme } = useAuth();
 
-  const [isSaved, setIsSaved] = useState(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('jansetu_saved_schemes') || '[]');
-      return saved.some((s) => s.id === scheme.id || s === scheme.id);
-    } catch {
-      return false;
-    }
-  });
+  const isSaved = isSchemeSaved(scheme.id);
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
@@ -25,33 +20,24 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
   const labels = {
     about: lang === 'hi' ? 'योजना का विवरण' : lang === 'bn' ? 'প্রকল্প সম্পর্কে' : lang === 'ta' ? 'திட்டம் பற்றி' : lang === 'te' ? 'పథకం గురించి' : 'About this scheme',
     eligibility: lang === 'hi' ? 'पात्रता मापदंड' : lang === 'bn' ? 'যোগ্যতার মানদণ্ড' : lang === 'ta' ? 'தகுதி வரம்புகள்' : lang === 'te' ? 'అర్హత ప్రమాణాలు' : 'Eligibility Criteria',
-    documents: lang === 'hi' ? 'आवश्यक दस्तावेज' : lang === 'bn' ? 'প্রয়োজনীয় ডকুমেন্টস' : lang === 'ta' ? 'தேவையான ஆவணங்கள்' : lang === 'te' ? 'அవసరమైన పత్రాలు' : 'Required Documents',
-    disclaimer: lang === 'hi' ? 'पात्रता राज्य नीतियों और योजना उपलब्धता के अनुसार भिन्न हो सकती है। आवेदन करने से पहले आधिकारिक पोर्टल पर वर्तमान मानदंडों की पुष्टि करें।' : 'Eligibility may vary based on state policies and scheme availability. Visit the official portal to verify current criteria before applying.',
+    documents: lang === 'hi' ? 'आवश्यक दस्तावेज' : lang === 'bn' ? 'প্রয়োজনীয় ডকুমেন্টস' : lang === 'ta' ? 'தேவையான ஆவணங்கள்' : lang === 'te' ? 'అవసరమైన పత్రాలు' : 'Required Documents',
+    disclaimer: lang === 'hi' ? 'पात्रता राज्य नीतियों और योजना उपलब्धता के अनुसार भिन्न हो सकती है। आवेदन करने से पहले आधिकारिक पोर्टल पर वर्तमान मानदंडों की पुष्टि करें।' : lang === 'bn' ? 'যোগ্যতা রাজ্য নীতি এবং প্রকল্পের প্রাপ্যতার উপর নির্ভর করে পরিবর্তিত হতে পারে। আবেদন করার আগে অফিসিয়াল পোর্টালে বর্তমান মানদণ্ড যাচাই করুন।' : lang === 'ta' ? 'மாநில கொள்கைகள் மற்றும் திட்ட கிடைக்கும் தன்மைக்கு ஏற்ப தகுதி மாறுபடலாம். விண்ணப்பிக்கும் முன் அதிகாரப்பூர்வ தளத்தில் சரிபார்க்கவும்.' : lang === 'te' ? 'రాష్ట్ర విధానాలు మరియు పథకం లభ్యత ఆధారంగా అర్హత మారవచ్చు. దరఖాస్తు చేయడానికి ముందు అధికారిక పోర్టల్‌లో ప్రస్తుత నిబంధనలను ధృవీకరించండి.' : 'Eligibility may vary based on state policies and scheme availability. Visit the official portal to verify current criteria before applying.',
     close: lang === 'hi' ? 'बंद करें' : lang === 'bn' ? 'বন্ধ করুন' : lang === 'ta' ? 'மூடு' : lang === 'te' ? 'మూసివేయి' : 'Close',
     apply: lang === 'hi' ? 'आधिकारिक पोर्टल' : lang === 'bn' ? 'অফিসিয়াল পোর্টাল' : lang === 'ta' ? 'அதிகாரப்பூர்வ தளம்' : lang === 'te' ? 'అధికారిక పోర్టల్' : 'Apply on Official Site',
     saveScheme: lang === 'hi' ? 'योजना सहेजें' : lang === 'bn' ? 'সংরক্ষণ করুন' : lang === 'ta' ? 'சேமிக்கவும்' : lang === 'te' ? 'సేవ్ చేయండి' : 'Save Scheme',
     saved: lang === 'hi' ? 'सहेजा गया ✓' : lang === 'bn' ? 'সংরক্ষিত ✓' : lang === 'ta' ? 'சேமிக்கப்பட்டது ✓' : lang === 'te' ? 'సేవ్ చేయబడింది ✓' : 'Saved ✓',
-    savedToast: lang === 'hi' ? 'योजना आपके बुकमार्क में सहेजी गई!' : 'Scheme saved to your bookmarks!',
-    unsavedToast: lang === 'hi' ? 'योजना बुकमार्क से हटाई गई' : 'Scheme removed from bookmarks',
-    keyBenefit: lang === 'hi' ? 'मुख्य लाभ' : 'Key Benefit',
+    savedToast: lang === 'hi' ? 'योजना आपके बुकमार्क में सहेजी गई!' : lang === 'bn' ? 'প্রকল্পটি আপনার বুকমার্কে সংরক্ষিত হয়েছে!' : lang === 'ta' ? 'திட்டம் சேமிக்கப்பட்டது!' : lang === 'te' ? 'పథకం విజయవంతంగా సేవ్ చేయబడింది!' : 'Scheme saved to your bookmarks!',
+    unsavedToast: lang === 'hi' ? 'योजना बुकमार्क से हटाई गई' : lang === 'bn' ? 'প্রকল্প বুকমার্ক থেকে সরানো হয়েছে' : lang === 'ta' ? 'திட்டம் நீக்கப்பட்டது' : lang === 'te' ? 'పథకం తొలగించబడింది' : 'Scheme removed from bookmarks',
+    keyBenefit: lang === 'hi' ? 'मुख्य लाभ' : lang === 'bn' ? 'মূল সুবিধা' : lang === 'ta' ? 'முக்கிய நன்மை' : lang === 'te' ? 'ప్రధాన ప్రయోజనం' : 'Key Benefit',
   };
 
   const handleToggleSave = () => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('jansetu_saved_schemes') || '[]');
-      let updated;
-      if (isSaved) {
-        updated = saved.filter((s) => (typeof s === 'object' ? s.id !== scheme.id : s !== scheme.id));
-        setIsSaved(false);
-        toast(labels.unsavedToast, { icon: '🗑️' });
-      } else {
-        updated = [...saved, { id: scheme.id, name: scheme.name, category: scheme.category, benefit: scheme.benefit, savedAt: new Date().toISOString() }];
-        setIsSaved(true);
-        toast.success(labels.savedToast);
-      }
-      localStorage.setItem('jansetu_saved_schemes', JSON.stringify(updated));
-    } catch (err) {
-      console.error('Error saving scheme:', err);
+    if (isSaved) {
+      removeSavedScheme(scheme.id);
+      toast(labels.unsavedToast, { icon: '🗑️' });
+    } else {
+      saveScheme(scheme);
+      toast.success(labels.savedToast);
     }
   };
 

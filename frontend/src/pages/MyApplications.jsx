@@ -90,7 +90,7 @@ const APPS_I18N = {
 export default function MyApplications() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
-  const currentLang = i18n.language || 'en';
+  const currentLang = (i18n.language || 'en').slice(0, 2);
   const t = APPS_I18N[currentLang] || APPS_I18N['en'];
 
   const [applications, setApplications] = useState([]);

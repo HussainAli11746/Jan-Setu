@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import {
   ChevronDown, User, LogOut, MessageSquare, FileText,
-  Sparkles, CheckCircle2, Shield, Settings, Compass, Globe
+  Sparkles, CheckCircle2, Shield, Settings, Compass, Globe, Bookmark
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
@@ -11,7 +11,7 @@ import LanguageChangeModal from '../Common/LanguageChangeModal';
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
-  const { isAuthenticated, user, logout, updateLanguage } = useAuth();
+  const { isAuthenticated, user, logout, updateLanguage, savedSchemes = [] } = useAuth();
   const navigate = useNavigate();
 
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -80,6 +80,7 @@ export default function Navbar() {
       about: 'परिचय',
       assistant: 'सहायक',
       myProfile: 'मेरा प्रोफाइल',
+      savedSchemes: 'सहेजी गई योजनाएँ',
       browseSchemes: 'योजनाएँ देखें',
       verifiedCitizen: 'सत्यापित नागरिक',
       signIn: 'साइन इन',
@@ -89,10 +90,11 @@ export default function Navbar() {
     bn: {
       home: 'হোম',
       applications: 'আমার আবেদন',
-      about: 'পরিচিতি',
+      about: 'সম্পর্কে',
       assistant: 'সহকারী',
       myProfile: 'আমার প্রোফাইল',
-      browseSchemes: 'প্রকল্প দেখুন',
+      savedSchemes: 'সংরক্ষিত প্রকল্প',
+      browseSchemes: 'প্রকল্প ব্রাউজ করুন',
       verifiedCitizen: 'যাচাইকৃত নাগরিক',
       signIn: 'সাইন ইন',
       register: 'নিবন্ধন',
@@ -100,13 +102,14 @@ export default function Navbar() {
     },
     ta: {
       home: 'முகப்பு',
-      applications: 'எனது விண்ணப்பங்கள்',
-      about: 'எங்களை பற்றி',
+      applications: 'விண்ணப்பங்கள்',
+      about: 'பற்றி',
       assistant: 'உதவியாளர்',
-      myProfile: 'எனது சுயவிவரம்',
-      browseSchemes: 'திட்டங்களை உலாவுங்கள்',
+      myProfile: 'சுயவிவரம்',
+      savedSchemes: 'சேமிக்கப்பட்ட திட்டங்கள்',
+      browseSchemes: 'திட்டங்கள்',
       verifiedCitizen: 'சரிபார்க்கப்பட்ட குடிமகன்',
-      signIn: 'உள்நுழைய',
+      signIn: 'உள்நுழைக',
       register: 'பதிவு செய்க',
       signOut: 'வெளியேறு',
     },
@@ -116,7 +119,8 @@ export default function Navbar() {
       about: 'గురించి',
       assistant: 'అసిస్టెంట్',
       myProfile: 'నా ప్రొఫైల్',
-      browseSchemes: 'పథకాలను బ్రౌజ్ చేయండి',
+      savedSchemes: 'సేవ్ చేసిన పథకాలు',
+      browseSchemes: 'పథకాలు బ్రౌజ్ చేయండి',
       verifiedCitizen: 'ధృవీకరించబడిన పౌరుడు',
       signIn: 'సైన్ ఇన్',
       register: 'నమోదు చేయండి',
@@ -128,6 +132,7 @@ export default function Navbar() {
       about: 'About',
       assistant: 'Assistant',
       myProfile: 'My Profile',
+      savedSchemes: 'Saved Schemes',
       browseSchemes: 'Browse Schemes',
       verifiedCitizen: 'Verified Citizen',
       signIn: 'Sign In',
@@ -232,7 +237,22 @@ export default function Navbar() {
 
             {/* Auth section */}
             {isAuthenticated ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                {/* Saved Schemes (Shifted to right of navbar) */}
+                <Link
+                  to="/profile?tab=saved"
+                  title={nav.savedSchemes || 'Saved Schemes'}
+                  className="flex items-center gap-1.5 text-[12px] font-semibold text-amber-900 bg-amber-50 hover:bg-amber-100/90 border border-amber-200/80 px-2.5 sm:px-3 py-1.5 rounded-lg transition-all shadow-2xs cursor-pointer"
+                >
+                  <Bookmark className="w-3.5 h-3.5 fill-amber-500 text-amber-600 shrink-0" />
+                  <span className="hidden sm:inline">{nav.savedSchemes || 'Saved Schemes'}</span>
+                  {savedSchemes.length > 0 && (
+                    <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-amber-200 text-amber-900 leading-none">
+                      {savedSchemes.length}
+                    </span>
+                  )}
+                </Link>
+
                 {/* Assistant CTA */}
                 <Link
                   to="/assistant"
@@ -287,6 +307,15 @@ export default function Navbar() {
                         >
                           <User className="w-4 h-4 text-slate-400" />
                           <span>{nav.myProfile}</span>
+                        </Link>
+
+                        <Link
+                          to="/profile?tab=saved"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"
+                        >
+                          <Bookmark className="w-4 h-4 text-amber-500" />
+                          <span>{nav.savedSchemes || 'Saved Schemes'}</span>
                         </Link>
 
                         <Link

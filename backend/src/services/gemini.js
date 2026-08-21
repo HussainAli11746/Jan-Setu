@@ -2,15 +2,26 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 dotenv.config();
 
-let geminiModel;
-if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.startsWith('AIzaSy')) {
+let genAI = null;
+if (process.env.GEMINI_API_KEY) {
   try {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    geminiModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   } catch (err) {
-    console.warn('Gemini model init failed:', err.message);
+    console.error('Failed to initialize GoogleGenerativeAI:', err.message);
   }
 }
+
+const getGeminiModel = () => {
+  if (!genAI) return null;
+  // Use gemini-2.5-flash which is the active supported model for this API key
+  return genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash',
+    generationConfig: {
+      responseMimeType: 'application/json',
+      temperature: 0.3,
+    },
+  });
+};
 
 const LANGUAGE_NAMES = {
   hi: 'Hindi (हिंदी)',
@@ -35,21 +46,19 @@ const OFF_TOPIC_PATTERNS = [
 
 const isOffTopic = (msg) => OFF_TOPIC_PATTERNS.some((p) => p.test(msg));
 
-/** Polite off-topic response in the target language. */
 const getOffTopicReply = (language = 'en') => {
   const msgs = {
     hi: 'कृपया जन-सेतु और सरकारी कल्याणकारी योजनाओं से संबंधित प्रश्न ही पूछें। मैं केवल योजनाओं की पात्रता और सहायता में मदद कर सकता हूं।',
     bn: 'অনুগ্রহ করে জন-সেতু এবং সরকারি কল্যাণমূলক প্রকল্প সম্পর্কিত প্রশ্ন করুন। আমি শুধুমাত্র সরকারি প্রকল্পের যোগ্যতায় সাহায্য করতে পারি।',
     ta: 'தயவுசெய்து அரசு நலத்திட்டங்கள் தொடர்பான கேள்விகளை மட்டும் கேளுங்கள். திட்டங்களின் தகுதி குறித்து மட்டுமே உதவ முடியும்.',
     te: 'దయచేసి ప్రభుత్వ సంక్షేమ పథకాలకు సంబంధించిన ప్రశ్నలు మాత్రమే అడగండి. పథకాల అర్హత విషయంలో మాత్రమే నేను సహాయం చేయగలను.',
-    en: 'I can only help with Indian government welfare schemes and eligibility. Please ask about schemes related to agriculture, education, housing, employment, or social welfare.',
+    en: 'I can only help with Indian government welfare schemes and eligibility. Please ask about schemes related to agriculture, education, housing, employment, internships, or social welfare.',
   };
   return msgs[language] || msgs['en'];
 };
 
 /**
- * Calls Gemini to suggest 5-6 relevant Indian government schemes based on
- * the user's message, profile, selected language, and conversation history.
+ * Calls Gemini directly with the user prompt, profile, language, and conversation history.
  */
 export const suggestSchemes = async (userMessage, profile = {}, language = 'en', history = []) => {
   const targetLanguageName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES['en'];
@@ -65,22 +74,22 @@ export const suggestSchemes = async (userMessage, profile = {}, language = 'en',
   // Format citizen demographic background
   const profileSummary = Object.entries(profile)
     .filter(([, v]) => v)
-    .map(([k, v]) => `• ${k}: ${v}`)
-    .join('\n') || '• Not specified';
+    .map(([k, v]) => `- ${k}: ${v}`)
+    .join('\n') || '- Not specified';
 
-  // Format recent conversation history (last 4-6 turns)
+  // Format recent conversation history
   const formattedHistory = (history || [])
     .slice(-6)
     .filter(h => h.text)
     .map(h => `${h.sender === 'user' ? 'Citizen' : 'JanSetu AI'}: "${h.text.replace(/\n/g, ' ')}"`)
     .join('\n') || 'None (First message in conversation)';
 
-  const prompt = `You are JanSetu AI, an expert, compassionate Indian civic welfare assistant dedicated to connecting citizens with government schemes.
+  const prompt = `You are JanSetu AI, an expert Indian government civic welfare assistant.
 
 CITIZEN PROFILE:
 ${profileSummary}
 
-PRIOR CONVERSATION HISTORY:
+CONVERSATION HISTORY:
 ${formattedHistory}
 
 LATEST CITIZEN QUERY / PROMPT:
@@ -88,46 +97,57 @@ LATEST CITIZEN QUERY / PROMPT:
 
 TARGET LANGUAGE: ${targetLanguageName} (Code: ${language})
 
-CRITICAL GUIDELINES:
-1. OUTPUT LANGUAGE: Write the ENTIRE text of your response in ${targetLanguageName} (including reply, scheme names, descriptions, eligibility criteria, and required docs).
-2. DIRECT RELEVANCE: If the citizen asks for a specific category (e.g. housing, education, farming, health, loans), suggest 5 to 6 government schemes that STRICTLY match that requested domain. Do NOT mix unrelated schemes.
-3. CONVERSATIONAL DIRECT ANSWER: In the "reply" field, provide a polite, helpful 1-2 sentence response directly answering their inquiry in ${targetLanguageName}.
+CRITICAL MANDATORY INSTRUCTIONS:
+1. OUTPUT MUST BE STRICTLY VALID JSON matching the schema below.
+2. RELEVANCE: Search and return 5 to 6 Indian central/state government schemes or initiatives that DIRECTLY match what the user is asking in "${userMessage}".
+   - If user asks for "internship" / "apprenticeship" / "skills", return Prime Minister's Internship Scheme (PMIS), NATS, NAPS, PMKVY 4.0, TULIP (The Urban Learning Internship Program), etc.
+   - If user asks for "housing", return PMAY-G, PMAY-U, CLSS, ARHC, etc.
+   - If user asks for "farming", return PM-KISAN, PMFBY, KCC, etc.
+   - Do NOT return healthcare or unrelated schemes if the user asks for internships or housing!
+3. LANGUAGE: All output text (including the conversational "reply", scheme "name", "ministry", "description", "benefit", "eligibility" points, and "requiredDocs" points) MUST be written in ${targetLanguageName}.
 
-Format your response strictly as valid JSON matching this structure (no markdown backticks or commentary):
+JSON SCHEMA TO RETURN:
 {
-  "reply": "Direct response in ${targetLanguageName}",
+  "reply": "Polite, helpful direct response to the user's question in ${targetLanguageName}",
   "schemes": [
     {
-      "id": "scheme_id_lowercase_underscore",
-      "name": "Full Scheme Name in ${targetLanguageName}",
+      "id": "scheme_id_lowercase",
+      "name": "Full Official Name in ${targetLanguageName}",
       "shortName": "Acronym",
-      "ministry": "Ministry/Department Name in ${targetLanguageName}",
-      "category": "agriculture|education|housing|health|employment|business|social|skill",
-      "description": "2-3 sentence summary in ${targetLanguageName}",
-      "benefit": "Key benefit or financial subsidy in ${targetLanguageName}",
+      "ministry": "Ministry / Department in ${targetLanguageName}",
+      "category": "skill|education|employment|housing|agriculture|health|business|social",
+      "description": "2-3 sentence overview in ${targetLanguageName}",
+      "benefit": "Key financial assistance, stipend, or subsidy in ${targetLanguageName}",
       "eligibility": ["Eligibility point 1 in ${targetLanguageName}", "Eligibility point 2 in ${targetLanguageName}"],
-      "requiredDocs": ["Doc 1 in ${targetLanguageName}", "Doc 2 in ${targetLanguageName}"],
-      "applyUrl": "https://official-government-portal.gov.in"
+      "requiredDocs": ["Document 1 in ${targetLanguageName}", "Document 2 in ${targetLanguageName}"],
+      "applyUrl": "https://official-portal.gov.in"
     }
   ]
 }`;
 
-  if (geminiModel) {
+  const model = getGeminiModel();
+  if (model) {
     try {
-      const result = await geminiModel.generateContent(prompt);
+      console.log(`[Gemini API] Querying Gemini for prompt: "${userMessage}" in language: ${language}`);
+      const result = await model.generateContent(prompt);
       const text = result.response.text().trim();
 
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
-        if (parsed.schemes && parsed.schemes.length > 0) return parsed;
+        if (parsed.schemes && parsed.schemes.length > 0) {
+          console.log(`[Gemini API] Successfully returned ${parsed.schemes.length} schemes from live Gemini!`);
+          return parsed;
+        }
       }
     } catch (err) {
-      console.warn('Gemini API query error, using domain-matched fallback:', err.message);
+      console.error('[Gemini API Error] Falling back to domain catalog:', err.message);
     }
+  } else {
+    console.warn('[Gemini API] Model not initialized, using fallback catalog');
   }
 
-  // Fallback: return strict domain-matched schemes (5-6 schemes)
+  // Fallback domain-matched schemes
   return getLocalizedFallbackSchemes(userMessage, language);
 };
 
@@ -141,8 +161,87 @@ const getLocalizedFallbackSchemes = (message, language = 'en') => {
   let schemes = [];
   let topicLabel = '';
 
-  // 1. HOUSING & SHELTER SCHEMES (Strictly housing only)
-  if (/housing|house|home|awas|makan|shelter|pucca|kutcha|dwelling|मकान|घर|आवास|गृह|আবাসন|வீடு|வீட்டு|గృహ|ఇల్లు/i.test(lower)) {
+  // 1. INTERNSHIPS, SKILLS, APPRENTICESHIP & YOUTH TRAINING
+  if (/intern|internship|apprentice|skill|training|kaushal|trainee|stipend|fellowship|योजना|इंटर्नशिप|प्रशिक्षु|कौशल|ইন্টার্নশিপ|பயிற்சி|ఇంటర్న్‌షిప్/i.test(lower)) {
+    topicLabel = isHi ? 'इंटर्नशिप और कौशल प्रशिक्षण' : isBn ? 'ইন্টার্নশিপ ও দক্ষতা উন্নয়ন' : isTa ? 'இன்டர்ன்ஷிப் & திறன் பயிற்சி' : isTe ? 'ఇంటర్న్‌షిప్ & నైపుణ్య శిక్షణ' : 'Internships and Skill Apprenticeships';
+    schemes = [
+      {
+        id: 'pm_internship_scheme',
+        name: isHi ? 'प्रधानमंत्री इंटर्नशिप योजना (PMIS)' : "Prime Minister's Internship Scheme (PMIS)",
+        shortName: 'PMIS',
+        ministry: isHi ? 'कॉर्पोरेट कार्य मंत्रालय' : 'Ministry of Corporate Affairs',
+        category: 'skill',
+        description: isHi ? 'भारत की शीर्ष 500 कंपनियों में युवाओं को 12 महीने की वास्तविक व्यावसायिक इंटर्नशिप और मासिक वजीफा।' : '12-month internship opportunities in top 500 companies in India with monthly financial assistance and real industry exposure.',
+        benefit: isHi ? '₹5,000 प्रति माह वजीफा (स्टाइपेंड) + ₹6,000 एकमुश्त अनुदान' : '₹5,000 / month stipend + ₹6,000 one-time grant',
+        eligibility: isHi ? ['आयु 21-24 वर्ष', '10वीं/12वीं/आईटीआई/पॉलिटेक्निक/ग्रेजुएट', 'पारिवारिक आय < ₹8 लाख'] : ['Age 21-24 years', '10th/12th/ITI/Diploma/Graduate', 'Family income < ₹8L'],
+        requiredDocs: isHi ? ['आधार कार्ड', 'शैक्षणिक मार्कशीट', 'बैंक खाता (DBT)'] : ['Aadhaar Card', 'Educational Certificates', 'Bank Account'],
+        applyUrl: 'https://pminternship.mca.gov.in',
+      },
+      {
+        id: 'nats_apprenticeship',
+        name: isHi ? 'राष्ट्रीय शिक्षुता प्रशिक्षण योजना (NATS)' : 'National Apprenticeship Training Scheme (NATS)',
+        shortName: 'NATS',
+        ministry: isHi ? 'शिक्षा मंत्रालय' : 'Ministry of Education',
+        category: 'skill',
+        description: isHi ? 'डिप्लोमा और इंजीनियरिंग/ग्रेजुएट पास युवाओं के लिए प्रतिष्ठित उद्योगों में 1 वर्ष का व्यावहारिक प्रशिक्षण।' : '1-year on-the-job apprenticeship training for fresh engineering graduates, diploma holders, and general stream graduates.',
+        benefit: isHi ? '₹8,000 से ₹9,000 प्रति माह सरकारी सहायता प्राप्त वजीफा' : 'Monthly stipend up to ₹9,000 with government DBT share',
+        eligibility: isHi ? ['डिग्री अथवा डिप्लोमा धारक (अंतिम 3 वर्षों में उत्तीर्ण)'] : ['Degree/Diploma holder passed within last 3 years'],
+        requiredDocs: isHi ? ['आधार कार्ड', 'डिग्री/डिप्लोमा प्रमाण पत्र', 'बैंक पासबुक'] : ['Aadhaar Card', 'Degree/Diploma Certificate', 'Bank Passbook'],
+        applyUrl: 'https://nats.education.gov.in',
+      },
+      {
+        id: 'naps_scheme',
+        name: isHi ? 'राष्ट्रीय शिक्षुता संवर्धन योजना (NAPS)' : 'National Apprenticeship Promotion Scheme (NAPS)',
+        shortName: 'NAPS',
+        ministry: isHi ? 'कौशल विकास एवं उद्यमिता मंत्रालय' : 'Ministry of Skill Development & Entrepreneurship',
+        category: 'skill',
+        description: isHi ? 'आईटीआई और गैर-आईटीआई युवाओं को उद्योगों में शिक्षुता (Apprenticeship) के साथ मासिक वित्तीय सहयोग।' : 'Direct financial support to apprentices in manufacturing and service industries across India.',
+        benefit: isHi ? 'वजीफे का 25% (₹1,500/माह तक) सीधा सरकारी भुगतान' : 'Government pays 25% of stipend (up to ₹1,500/month)',
+        eligibility: isHi ? ['न्यूनतम आयु 14 वर्ष', '5वीं पास से आईटीआई/स्नातक'] : ['Minimum age 14 years', '5th pass to ITI/Graduate'],
+        requiredDocs: isHi ? ['आधार कार्ड', 'अंकतालिका', 'पासपोर्ट फोटो'] : ['Aadhaar Card', 'Academic Marksheet', 'Photo'],
+        applyUrl: 'https://www.apprenticeshipindia.gov.in',
+      },
+      {
+        id: 'tulip_internship',
+        name: isHi ? 'द अर्बन लर्निंग इंटर्नशिप प्रोग्राम (TULIP)' : 'The Urban Learning Internship Program (TULIP)',
+        shortName: 'TULIP',
+        ministry: isHi ? 'आवासन और शहरी कार्य मंत्रालय एवं AICTE' : 'Ministry of Housing & Urban Affairs & AICTE',
+        category: 'skill',
+        description: isHi ? 'स्मार्ट शहरों और नगर निगमों में स्नातक छात्रों के लिए शहरी विकास और प्रशासन इंटर्नशिप।' : 'Internship opportunities with Urban Local Bodies and Smart Cities for fresh graduates.',
+        benefit: isHi ? 'मासिक वजीफा + भारत सरकार से इंटर्नशिप प्रमाण पत्र' : 'Monthly stipend + Official Government Internship Certificate',
+        eligibility: isHi ? ['B.Tech / B.Arch / B.Plan / BA / B.Com / BSc स्नातक (18 माह के भीतर)'] : ['Fresh graduates within 18 months of graduation'],
+        requiredDocs: isHi ? ['आधार कार्ड', 'कॉलेज डिग्री / प्रोविजनल', 'बायोडाटा (CV)'] : ['Aadhaar Card', 'College Degree', 'Resume/CV'],
+        applyUrl: 'https://internship.aicte-india.org',
+      },
+      {
+        id: 'pmkvy4',
+        name: isHi ? 'प्रधानमंत्री कौशल विकास योजना 4.0 (PMKVY 4.0)' : 'PM Kaushal Vikas Yojana 4.0 (PMKVY 4.0)',
+        shortName: 'PMKVY',
+        ministry: isHi ? 'कौशल विकास एवं उद्यमिता मंत्रालय' : 'Ministry of Skill Development',
+        category: 'skill',
+        description: isHi ? 'एआई, कोडिंग, रोबोटिक्स, 3डी प्रिंटिंग व नए उद्योगों में मुफ्त अल्पकालिक कौशल प्रशिक्षण व प्लेसमेंट।' : 'Free industry 4.0 skill training in AI, robotics, drones, coding, and traditional trades with placement assistance.',
+        benefit: isHi ? '100% मुफ्त प्रशिक्षण + राष्ट्रीय कौशल प्रमाण पत्र + ₹8,000 प्रोत्साहन' : '100% free training + Government certification + ₹8,000 reward',
+        eligibility: isHi ? ['आयु 15-45 वर्ष', 'भारतीय नागरिक'] : ['Age 15-45', 'Indian citizen'],
+        requiredDocs: isHi ? ['आधार कार्ड', 'बैंक खाता', 'शैक्षणिक दस्तावेज'] : ['Aadhaar Card', 'Bank Account', 'Education proof'],
+        applyUrl: 'https://www.pmkvyofficial.org',
+      },
+      {
+        id: 'ddu_gky',
+        name: isHi ? 'दीन दयाल उपाध्याय ग्रामीण कौशल्य योजना (DDU-GKY)' : 'Deen Dayal Upadhyaya Grameen Kaushalya Yojana',
+        shortName: 'DDU-GKY',
+        ministry: isHi ? 'ग्रामीण विकास मंत्रालय' : 'Ministry of Rural Development',
+        category: 'skill',
+        description: isHi ? 'ग्रामीण गरीब युवाओं के लिए आवासीय कौशल प्रशिक्षण और गारंटीड रोजगार इंटर्नशिप।' : 'Placement-linked residential skill development training for rural poor youth.',
+        benefit: isHi ? 'मुफ्त भोजन, आवास, यूनिफॉर्म, टैबलेट + गारंटीड नौकरी' : 'Free boarding, lodging, uniform, tablet + Guaranteed job placement',
+        eligibility: isHi ? ['ग्रामीण युवा', 'आयु 15-35 वर्ष (महिला/दिव्यांग 45 तक)', 'गरीब परिवार'] : ['Rural youth', 'Age 15-35', 'Poor household'],
+        requiredDocs: isHi ? ['आधार कार्ड', 'राशन कार्ड / BPL प्रमाण', 'स्कूल अंकतालिका'] : ['Aadhaar', 'Ration Card / BPL proof', 'Marksheet'],
+        applyUrl: 'https://ddugky.gov.in',
+      }
+    ];
+  }
+
+  // 2. HOUSING & SHELTER SCHEMES (Strictly housing only)
+  else if (/housing|house|home|awas|makan|shelter|pucca|kutcha|dwelling|मकान|घर|आवास|गृह|আবাসন|வீடு|வீட்டு|గృహ|ఇల్లు/i.test(lower)) {
     topicLabel = isHi ? 'आवास और मकान निर्माण' : isBn ? 'আবাসন ও গৃহায়ন' : isTa ? 'வீட்டு வசதி' : isTe ? 'గృహ నిర్మాణం' : 'Housing and Home Assistance';
     schemes = [
       {
@@ -220,7 +319,7 @@ const getLocalizedFallbackSchemes = (message, language = 'en') => {
     ];
   }
 
-  // 2. EDUCATION & SCHOLARSHIPS (Strictly education only)
+  // 3. EDUCATION & SCHOLARSHIPS (Strictly education only)
   else if (/educat|school|college|student|scholar|fee|admission|study|matric|degree|शिक्षा|छात्र|पढ़ाई|छात्रवृत्ति|স্কলারশিপ|கல்வி|చదువు/i.test(lower)) {
     topicLabel = isHi ? 'शिक्षा और छात्रवृत्ति' : isBn ? 'শিক্ষা ও বৃত্তি' : isTa ? 'கல்வி மற்றும் உதவித்தொகை' : isTe ? 'విద్య మరియు స్కాలర్‌షిప్‌లు' : 'Education and Scholarships';
     schemes = [
@@ -299,7 +398,7 @@ const getLocalizedFallbackSchemes = (message, language = 'en') => {
     ];
   }
 
-  // 3. AGRICULTURE & FARMING SCHEMES (Strictly agriculture only)
+  // 4. AGRICULTURE & FARMING SCHEMES (Strictly agriculture only)
   else if (/farm|kisan|agricultur|crop|land|irrigation|fertilizer|seed|tractor|किसान|खेती|फसल|सिंचाई|কৃষি|விவசாயம்|వ్యవసాయం/i.test(lower)) {
     topicLabel = isHi ? 'कृषि और किसान कल्याण' : isBn ? 'কৃষি ও কৃষক কল্যাণ' : isTa ? 'விவசாயம் & உழவர் நலம்' : isTe ? 'వ్యవసాయం & రైతుల సంక్షేమం' : 'Agriculture and Farming';
     schemes = [
@@ -378,7 +477,7 @@ const getLocalizedFallbackSchemes = (message, language = 'en') => {
     ];
   }
 
-  // 4. HEALTH & MEDICAL SCHEMES (Strictly health only)
+  // 5. HEALTH & MEDICAL SCHEMES (Strictly health only)
   else if (/health|medical|doctor|hospital|ayushman|swasthya|treatment|disease|इलाज|स्वास्थ्य|अस्पताल|दवा|বীমা|மருத்துவம்|వైద్యం/i.test(lower)) {
     topicLabel = isHi ? 'स्वास्थ्य और चिकित्सा' : isBn ? 'স্বাস্থ্য ও চিকিৎসা' : isTa ? 'சுகாதாரம் & மருத்துவம்' : isTe ? 'ఆరోగ్యం & వైద్యం' : 'Health and Medical Insurance';
     schemes = [
@@ -457,7 +556,7 @@ const getLocalizedFallbackSchemes = (message, language = 'en') => {
     ];
   }
 
-  // 5. BUSINESS, LOANS & LIVELIHOOD (Strictly business only)
+  // 6. BUSINESS, LOANS & LIVELIHOOD (Strictly business only)
   else if (/loan|business|vendor|shop|mudra|svanidhi|credit|msme|startup|व्यापार|दुकान|ऋण|लोन|ব্যবসা|வணிகம்|వ్యాపారం/i.test(lower)) {
     topicLabel = isHi ? 'व्यवसाय और स्वरोजगार ऋण' : isBn ? 'ব্যবসা ও ঋণ' : isTa ? 'வணிகம் & கடன்கள்' : isTe ? 'వ్యాపారం & రుణాలు' : 'Business and Micro-Credit';
     schemes = [
@@ -536,7 +635,7 @@ const getLocalizedFallbackSchemes = (message, language = 'en') => {
     ];
   }
 
-  // 6. DEFAULT GENERAL MIX (Only if query is broad or general like "help me")
+  // 7. DEFAULT GENERAL MIX (Only if query is completely generic like "hello")
   else {
     topicLabel = isHi ? 'प्रमुख कल्याणकारी योजनाएं' : isBn ? 'প্রধান সরকারি প্রকল্প' : isTa ? 'முக்கிய அரசு திட்டங்கள்' : isTe ? 'ముఖ్యమైన ప్రభుత్వ పథకాలు' : 'Government Welfare Schemes';
     schemes = [

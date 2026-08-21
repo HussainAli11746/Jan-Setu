@@ -75,14 +75,15 @@ function getProfileSummary(profile) {
 export default function Assistant() {
   const { user, token, updateLanguage } = useAuth();
   const { i18n } = useTranslation();
-  const currentLang = i18n.language || 'en';
+  const currentLang = (i18n.language || 'en').slice(0, 2);
   const profile = user?.profile || {};
 
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const getGreeting = useCallback((lang = currentLang) => {
-    const fn = GREETINGS_BY_LANG[lang] || GREETINGS_BY_LANG['en'];
+    const langCode = (lang || 'en').slice(0, 2);
+    const fn = GREETINGS_BY_LANG[langCode] || GREETINGS_BY_LANG['en'];
     const firstName = user?.name ? user.name.split(' ')[0] : '';
     return fn(firstName);
   }, [currentLang, user]);
@@ -95,6 +96,21 @@ export default function Assistant() {
       schemes: [],
     }
   ]);
+
+  // Keep initial greeting in sync when language changes globally
+  useEffect(() => {
+    setMessages(prev => {
+      if (prev.length === 1 && prev[0].id === 'greeting') {
+        return [{
+          id: 'greeting',
+          sender: 'bot',
+          text: getGreeting(currentLang),
+          schemes: [],
+        }];
+      }
+      return prev;
+    });
+  }, [currentLang, getGreeting]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);

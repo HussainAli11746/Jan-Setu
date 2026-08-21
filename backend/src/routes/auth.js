@@ -27,6 +27,7 @@ router.post('/register', async (req, res) => {
       password,
       language,
       profile: { language },
+      savedSchemes: [],
     });
     const token = generateToken(user._id);
 
@@ -38,6 +39,7 @@ router.post('/register', async (req, res) => {
         email: user.email,
         language: user.language,
         profile: user.profile,
+        savedSchemes: user.savedSchemes || [],
       },
     });
   } catch (err) {
@@ -75,6 +77,7 @@ router.post('/login', async (req, res) => {
         email: user.email,
         language: user.language || user.profile?.language || 'en',
         profile: user.profile,
+        savedSchemes: user.savedSchemes || [],
       },
     });
   } catch (err) {
@@ -94,6 +97,7 @@ router.get('/me', verifyToken, async (req, res) => {
       email: user.email,
       language: user.language || user.profile?.language || 'en',
       profile: user.profile,
+      savedSchemes: user.savedSchemes || [],
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch user' });
@@ -132,6 +136,7 @@ router.patch('/profile', verifyToken, async (req, res) => {
       email: user.email,
       language: user.language,
       profile: user.profile,
+      savedSchemes: user.savedSchemes || [],
     });
   } catch (err) {
     console.error('Profile update error:', err);
@@ -158,10 +163,77 @@ router.patch('/language', verifyToken, async (req, res) => {
       id: user._id,
       language: user.language,
       profile: user.profile,
+      savedSchemes: user.savedSchemes || [],
     });
   } catch (err) {
     console.error('Language update error:', err);
     res.status(500).json({ error: 'Failed to update language' });
+  }
+});
+
+// GET /api/auth/saved-schemes — retrieve all saved schemes
+router.get('/saved-schemes', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user.savedSchemes || []);
+  } catch (err) {
+    console.error('Failed to get saved schemes:', err);
+    res.status(500).json({ error: 'Failed to get saved schemes' });
+  }
+});
+
+// POST /api/auth/saved-schemes — save a scheme
+router.post('/saved-schemes', verifyToken, async (req, res) => {
+  try {
+    const { scheme } = req.body;
+    if (!scheme || !scheme.id) {
+      return res.status(400).json({ error: 'Scheme data is required' });
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Check if already saved
+    const exists = user.savedSchemes.some(s => s.id === scheme.id);
+    if (!exists) {
+      user.savedSchemes.push({
+        id: scheme.id,
+        name: scheme.name || scheme.shortName || 'Government Scheme',
+        shortName: scheme.shortName,
+        ministry: scheme.ministry,
+        category: scheme.category || 'social',
+        description: scheme.description,
+        benefit: scheme.benefit,
+        eligibility: scheme.eligibility || [],
+        requiredDocs: scheme.requiredDocs || [],
+        applyUrl: scheme.applyUrl,
+        savedAt: new Date(),
+      });
+      await user.save();
+    }
+
+    res.json({ success: true, savedSchemes: user.savedSchemes });
+  } catch (err) {
+    console.error('Failed to save scheme:', err);
+    res.status(500).json({ error: 'Failed to save scheme' });
+  }
+});
+
+// DELETE /api/auth/saved-schemes/:schemeId — remove a saved scheme
+router.delete('/saved-schemes/:schemeId', verifyToken, async (req, res) => {
+  try {
+    const { schemeId } = req.params;
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.savedSchemes = user.savedSchemes.filter(s => s.id !== schemeId);
+    await user.save();
+
+    res.json({ success: true, savedSchemes: user.savedSchemes });
+  } catch (err) {
+    console.error('Failed to remove saved scheme:', err);
+    res.status(500).json({ error: 'Failed to remove saved scheme' });
   }
 });
 

@@ -143,7 +143,7 @@ export default function Register() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
 
-  const currentLang = i18n.language || 'en';
+  const currentLang = (i18n.language || 'en').slice(0, 2);
   const t = REGISTER_I18N[currentLang] || REGISTER_I18N['en'];
 
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });

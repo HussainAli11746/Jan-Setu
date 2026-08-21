@@ -4,8 +4,28 @@ import { Mic, Search, MessageSquare, ShieldCheck, Cpu, ArrowRight, Sparkles, Bui
 import { useTranslation } from 'react-i18next';
 
 export default function About() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const currentLang = (i18n.language || 'en').slice(0, 2);
+
+  const localizedBrowse = {
+    hi: 'मैन्युअल रूप से योजनाएं देखें',
+    bn: 'ম্যানুয়ালি প্রকল্প খুঁজুন',
+    ta: 'திட்டங்களை உலாவவும்',
+    te: 'పథకాలను మాన్యువల్‌గా చూడండి',
+    en: 'Browse Schemes manually',
+  };
+
+  const localizedVoice = {
+    hi: 'वॉइस सहायक आज़माएं',
+    bn: 'ভয়েস সহকারী চেষ্টা করুন',
+    ta: 'குரல் உதவியாளர்',
+    te: 'వాయిస్ అసిస్టెంట్‌ని ప్రయత్నించండి',
+    en: 'Try Voice Assistant',
+  };
+
+  const browseManualText = localizedBrowse[currentLang] || localizedBrowse['en'];
+  const tryVoiceText = localizedVoice[currentLang] || localizedVoice['en'];
 
   return (
     <div className="min-h-screen bg-[#FBFBFA] py-12 px-4 sm:px-6">
@@ -34,14 +54,14 @@ export default function About() {
               className="bg-[#0A1633] hover:bg-slate-900 text-white text-xs font-bold px-6 py-3.5 rounded-xl flex items-center gap-2 shadow-sm transition-all cursor-pointer"
             >
               <Mic className="w-4 h-4" />
-              <span>{t('about.try_voice', 'Try Voice Assistant')}</span>
+              <span>{tryVoiceText}</span>
             </button>
 
             <button
               onClick={() => navigate('/schemes')}
               className="bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold px-6 py-3.5 rounded-xl border border-slate-300 shadow-2xs transition-all cursor-pointer"
             >
-              <span>{t('about.browse_manual', 'Browse Schemes manually')}</span>
+              <span>{browseManualText}</span>
             </button>
           </div>
 

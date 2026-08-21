@@ -7,7 +7,7 @@ import SchemeCard from './SchemeCard';
 export default function SchemeSlider({ schemes = [], onAskMore, queryText = '' }) {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
-  const currentLang = i18n.language || 'en';
+  const currentLang = (i18n.language || 'en').slice(0, 2);
 
   const labels = {
     hi: {

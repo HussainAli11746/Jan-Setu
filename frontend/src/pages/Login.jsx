@@ -100,7 +100,7 @@ export default function Login() {
   const location = useLocation();
   const from = location.state?.from || '/';
 
-  const currentLang = i18n.language || 'en';
+  const currentLang = (i18n.language || 'en').slice(0, 2);
   const t = LOGIN_I18N[currentLang] || LOGIN_I18N['en'];
 
   const [form, setForm] = useState({ email: '', password: '' });

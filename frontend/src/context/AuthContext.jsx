@@ -8,9 +8,16 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem('jansetu_token'));
+  const [savedSchemes, setSavedSchemes] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('jansetu_saved_schemes') || '[]');
+    } catch {
+      return [];
+    }
+  });
   const [loading, setLoading] = useState(true);
 
-  // On mount, verify token and rehydrate user + sync language
+  // On mount, verify token and rehydrate user + sync language and saved schemes
   useEffect(() => {
     const storedToken = localStorage.getItem('jansetu_token');
     const storedUser = localStorage.getItem('jansetu_user');
@@ -19,6 +26,11 @@ export function AuthProvider({ children }) {
         const parsed = JSON.parse(storedUser);
         setUser(parsed);
         setToken(storedToken);
+
+        if (Array.isArray(parsed.savedSchemes)) {
+          setSavedSchemes(parsed.savedSchemes);
+          localStorage.setItem('jansetu_saved_schemes', JSON.stringify(parsed.savedSchemes));
+        }
 
         const userLang = parsed.language || parsed.profile?.language;
         if (userLang && userLang !== i18n.language) {
@@ -58,6 +70,11 @@ export function AuthProvider({ children }) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Login failed');
     _persist(data.token, data.user);
+
+    if (Array.isArray(data.user.savedSchemes)) {
+      setSavedSchemes(data.user.savedSchemes);
+      localStorage.setItem('jansetu_saved_schemes', JSON.stringify(data.user.savedSchemes));
+    }
 
     const userLang = data.user.language || data.user.profile?.language;
     if (userLang) {
@@ -127,6 +144,72 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Save / Bookmark a scheme to DB and state
+  const saveScheme = async (scheme) => {
+    if (!scheme || !scheme.id) return;
+    const item = {
+      id: scheme.id,
+      name: scheme.name || scheme.shortName || 'Government Scheme',
+      shortName: scheme.shortName,
+      ministry: scheme.ministry,
+      category: scheme.category || 'social',
+      description: scheme.description,
+      benefit: scheme.benefit,
+      eligibility: scheme.eligibility || [],
+      requiredDocs: scheme.requiredDocs || [],
+      applyUrl: scheme.applyUrl,
+      savedAt: new Date().toISOString(),
+    };
+
+    const exists = savedSchemes.some(s => s.id === scheme.id);
+    if (!exists) {
+      const updated = [item, ...savedSchemes];
+      setSavedSchemes(updated);
+      localStorage.setItem('jansetu_saved_schemes', JSON.stringify(updated));
+
+      const storedToken = localStorage.getItem('jansetu_token') || token;
+      if (storedToken) {
+        try {
+          await fetch(`${API_BASE}/auth/saved-schemes`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${storedToken}`,
+            },
+            body: JSON.stringify({ scheme: item }),
+          });
+        } catch (err) {
+          console.warn('Failed to sync saved scheme to DB:', err);
+        }
+      }
+    }
+  };
+
+  // Remove a saved scheme from DB and state
+  const removeSavedScheme = async (schemeId) => {
+    const updated = savedSchemes.filter(s => s.id !== schemeId);
+    setSavedSchemes(updated);
+    localStorage.setItem('jansetu_saved_schemes', JSON.stringify(updated));
+
+    const storedToken = localStorage.getItem('jansetu_token') || token;
+    if (storedToken) {
+      try {
+        await fetch(`${API_BASE}/auth/saved-schemes/${schemeId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+      } catch (err) {
+        console.warn('Failed to sync scheme deletion to DB:', err);
+      }
+    }
+  };
+
+  const isSchemeSaved = (schemeId) => {
+    return savedSchemes.some(s => s.id === schemeId);
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -149,6 +232,10 @@ export function AuthProvider({ children }) {
       user,
       token,
       loading,
+      savedSchemes,
+      saveScheme,
+      removeSavedScheme,
+      isSchemeSaved,
       isAuthenticated,
       isOnboarded,
       register,
