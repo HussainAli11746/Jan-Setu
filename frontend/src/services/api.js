@@ -438,6 +438,25 @@ export const matchUserSchemes = async (profile) => {
   }
 };
 
+// 4.1 Browse Paginated Schemes
+export const fetchBrowseSchemes = async ({ page = 1, limit = 6, category = 'all', search = '' }) => {
+  try {
+    const { data } = await api.get('/schemes', {
+      params: { page, limit, category, search },
+    });
+    return data;
+  } catch (error) {
+    console.warn('Failed to fetch paginated schemes, using fallback:', error);
+    return {
+      schemes: INITIAL_SCHEMES.slice((page - 1) * limit, page * limit),
+      total: INITIAL_SCHEMES.length,
+      page,
+      limit,
+      hasMore: page * limit < INITIAL_SCHEMES.length,
+    };
+  }
+};
+
 // 5. DigiLocker OAuth & Consent Simulation
 export const initiateDigiLocker = async (schemeId) => {
   try {

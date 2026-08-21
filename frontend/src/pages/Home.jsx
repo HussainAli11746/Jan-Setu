@@ -2,15 +2,21 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mic, ArrowRight, ShieldCheck, Cpu, MessageSquare, Tractor, Home as HomeIcon, Store, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 
 export default function Home() {
   const { t } = useTranslation();
   const [situationText, setSituationText] = useState('');
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const goToAssistant = () => {
+    navigate(isAuthenticated ? '/assistant' : '/register-wall');
+  };
 
   const handleStart = (e) => {
     e?.preventDefault();
-    navigate('/assistant', { state: { initialText: situationText } });
+    goToAssistant();
   };
 
   return (
@@ -38,7 +44,7 @@ export default function Home() {
 
         {/* Hero Search Box with Orange Action */}
         <div
-          onClick={() => navigate('/assistant', { state: { initialText: situationText } })}
+          onClick={goToAssistant}
           className="w-full max-w-2xl bg-white rounded-2xl p-2 sm:p-2.5 shadow-lg border border-slate-200/90 flex flex-col sm:flex-row items-center gap-2 mb-6 transition-all hover:border-orange-400 focus-within:ring-2 focus-within:ring-orange-500/20 focus-within:border-orange-500 cursor-pointer"
         >
           <div className="flex items-center gap-3 w-full px-3 py-1 cursor-pointer">
@@ -46,7 +52,7 @@ export default function Home() {
             <input
               type="text"
               readOnly
-              onClick={() => navigate('/assistant')}
+              onClick={goToAssistant}
               placeholder={t('home.input_placeholder', 'Describe your situation...')}
               className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden cursor-pointer"
             />
@@ -56,12 +62,23 @@ export default function Home() {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              navigate('/assistant');
+              goToAssistant();
             }}
             className="w-full sm:w-auto shrink-0 bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white font-bold text-xs sm:text-[13px] px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
           >
             <Mic className="w-4 h-4" />
-            <span>{t('home.btn_story', 'Tell us your story')}</span>
+            <span>{t('home.btn_story', isAuthenticated ? 'Open Assistant' : 'Get Started Free')}</span>
+          </button>
+        </div>
+
+        {/* Hero Secondary Actions */}
+        <div className="flex items-center gap-3 mb-6">
+          <button
+            onClick={() => navigate('/schemes')}
+            className="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 shadow-2xs hover:border-slate-300 transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <span>{t('home.browse_manual', 'Browse Schemes manually')}</span>
+            <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
           </button>
         </div>
 
@@ -268,13 +285,21 @@ export default function Home() {
             {t('home.cta_desc', "Just tell JanSetu your situation. We'll securely match you with the right programs and guide you through the application.")}
           </p>
 
-          <button
-            onClick={() => navigate('/assistant')}
-            className="z-10 bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-xs sm:text-[13px] px-7 py-3.5 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-orange-500/25 transition-all cursor-pointer"
-          >
-            <Mic className="w-4 h-4" />
-            <span>{t('home.start_with_jansetu', 'Start with JanSetu')}</span>
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-3 z-10">
+            <button
+              onClick={goToAssistant}
+              className="w-full sm:w-auto bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-xs sm:text-[13px] px-7 py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-orange-500/25 transition-all cursor-pointer"
+            >
+              <Mic className="w-4 h-4" />
+              <span>{t('home.start_with_jansetu', isAuthenticated ? 'Open JanSetu Assistant' : 'Start with JanSetu')}</span>
+            </button>
+            <button
+              onClick={() => navigate('/schemes')}
+              className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-[13px] px-6 py-3.5 rounded-xl border border-white/20 transition-all cursor-pointer"
+            >
+              <span>{t('home.browse_manual', 'Browse Schemes manually')}</span>
+            </button>
+          </div>
         </div>
       </section>
 

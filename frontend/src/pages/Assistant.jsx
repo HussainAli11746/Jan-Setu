@@ -1,480 +1,491 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  Mic, Send, Bot, Info, ArrowRight, CheckCircle2,
-  Loader2, Edit3, Check, RotateCcw
-} from 'lucide-react';
-import { sendMessage } from '../services/api';
+import { Send, Bot, Mic, Loader2, Sparkles, RotateCcw, User, Globe, ChevronDown } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import SchemeCard from '../components/Chat/SchemeCard';
+import SchemeSlider from '../components/Chat/SchemeSlider';
+import LanguageChangeModal from '../components/Common/LanguageChangeModal';
 import toast from 'react-hot-toast';
 
-// Fields that should only appear in the review screen if they were actually collected
-const REVIEW_FIELDS = [
-  { key: 'occupation',     label_key: 'assistant.occupation',     label: 'Occupation',      always: true },
-  { key: 'annualIncome',   label_key: 'assistant.annual_income',  label: 'Annual Income',   always: true },
-  { key: 'location',       label_key: 'assistant.location',       label: 'Location',        always: true },
-  { key: 'familyMembers',  label_key: 'assistant.family_members', label: 'Family Members',  always: false },
-  { key: 'landOwnership',  label_key: 'assistant.land_ownership', label: 'Land Ownership',  always: false, occupations: ['Farmer'] },
-  { key: 'caste',          label_key: 'assistant.caste',          label: 'Category',        always: false, occupations: ['Student'] },
-  { key: 'residence_type', label_key: 'assistant.residence_type', label: 'Area Type',       always: false },
-  { key: 'has_pucca_house',label_key: 'assistant.housing_type',   label: 'Housing Type',    always: false },
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+
+const LANGUAGES = [
+  { code: 'en', label: 'English', native: 'English' },
+  { code: 'hi', label: 'Hindi', native: 'हिंदी' },
+  { code: 'bn', label: 'Bengali', native: 'বাংলা' },
+  { code: 'ta', label: 'Tamil', native: 'தமிழ்' },
+  { code: 'te', label: 'Telugu', native: 'తెలుగు' },
 ];
 
-const formatHousingType = (val) => {
-  if (val === true) return 'Pucca house (permanent)';
-  if (val === false) return 'Kutcha / temporary dwelling';
-  return null;
+const QUICK_PROMPTS_BY_LANG = {
+  hi: [
+    'मुझे शिक्षा और छात्रवृत्ति से संबंधित योजनाएँ चाहिए',
+    'किसानों और कृषि के लिए योजनाएं दिखाएं',
+    'आवास सहायता योजनाएं खोजें',
+    'स्वास्थ्य और आयुष्मान योजनाएं बताएं',
+    'युवाओं के लिए रोजगार और कौशल योजनाएं',
+  ],
+  bn: [
+    'আমাকে শিক্ষা এবং বৃত্তি সম্পর্কিত প্রকল্প দেখান',
+    'কৃষকদের জন্য কৃষি প্রকল্প দেখান',
+    'আবাসন সহায়তা প্রকল্প খুঁজুন',
+    'স্বাস্থ্য বীমা প্রকল্প সম্পর্কে জানান',
+    'যুবকদের জন্য কর্মসংস্থান প্রকল্প',
+  ],
+  ta: [
+    'கல்வி மற்றும் உதவித்தொகை திட்டங்களை எனக்குக் காட்டுங்கள்',
+    'விவசாயிகளுக்கான திட்டங்களை காட்டுங்கள்',
+    'வீட்டு வசதி உதவித் திட்டங்கள்',
+    'மருத்துவ காப்பீட்டு திட்டங்கள்',
+    'வேலைவாய்ப்பு மற்றும் திறன் திட்டங்கள்',
+  ],
+  te: [
+    'నాకు విద్య మరియు స్కాలర్‌షిప్ పథకాలు కావాలి',
+    'రైతుల కోసం వ్యవసాయ పథకాలను చూపించండి',
+    'గృహ నిర్మాణ సహాయ పథకాలు',
+    'ఆరోగ్య బీమా పథకాల గురించి చెప్పండి',
+    'యువత కోసం ఉపాధి పథకాలు',
+  ],
+  en: [
+    'I want education and scholarship schemes',
+    'Show me farming and agriculture schemes',
+    'Find housing assistance schemes',
+    'I need health insurance schemes',
+    'Employment and skill schemes for youth',
+  ],
 };
 
-const formatResidenceType = (val) => {
-  if (!val) return null;
-  return val.charAt(0).toUpperCase() + val.slice(1);
+const GREETINGS_BY_LANG = {
+  hi: (name) => `नमस्ते${name ? `, ${name}` : ''}! 👋 मैं जन-सेतु AI हूँ। आप किस प्रकार की सरकारी योजनाएँ खोजना चाहते हैं?\n\nआप पूछ सकते हैं: *"मुझे शिक्षा संबंधित योजनाएँ चाहिए"* या *"किसानों के लिए योजनाएं दिखाएं"*।`,
+  bn: (name) => `নমস্কার${name ? `, ${name}` : ''}! 👋 আমি জন-সেতু AI। আপনি কোন ধরনের সরকারি প্রকল্প খুঁজছেন?\n\nআপনি বলতে পারেন: *"আমাকে শিক্ষা সম্পর্কিত প্রকল্প দেখান"*।`,
+  ta: (name) => `வணக்கம்${name ? `, ${name}` : ''}! 👋 நான் ஜன-சேது AI. உங்களுக்கு என்ன அரசு நலத்திட்டங்கள் தேவை?\n\nஉதாரணம்: *"கல்வி உதவித்தொகை திட்டங்களை காட்டுங்கள்"*।`,
+  te: (name) => `నమస్తే${name ? `, ${name}` : ''}! 👋 నేను జన-సేతు AI. మీరు ఎలాంటి ప్రభుత్వ సంక్షేమ పథకాల కోసం చూస్తున్నారు?\n\nఉదాహరణ: *"నాకు విద్య పథకాలు కావాలి"*।`,
+  en: (name) => `Namaste${name ? `, ${name}` : ''}! 👋 I'm JanSetu AI. Tell me what kind of government schemes you're looking for and I'll find the most relevant ones for you.\n\nYou can ask things like *"I want education schemes"* or *"Show me farming schemes"*.`,
 };
+
+function getProfileSummary(profile) {
+  if (!profile) return null;
+  const parts = [];
+  if (profile.occupation) parts.push(profile.occupation);
+  if (profile.state) parts.push(profile.state);
+  if (profile.incomeBracket) parts.push(`income ${profile.incomeBracket}`);
+  return parts.length > 0 ? parts.join(' · ') : null;
+}
 
 export default function Assistant() {
-  const { t, i18n } = useTranslation();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { user, token, updateLanguage } = useAuth();
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language || 'en';
+  const profile = user?.profile || {};
 
-  // Compute greeting based on current language
-  const getGreeting = useCallback(() =>
-    t('assistant.bot_greeting',
-      "Namaste! Tell me about yourself — your occupation, family situation, income, and location. I'll help find the government schemes you may be eligible for."
-    ),
-  [t, i18n.language] // eslint-disable-line
-  );
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-  const [messages, setMessages] = useState(() => [{ sender: 'bot', text: getGreeting() }]);
-  const [inputVal, setInputVal] = useState(location.state?.initialText || '');
-  const [isListening, setIsListening] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [showUnderstood, setShowUnderstood] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
-  const [lastAskedField, setLastAskedField] = useState(null);
-  const [isEditingInline, setIsEditingInline] = useState(false);
-  const [relevantSchemes, setRelevantSchemes] = useState([]);
+  const getGreeting = useCallback((lang = currentLang) => {
+    const fn = GREETINGS_BY_LANG[lang] || GREETINGS_BY_LANG['en'];
+    const firstName = user?.name ? user.name.split(' ')[0] : '';
+    return fn(firstName);
+  }, [currentLang, user]);
 
-  // Profile — null values mean "not collected yet" (distinct from empty string)
-  const [profile, setProfile] = useState(() => {
-    try {
-      const saved = sessionStorage.getItem('jansetu_chat_profile');
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
+  const [messages, setMessages] = useState(() => [
+    {
+      id: 'greeting',
+      sender: 'bot',
+      text: getGreeting(currentLang),
+      schemes: [],
     }
-  });
-
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [pendingLanguage, setPendingLanguage] = useState(null);
   const messagesEndRef = useRef(null);
-  const chatInputRef = useRef(null);
+  const inputRef = useRef(null);
 
-  // Re-generate greeting whenever language changes
+  // Close language dropdown on outside click
   useEffect(() => {
-    setMessages(prev => {
-      const newGreeting = getGreeting();
-      // Only update the first message if it was the bot greeting
-      if (prev.length > 0 && prev[0].sender === 'bot') {
-        return [{ sender: 'bot', text: newGreeting }, ...prev.slice(1)];
+    const handleOutsideClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setLangDropdownOpen(false);
       }
-      return prev;
-    });
-  }, [i18n.language]); // eslint-disable-line
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, showUnderstood, isComplete]);
+  }, [messages, loading]);
 
   useEffect(() => {
-    if (chatInputRef.current) chatInputRef.current.focus();
-  }, [showUnderstood]);
+    inputRef.current?.focus();
+  }, []);
 
-  useEffect(() => {
-    if (location.state?.initialText) {
-      handleSendText(location.state.initialText);
-    }
-  }, []); // eslint-disable-line
-
-  const handleStartOver = () => {
-    sessionStorage.removeItem('jansetu_chat_profile');
-    setProfile({});
-    setMessages([{ sender: 'bot', text: getGreeting() }]);
-    setIsComplete(false);
-    setShowUnderstood(false);
-    setIsEditingInline(false);
-    setLastAskedField(null);
-    setRelevantSchemes([]);
-    setInputVal('');
+  const handleSelectLanguage = (lang) => {
+    setLangDropdownOpen(false);
+    if (lang.code === currentLang) return;
+    setPendingLanguage(lang);
   };
 
-  const handleVoiceToggle = () => {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      toast.error('Voice input is not supported in this browser.');
-      return;
-    }
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    const langMap = { hi: 'hi-IN', bn: 'bn-IN', ta: 'ta-IN', te: 'te-IN' };
-    recognition.lang = langMap[i18n.language] || 'en-IN';
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    if (!isListening) {
-      setIsListening(true);
-      toast(t('chat.listening', 'Listening... Speak now'), { icon: '🎙️' });
-      recognition.start();
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setInputVal(transcript);
-        setIsListening(false);
-        handleSendText(transcript);
-      };
-      recognition.onerror = () => { setIsListening(false); toast.error('Voice input ended'); };
-      recognition.onend = () => setIsListening(false);
+  // Language Change Confirmation Handler: updates i18n, saves to DB, and RESTARTS the chat
+  const handleConfirmLanguageChange = async () => {
+    if (!pendingLanguage) return;
+    const newLangCode = pendingLanguage.code;
+    const langObj = pendingLanguage;
+    setPendingLanguage(null);
+
+    if (updateLanguage) {
+      await updateLanguage(newLangCode);
     } else {
-      setIsListening(false);
+      i18n.changeLanguage(newLangCode);
+      localStorage.setItem('i18nextLng', newLangCode);
     }
+
+    // Restart chat completely in the newly selected language
+    const newGreeting = getGreeting(newLangCode);
+    setMessages([
+      {
+        id: 'greeting',
+        sender: 'bot',
+        text: newGreeting,
+        schemes: [],
+      }
+    ]);
+    setInput('');
+
+    const toastMsg = newLangCode === 'hi'
+      ? `भाषा बदलकर ${langObj.native} कर दी गई! चैट रीस्टार्ट हो गई।`
+      : `Language changed to ${langObj.native}! Chat restarted.`;
+    toast.success(toastMsg);
   };
 
-  const handleSend = (e) => {
-    e?.preventDefault();
-    if (!inputVal.trim()) return;
-    handleSendText(inputVal);
-  };
-
-  const handleSendText = async (text) => {
-    setMessages(prev => [...prev, { sender: 'user', text }]);
-    setInputVal('');
+  const sendMessage = async (text) => {
+    if (!text.trim() || loading) return;
+    const userMsg = { id: Date.now(), sender: 'user', text };
+    setMessages(prev => [...prev, userMsg]);
+    setInput('');
     setLoading(true);
+
     try {
-      const response = await sendMessage(text, i18n.language || 'en', undefined, profile, lastAskedField);
-      if (response?.reply) {
-        setMessages(prev => [...prev, { sender: 'bot', text: response.reply }]);
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          message: text,
+          profile,
+          language: currentLang,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Request failed');
       }
-      if (response?.profile) {
-        const backendP = response.profile;
-        const updated = {
-          ...profile,
-          ...backendP,
-          // Normalize display fields
-          annualIncome: backendP.annualIncome
-            || (backendP.income_annual != null ? `₹${Number(backendP.income_annual).toLocaleString('en-IN')}` : profile.annualIncome),
-          location: backendP.location || backendP.state || profile.location,
-          familyMembers: backendP.familyMembers
-            || (backendP.family_size != null ? String(backendP.family_size) : profile.familyMembers),
-          landOwnership: backendP.landOwnership
-            || (backendP.has_land === true && !profile.landOwnership ? 'Owns land' : profile.landOwnership),
-          caste: backendP.caste || backendP.category || profile.caste,
-        };
-        setProfile(updated);
-        sessionStorage.setItem('jansetu_chat_profile', JSON.stringify(updated));
-      }
-      if (response) {
-        setIsComplete(Boolean(response.isComplete));
-        setLastAskedField(response.nextField || null);
-        if (response.relevantSchemes?.length) setRelevantSchemes(response.relevantSchemes);
-      }
+
+      const data = await res.json();
+      setMessages(prev => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          sender: 'bot',
+          text: data.reply || 'Here are some schemes that might help you.',
+          schemes: data.schemes || [],
+          lastUserQuery: text,
+        }
+      ]);
     } catch (err) {
-      console.error(err);
-      toast.error('Something went wrong. Please try again.');
+      toast.error(err.message || 'Failed to reach JanSetu AI');
+      setMessages(prev => [
+        ...prev,
+        {
+          id: Date.now() + 2,
+          sender: 'bot',
+          text: currentLang === 'hi'
+            ? 'क्षमा करें, सर्वर से कनेक्ट करने में समस्या हुई। कृपया पुनः प्रयास करें।'
+            : 'Sorry, I had trouble connecting. Please try again.',
+          schemes: [],
+          isError: true,
+        }
+      ]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Determine which tiles to show in review screen
-  const getVisibleTiles = () => {
-    return REVIEW_FIELDS.filter(field => {
-      if (field.always) return true;
-      // Occupation-specific tiles
-      if (field.occupations) {
-        if (!profile.occupation) return false;
-        return field.occupations.includes(profile.occupation);
-      }
-      // Only show if actually collected
-      if (field.key === 'has_pucca_house') return profile.has_pucca_house !== undefined && profile.has_pucca_house !== null;
-      if (field.key === 'residence_type') return !!profile.residence_type;
-      if (field.key === 'landOwnership') {
-        // Show for farmers or if land was mentioned
-        return profile.occupation === 'Farmer' || profile.landOwnership != null;
-      }
-      return false;
-    });
+  const handleAskMore = (lastQuery) => {
+    let moreQuery = '';
+    if (currentLang === 'hi') {
+      moreQuery = lastQuery ? `कृपया "${lastQuery}" से संबंधित और अधिक सरकारी योजनाएँ खोजें` : 'कृपया मुझे और अधिक सरकारी योजनाएं दिखाएं';
+    } else if (currentLang === 'bn') {
+      moreQuery = lastQuery ? `অনুগ্রহ করে "${lastQuery}" সম্পর্কিত আরও সরকারি প্রকল্প দেখান` : 'অনুগ্রহ করে আমাকে আরও প্রকল্প দেখান';
+    } else if (currentLang === 'ta') {
+      moreQuery = lastQuery ? `"${lastQuery}" தொடர்பான மேலும் அரசு திட்டங்களைக் காட்டுங்கள்` : 'மேலும் அரசு திட்டங்களைக் காட்டுங்கள்';
+    } else if (currentLang === 'te') {
+      moreQuery = lastQuery ? `"${lastQuery}"కి సంబంధించిన మరిన్ని ప్రభుత్వ పథకాలను చూపించండి` : 'మరిన్ని ప్రభుత్వ పథకాలను చూపించండి';
+    } else {
+      moreQuery = lastQuery ? `Show me more government schemes related to "${lastQuery}"` : 'Show me more government schemes';
+    }
+    sendMessage(moreQuery);
   };
 
-  const getTileValue = (field) => {
-    if (field.key === 'has_pucca_house') return formatHousingType(profile.has_pucca_house);
-    if (field.key === 'residence_type') return formatResidenceType(profile.residence_type);
-    return profile[field.key] || null;
+  const handleVoice = () => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      toast.error('Voice input not supported in this browser');
+      return;
+    }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SR();
+    const langMap = { hi: 'hi-IN', bn: 'bn-IN', ta: 'ta-IN', te: 'te-IN', en: 'en-IN' };
+    recognition.lang = langMap[currentLang] || 'en-IN';
+    recognition.interimResults = false;
+    setIsListening(true);
+    toast(currentLang === 'hi' ? '🎙️ सुन रहे हैं... बोलिए' : '🎙️ Listening… speak now', { duration: 3000 });
+    recognition.start();
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      setInput(transcript);
+      setIsListening(false);
+      sendMessage(transcript);
+    };
+    recognition.onerror = () => { setIsListening(false); };
+    recognition.onend = () => setIsListening(false);
   };
 
-  const visibleTiles = getVisibleTiles();
+  const handleReset = () => {
+    setMessages([{
+      id: 'greeting',
+      sender: 'bot',
+      text: getGreeting(currentLang),
+      schemes: [],
+    }]);
+    toast(currentLang === 'hi' ? 'नई चैट प्रारंभ की गई' : 'New chat started', { icon: '🔄' });
+  };
+
+  const quickPrompts = QUICK_PROMPTS_BY_LANG[currentLang] || QUICK_PROMPTS_BY_LANG['en'];
+  const profileSummary = getProfileSummary(profile);
+  const activeLangObj = LANGUAGES.find(l => l.code === currentLang) || LANGUAGES[0];
+
+  const placeholderText = currentLang === 'hi'
+    ? 'सरकारी योजनाओं के बारे में यहाँ पूछें...'
+    : currentLang === 'bn'
+    ? 'সরকারি প্রকল্প সম্পর্কে এখানে জিজ্ঞাসা করুন...'
+    : currentLang === 'ta'
+    ? 'அரசு திட்டங்கள் பற்றி இங்கே கேளுங்கள்...'
+    : currentLang === 'te'
+    ? 'ప్రభుత్వ పథకాల గురించి ఇక్కడ అడగండి...'
+    : 'Ask about any government scheme…';
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FBFBFA]">
 
-      {/* Top Step Progress Bar */}
-      <div className="w-full bg-white border-b border-slate-200/90 py-3.5 px-4 sm:px-8">
-        <div className="max-w-4xl mx-auto flex flex-col gap-2">
-          <div className="w-full bg-slate-200/80 h-1 rounded-full overflow-hidden flex">
-            <div
-              className="bg-[#F97316] h-full rounded-full transition-all duration-500"
-              style={{ width: isComplete ? '66%' : showUnderstood ? '100%' : '33%' }}
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-900">
-                {showUnderstood ? t('assistant.step_review', '2. Review') : t('assistant.step_title', '1. Tell Us')}
-              </span>
-              <span className="text-xs text-slate-500 font-medium">
-                {t('assistant.step_desc', 'You can speak or type. No complicated forms.')}
-              </span>
+      {/* Top bar */}
+      <div className="sticky top-0 z-20 bg-white border-b border-slate-200/90 px-4 py-3">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[#0A1633] flex items-center justify-center shadow-sm">
+              <Bot className="w-4 h-4 text-white" />
             </div>
-            <div className="flex items-center gap-2">
-              {/* Start Over button */}
-              <button
-                onClick={handleStartOver}
-                className="text-[11px] text-slate-400 hover:text-slate-600 flex items-center gap-1 cursor-pointer transition-colors"
-                title="Start a new conversation"
-              >
-                <RotateCcw className="w-3 h-3" />
-                <span className="hidden sm:inline">Start over</span>
-              </button>
-              {isComplete && !showUnderstood && (
-                <button
-                  onClick={() => setShowUnderstood(true)}
-                  className="text-[11px] font-bold text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 px-3 py-1 rounded-lg border border-orange-200/60 flex items-center gap-1 transition-all cursor-pointer animate-in fade-in"
-                >
-                  <span>{t('assistant.btn_review', 'Review my information')}</span>
-                  <ArrowRight className="w-3 h-3" />
-                </button>
+            <div>
+              <p className="text-sm font-bold text-slate-900">JanSetu AI</p>
+              {profileSummary && (
+                <p className="text-[11px] text-slate-400">Profile: {profileSummary}</p>
               )}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 flex flex-col justify-between">
-
-        {!showUnderstood ? (
-          /* Chat View */
-          <div className="flex flex-col gap-6 max-w-3xl mx-auto w-full">
-
-            {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex items-start gap-3.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+          <div className="flex items-center gap-2.5">
+            {/* Interactive Language Selector with chat restart */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 transition-all cursor-pointer shadow-2xs"
+                title="Change language (restarts chat)"
               >
-                {msg.sender === 'bot' && (
-                  <div className="w-8 h-8 rounded-lg bg-[#0A1633] flex items-center justify-center text-white shrink-0 mt-1 shadow-sm">
-                    <Bot className="w-4 h-4 text-white" />
+                <Globe className="w-3.5 h-3.5 text-orange-600" />
+                <span>{activeLangObj.native}</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
+
+              {langDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-1">
+                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
+                    Select Language
                   </div>
-                )}
-                <div
-                  className={`rounded-2xl p-4 sm:p-5 max-w-xl text-xs sm:text-[13px] leading-relaxed shadow-2xs ${
-                    msg.sender === 'user'
-                      ? 'bg-[#1E293B] text-white rounded-tr-none'
-                      : 'bg-white border border-slate-200/90 text-slate-800 rounded-tl-none font-normal'
-                  }`}
-                >
-                  {msg.text}
-                </div>
-              </div>
-            ))}
-
-            {loading && (
-              <div className="flex items-center gap-2 text-slate-400 text-xs py-2">
-                <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
-                <span>{t('assistant.analyzing', 'JanSetu is analyzing your details with rules engine...')}</span>
-              </div>
-            )}
-
-            {/* Review CTA — only when isComplete */}
-            {isComplete && !loading && (
-              <div className="bg-white border-2 border-orange-200/90 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 my-2 animate-in fade-in slide-in-from-bottom-1">
-                <div>
-                  <h4 className="text-xs font-bold text-slate-900">
-                    {t('assistant.complete_title', 'I have everything I need.')}
-                  </h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    {relevantSchemes.length > 0
-                      ? `Checking eligibility for: ${relevantSchemes.join(', ')}`
-                      : t('assistant.complete_desc', 'You can continue chatting or review your information.')
-                    }
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowUnderstood(true)}
-                  className="w-full sm:w-auto bg-[#8C3A0A] hover:bg-[#722F08] text-white text-xs font-bold py-2.5 px-5 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer shrink-0"
-                >
-                  <span>{t('assistant.btn_review', 'Review my information')}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            )}
-
-            {/* Quick Suggestion Pills — only on first message */}
-            {!loading && messages.length === 1 && (
-              <div className="flex flex-wrap gap-2.5 pt-4">
-                {[
-                  t('assistant.prompt_1', 'I am a farmer with 2 acres of land'),
-                  t('assistant.prompt_2', 'I am looking for housing assistance'),
-                  t('assistant.prompt_3', 'I am a student from a low-income family'),
-                ].map((prompt, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSendText(prompt)}
-                    className="text-xs bg-white hover:bg-slate-50 text-slate-700 font-medium px-4 py-2.5 rounded-full border border-slate-200 shadow-2xs hover:border-slate-300 transition-all cursor-pointer"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-        ) : (
-          /* Review Screen */
-          <div className="max-w-4xl mx-auto w-full py-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-              {/* Left Column */}
-              <div className="lg:col-span-5 flex flex-col gap-5">
-                <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                  {t('assistant.understood_title', "Here's what we understood")}
-                </h1>
-                <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed">
-                  {t('assistant.understood_desc', "We've extracted this information based on your conversation. Please review and confirm before we match you with eligible government schemes.")}
-                </p>
-                {relevantSchemes.length > 0 && (
-                  <div className="bg-emerald-50 border border-emerald-200/60 rounded-xl p-3.5 text-xs text-emerald-800 font-medium">
-                    <span className="font-bold block mb-1">Schemes being evaluated:</span>
-                    <span>{relevantSchemes.join(' · ')}</span>
-                  </div>
-                )}
-                <div className="bg-[#EEF2F6]/90 border border-slate-200 rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
-                  <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                  <div>
-                    <h5 className="text-xs font-bold text-slate-900 mb-1">{t('assistant.why_need_title', 'Why do we need this?')}</h5>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
-                      {t('assistant.why_need_desc', 'Accurate details ensure we only show you schemes where you have a high probability of approval.')}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column — Dynamic Tiles */}
-              <div className="lg:col-span-7 flex flex-col gap-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {visibleTiles.map((field) => {
-                    const value = getTileValue(field);
+                  {LANGUAGES.map((lang) => {
+                    const isActive = currentLang === lang.code;
                     return (
-                      <div key={field.key} className="bg-slate-100/90 rounded-2xl p-4 border border-slate-200/60">
-                        <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
-                          {t(field.label_key, field.label)}
-                        </span>
-                        {isEditingInline ? (
-                          <input
-                            type="text"
-                            value={profile[field.key] || ''}
-                            onChange={(e) => setProfile({ ...profile, [field.key]: e.target.value })}
-                            placeholder={field.label}
-                            className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-900 mt-1 focus:outline-none focus:border-orange-500"
-                          />
-                        ) : (
-                          <p className={`text-sm font-bold mt-1 ${value ? 'text-slate-900' : 'text-slate-400 italic'}`}>
-                            {value || 'Not specified'}
-                          </p>
-                        )}
-                      </div>
+                      <button
+                        key={lang.code}
+                        onClick={() => handleSelectLanguage(lang)}
+                        className={`w-full text-left px-3.5 py-2.5 text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                          isActive
+                            ? 'bg-orange-50 text-orange-600'
+                            : 'text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold">{lang.native}</span>
+                          <span className="text-[10px] text-slate-400">{lang.label}</span>
+                        </div>
+                        {isActive && <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />}
+                      </button>
                     );
                   })}
                 </div>
+              )}
+            </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row items-center gap-3 pt-4">
-                  {isEditingInline ? (
-                    <button
-                      onClick={() => {
-                        setIsEditingInline(false);
-                        sessionStorage.setItem('jansetu_chat_profile', JSON.stringify(profile));
-                        toast.success('Information updated!');
-                      }}
-                      className="w-full sm:flex-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
-                    >
-                      <Check className="w-4 h-4" />
-                      <span>Save changes</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setIsEditingInline(true)}
-                      className="w-full sm:flex-1 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold py-3 px-4 rounded-xl border border-slate-300 transition-all cursor-pointer text-center flex items-center justify-center gap-1.5"
-                    >
-                      <Edit3 className="w-3.5 h-3.5 text-slate-500" />
-                      <span>{t('assistant.btn_edit', 'Edit information')}</span>
-                    </button>
-                  )}
+            {/* Restart Button */}
+            <button
+              onClick={handleReset}
+              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700 transition-all cursor-pointer"
+              title="Restart conversation"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
 
-                  <button
-                    onClick={() => {
-                      sessionStorage.setItem('jansetu_chat_profile', JSON.stringify(profile));
-                      navigate('/schemes');
-                    }}
-                    className="w-full sm:flex-1 bg-[#8C3A0A] hover:bg-[#722F08] text-white text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
-                  >
-                    <span>{t('assistant.btn_find_schemes', 'Yes, find my schemes')}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
+      {/* Messages */}
+      <div className="flex-1 max-w-3xl w-full mx-auto px-4 py-6 flex flex-col gap-6">
 
-                <div className="text-center pt-1">
-                  <button
-                    onClick={() => { setShowUnderstood(false); setIsEditingInline(false); }}
-                    className="text-xs text-slate-500 hover:text-slate-800 font-semibold cursor-pointer underline underline-offset-4"
-                  >
-                    ← {t('assistant.back_to_chat', 'Continue conversation in chat')}
-                  </button>
-                </div>
+        {messages.map((msg) => (
+          <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} items-start gap-3`}>
+
+            {/* Bot avatar */}
+            {msg.sender === 'bot' && (
+              <div className="w-8 h-8 rounded-xl bg-[#0A1633] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm">
+                <Sparkles className="w-3.5 h-3.5" />
               </div>
+            )}
+
+            <div className={`flex flex-col gap-3 max-w-2xl ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+              {/* Text bubble */}
+              <div
+                className={`rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
+                  msg.sender === 'user'
+                    ? 'bg-[#1E293B] text-white rounded-tr-none'
+                    : msg.isError
+                    ? 'bg-red-50 border border-red-200 text-red-700 rounded-tl-none'
+                    : 'bg-white border border-slate-200/80 text-slate-800 rounded-tl-none'
+                }`}
+              >
+                {msg.text.split('\n').map((line, i) => (
+                  <span key={i}>
+                    {line.split(/\*([^*]+)\*/g).map((part, j) =>
+                      j % 2 === 1 ? <strong key={j}>{part}</strong> : part
+                    )}
+                    {i < msg.text.split('\n').length - 1 && <br />}
+                  </span>
+                ))}
+              </div>
+
+              {/* Scheme cards with Horizontal Slider / Grid toggle & Load More */}
+              {msg.schemes && msg.schemes.length > 0 && (
+                <SchemeSlider
+                  schemes={msg.schemes}
+                  onAskMore={() => handleAskMore(msg.lastUserQuery || input)}
+                  queryText={msg.lastUserQuery || ''}
+                />
+              )}
+            </div>
+
+            {/* User avatar */}
+            {msg.sender === 'user' && (
+              <div className="w-8 h-8 rounded-xl bg-slate-600 flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm">
+                <User className="w-3.5 h-3.5" />
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* Loading indicator */}
+        {loading && (
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-[#0A1633] flex items-center justify-center text-white shrink-0 shadow-sm">
+              <Sparkles className="w-3.5 h-3.5" />
+            </div>
+            <div className="bg-white border border-slate-200/80 rounded-2xl rounded-tl-none px-5 py-3.5 flex items-center gap-2.5">
+              <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
+              <span className="text-sm text-slate-500">
+                {currentLang === 'hi'
+                  ? 'जन-सेतु AI योजनाएँ खोज रहा है...'
+                  : 'JanSetu AI is finding schemes…'}
+              </span>
             </div>
           </div>
         )}
+
+        {/* Quick prompt chips — only shown on first message */}
+        {messages.length === 1 && !loading && (
+          <div className="flex flex-wrap gap-2 pl-11">
+            {quickPrompts.map((prompt) => (
+              <button
+                key={prompt}
+                onClick={() => sendMessage(prompt)}
+                className="text-xs bg-white border border-slate-200 text-slate-600 font-medium px-3.5 py-2 rounded-full hover:border-orange-300 hover:text-orange-700 hover:bg-orange-50/50 transition-all cursor-pointer shadow-sm text-left"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Sticky Input Bar */}
-      {!showUnderstood && (
-        <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-slate-200/90 py-4 px-4">
-          <div className="max-w-3xl mx-auto flex items-center gap-3">
+      {/* Input bar */}
+      <div className="sticky bottom-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-4 py-4">
+        <div className="max-w-3xl mx-auto flex items-center gap-3">
+          {/* Mic button */}
+          <button
+            onClick={handleVoice}
+            className={`w-11 h-11 rounded-full flex items-center justify-center text-white shadow-md transition-all cursor-pointer shrink-0 ${
+              isListening ? 'bg-red-500 animate-pulse' : 'bg-[#F97316] hover:bg-[#EA580C]'
+            }`}
+            title="Voice input"
+          >
+            <Mic className="w-4 h-4" />
+          </button>
+
+          {/* Text input */}
+          <form
+            onSubmit={(e) => { e.preventDefault(); sendMessage(input); }}
+            className="flex-1 flex items-center gap-2"
+          >
+            <input
+              ref={inputRef}
+              id="assistant-input"
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={placeholderText}
+              disabled={loading}
+              className="flex-1 bg-slate-100/90 border border-slate-200 text-sm text-slate-800 placeholder-slate-400 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all disabled:opacity-60"
+            />
             <button
-              onClick={handleVoiceToggle}
-              className={`w-11 h-11 rounded-full flex items-center justify-center text-white shadow-md transition-transform active:scale-95 cursor-pointer shrink-0 ${
-                isListening ? 'bg-red-500 animate-pulse' : 'bg-[#F97316] hover:bg-[#EA580C]'
-              }`}
-              title="Speak in your language"
+              type="submit"
+              disabled={!input.trim() || loading}
+              className="w-11 h-11 rounded-xl bg-[#1E293B] hover:bg-slate-900 disabled:opacity-40 text-white flex items-center justify-center shadow-sm shrink-0 transition-colors cursor-pointer"
             >
-              <Mic className="w-5 h-5" />
+              <Send className="w-4 h-4" />
             </button>
-            <form onSubmit={handleSend} className="flex-1 flex items-center gap-2">
-              <input
-                ref={chatInputRef}
-                type="text"
-                value={inputVal}
-                onChange={(e) => setInputVal(e.target.value)}
-                placeholder={t('assistant.placeholder', 'Describe your situation...')}
-                className="w-full bg-slate-100/90 border border-slate-200 text-xs sm:text-[13px] text-slate-800 placeholder-slate-400 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-              />
-              <button
-                type="submit"
-                disabled={!inputVal.trim()}
-                className="w-11 h-11 rounded-xl bg-[#1E293B] hover:bg-slate-900 disabled:opacity-40 text-white flex items-center justify-center shadow-sm shrink-0 transition-colors cursor-pointer"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </form>
-          </div>
+          </form>
         </div>
-      )}
+      </div>
+
+      {/* Confirmation Modal for Language Change */}
+      <LanguageChangeModal
+        isOpen={!!pendingLanguage}
+        targetLanguage={pendingLanguage}
+        onClose={() => setPendingLanguage(null)}
+        onConfirm={handleConfirmLanguageChange}
+      />
     </div>
   );
 }
