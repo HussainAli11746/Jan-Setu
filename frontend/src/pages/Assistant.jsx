@@ -166,6 +166,12 @@ export default function Assistant() {
     setInput('');
     setLoading(true);
 
+    // Send recent conversation context (last 6 turns)
+    const history = messages
+      .slice(-6)
+      .filter(m => m.text)
+      .map(m => ({ sender: m.sender, text: m.text }));
+
     try {
       const res = await fetch(`${API_BASE}/chat`, {
         method: 'POST',
@@ -177,6 +183,7 @@ export default function Assistant() {
           message: text,
           profile,
           language: currentLang,
+          history,
         }),
       });
 

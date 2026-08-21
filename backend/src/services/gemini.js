@@ -49,9 +49,9 @@ const getOffTopicReply = (language = 'en') => {
 
 /**
  * Calls Gemini to suggest 5-6 relevant Indian government schemes based on
- * the user's message, profile, and selected language.
+ * the user's message, profile, selected language, and conversation history.
  */
-export const suggestSchemes = async (userMessage, profile = {}, language = 'en') => {
+export const suggestSchemes = async (userMessage, profile = {}, language = 'en', history = []) => {
   const targetLanguageName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES['en'];
 
   // Off-topic guard
@@ -62,38 +62,51 @@ export const suggestSchemes = async (userMessage, profile = {}, language = 'en')
     };
   }
 
+  // Format citizen demographic background
   const profileSummary = Object.entries(profile)
     .filter(([, v]) => v)
-    .map(([k, v]) => `${k}: ${v}`)
-    .join(', ') || 'not provided';
+    .map(([k, v]) => `• ${k}: ${v}`)
+    .join('\n') || '• Not specified';
 
-  const prompt = `You are JanSetu AI, an empathetic Indian government civic welfare scheme assistant.
+  // Format recent conversation history (last 4-6 turns)
+  const formattedHistory = (history || [])
+    .slice(-6)
+    .filter(h => h.text)
+    .map(h => `${h.sender === 'user' ? 'Citizen' : 'JanSetu AI'}: "${h.text.replace(/\n/g, ' ')}"`)
+    .join('\n') || 'None (First message in conversation)';
 
-TARGET OUTPUT LANGUAGE: ${targetLanguageName} (Language code: ${language})
-CRITICAL INSTRUCTION 1: You MUST write your response entirely in ${targetLanguageName}. All textual fields inside the JSON ("reply", "name", "shortName", "ministry", "description", "benefit", "eligibility" items, and "requiredDocs" items) MUST be written in ${targetLanguageName} script and vocabulary. The JSON keys themselves must remain in English.
+  const prompt = `You are JanSetu AI, an expert, compassionate Indian civic welfare assistant dedicated to connecting citizens with government schemes.
 
-CRITICAL INSTRUCTION 2 (DOMAIN RELEVANCE):
-If the user asks about a specific topic (such as "housing", "education", "health", "agriculture", "business loans", or "employment"), ALL 5 to 6 suggested schemes MUST STRICTLY belong to that exact domain. Do NOT mix unrelated schemes (e.g. do not include health or business schemes if the user asks for housing).
+CITIZEN PROFILE:
+${profileSummary}
 
-User's demographic profile: ${profileSummary}
-User's query: "${userMessage}"
+PRIOR CONVERSATION HISTORY:
+${formattedHistory}
 
-Suggest 5 to 6 highly relevant Indian central or state government schemes matching the exact subject matter of the user query.
+LATEST CITIZEN QUERY / PROMPT:
+"${userMessage}"
 
-IMPORTANT: Respond ONLY with a valid JSON object in EXACTLY this format, without any markdown backticks or commentary:
+TARGET LANGUAGE: ${targetLanguageName} (Code: ${language})
+
+CRITICAL GUIDELINES:
+1. OUTPUT LANGUAGE: Write the ENTIRE text of your response in ${targetLanguageName} (including reply, scheme names, descriptions, eligibility criteria, and required docs).
+2. DIRECT RELEVANCE: If the citizen asks for a specific category (e.g. housing, education, farming, health, loans), suggest 5 to 6 government schemes that STRICTLY match that requested domain. Do NOT mix unrelated schemes.
+3. CONVERSATIONAL DIRECT ANSWER: In the "reply" field, provide a polite, helpful 1-2 sentence response directly answering their inquiry in ${targetLanguageName}.
+
+Format your response strictly as valid JSON matching this structure (no markdown backticks or commentary):
 {
-  "reply": "A helpful 1-2 sentence response acknowledging the query in ${targetLanguageName}",
+  "reply": "Direct response in ${targetLanguageName}",
   "schemes": [
     {
-      "id": "unique_scheme_id_lowercase_underscore",
+      "id": "scheme_id_lowercase_underscore",
       "name": "Full Scheme Name in ${targetLanguageName}",
-      "shortName": "Short name / Acronym",
-      "ministry": "Ministry or department name in ${targetLanguageName}",
+      "shortName": "Acronym",
+      "ministry": "Ministry/Department Name in ${targetLanguageName}",
       "category": "agriculture|education|housing|health|employment|business|social|skill",
       "description": "2-3 sentence summary in ${targetLanguageName}",
-      "benefit": "Key benefit amount or assistance in ${targetLanguageName}",
-      "eligibility": ["Eligibility point 1 in ${targetLanguageName}", "Eligibility point 2 in ${targetLanguageName}", "Eligibility point 3 in ${targetLanguageName}"],
-      "requiredDocs": ["Document 1 in ${targetLanguageName} (e.g. आधार कार्ड / Aadhaar)", "Document 2 in ${targetLanguageName}"],
+      "benefit": "Key benefit or financial subsidy in ${targetLanguageName}",
+      "eligibility": ["Eligibility point 1 in ${targetLanguageName}", "Eligibility point 2 in ${targetLanguageName}"],
+      "requiredDocs": ["Doc 1 in ${targetLanguageName}", "Doc 2 in ${targetLanguageName}"],
       "applyUrl": "https://official-government-portal.gov.in"
     }
   ]
@@ -129,7 +142,7 @@ const getLocalizedFallbackSchemes = (message, language = 'en') => {
   let topicLabel = '';
 
   // 1. HOUSING & SHELTER SCHEMES (Strictly housing only)
-  if (/housing|house|home|awas|makan|shelter|pucca|kutcha|dwelling|मकान|घर|आवास|গৃহ|আবাসন|வீடு|வீட்டு|గృహ|ఇల్లు/i.test(lower)) {
+  if (/housing|house|home|awas|makan|shelter|pucca|kutcha|dwelling|मकान|घर|आवास|गृह|আবাসন|வீடு|வீட்டு|గృహ|ఇల్లు/i.test(lower)) {
     topicLabel = isHi ? 'आवास और मकान निर्माण' : isBn ? 'আবাসন ও গৃহায়ন' : isTa ? 'வீட்டு வசதி' : isTe ? 'గృహ నిర్మాణం' : 'Housing and Home Assistance';
     schemes = [
       {
