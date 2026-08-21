@@ -478,14 +478,14 @@ export default function Profile() {
   const tProfile = PROFILE_I18N[langCode] || PROFILE_I18N['en'];
 
   // Dynamic Applications count from local store
-  const [appCount, setAppCount] = useState(1);
+  const [appCount, setAppCount] = useState(0);
 
   useEffect(() => {
     try {
       const apps = getApplications();
-      if (apps && apps.length > 0) setAppCount(apps.length);
+      setAppCount(Array.isArray(apps) ? apps.length : 0);
     } catch {
-      // fallback
+      setAppCount(0);
     }
   }, []);
 
@@ -825,7 +825,10 @@ export default function Profile() {
 
                               <button
                                 type="button"
-                                onClick={() => handleRemoveScheme(scheme.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveScheme(scheme.id);
+                                }}
                                 title={tProfile.removeSchemeBtn}
                                 className="w-7 h-7 rounded-lg bg-white/90 border border-slate-200 text-slate-400 hover:text-red-600 hover:border-red-200 flex items-center justify-center shrink-0 transition-colors cursor-pointer"
                               >
@@ -851,7 +854,10 @@ export default function Profile() {
                           <div className="flex items-center gap-2 pt-2 border-t border-slate-200/60">
                             <button
                               type="button"
-                              onClick={() => setActiveDeepDive(scheme)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveDeepDive(scheme);
+                              }}
                               className="flex-1 px-3 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                             >
                               <BookOpen className="w-3.5 h-3.5 text-slate-500" />
@@ -859,9 +865,10 @@ export default function Profile() {
                             </button>
 
                             <a
-                              href={scheme.applyUrl || '#'}
+                              href={scheme.applyUrl && scheme.applyUrl !== '#' ? scheme.applyUrl : `https://www.myscheme.gov.in/search?q=${encodeURIComponent(scheme.name)}`}
                               target="_blank"
                               rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
                               className="flex-1 px-3 py-2 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />

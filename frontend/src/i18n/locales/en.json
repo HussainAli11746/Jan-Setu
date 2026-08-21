@@ -177,5 +177,11 @@
     "browse_manual": "Browse Schemes manually",
     "built_everyone": "Built for Everyone",
     "built_sub": "Three core principles that drive the JanSetu experience."
+  },
+  "schemes": {
+    "deep_dive": "Deep Dive",
+    "apply_now": "Apply Now",
+    "save_scheme": "Save Scheme",
+    "saved": "Saved"
   }
 }

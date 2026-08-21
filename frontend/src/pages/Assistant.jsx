@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Send, Bot, Mic, Loader2, Sparkles, RotateCcw, User, Globe, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -97,19 +98,22 @@ export default function Assistant() {
     }
   ]);
 
-  // Keep initial greeting in sync when language changes globally
+  const prevLangRef = useRef(currentLang);
+
+  // When language changes (from Navbar, Dropdown, or Profile), reset chatbot and its history completely
   useEffect(() => {
-    setMessages(prev => {
-      if (prev.length === 1 && prev[0].id === 'greeting') {
-        return [{
+    if (prevLangRef.current !== currentLang) {
+      prevLangRef.current = currentLang;
+      setMessages([
+        {
           id: 'greeting',
           sender: 'bot',
           text: getGreeting(currentLang),
           schemes: [],
-        }];
-      }
-      return prev;
-    });
+        }
+      ]);
+      setInput('');
+    }
   }, [currentLang, getGreeting]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -237,6 +241,17 @@ export default function Assistant() {
       setLoading(false);
     }
   };
+
+  const location = useLocation();
+  const initialQueryHandled = useRef(false);
+
+  // Automatically execute initial query passed from Home or other pages
+  useEffect(() => {
+    if (location.state?.initialQuery && !initialQueryHandled.current) {
+      initialQueryHandled.current = true;
+      sendMessage(location.state.initialQuery);
+    }
+  }, [location.state]);
 
   const handleAskMore = (lastQuery) => {
     let moreQuery = '';

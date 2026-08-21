@@ -18,17 +18,49 @@ const CATEGORY_COLORS = {
 
 export default function SchemeCard({ scheme }) {
   const [showModal, setShowModal] = useState(false);
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isSchemeSaved, saveScheme, removeSavedScheme } = useAuth();
   const lang = (i18n.language || 'en').slice(0, 2);
   const colors = CATEGORY_COLORS[scheme.category] || CATEGORY_COLORS.social;
 
   const isSaved = isSchemeSaved(scheme.id);
 
-  const btnDeepDive = lang === 'hi' ? 'विस्तार से' : lang === 'bn' ? 'বিস্তারিত' : lang === 'ta' ? 'விவரங்கள்' : lang === 'te' ? 'వివరాలు' : 'Deep Dive';
-  const btnApply = lang === 'hi' ? 'आवेदन करें' : lang === 'bn' ? 'আবেদন করুন' : lang === 'ta' ? 'விண்ணப்பிக்க' : lang === 'te' ? 'దరఖాస్తు' : 'Apply Now';
-  const btnSave = lang === 'hi' ? 'सहेजें' : lang === 'bn' ? 'সংরক্ষণ' : lang === 'ta' ? 'சேமி' : lang === 'te' ? 'సేవ్' : 'Save Scheme';
-  const btnSaved = lang === 'hi' ? 'सहेजा गया' : lang === 'bn' ? 'সংরক্ষিত' : lang === 'ta' ? 'சேமிக்கப்பட்டது' : lang === 'te' ? 'సేవ్ చేయబడింది' : 'Saved';
+  const fallbackDeepDive = {
+    hi: 'विस्तार से जानें',
+    bn: 'বিস্তারিত দেখুন',
+    ta: 'விவரங்கள்',
+    te: 'పూర్తి వివరాలు',
+    en: 'Deep Dive',
+  };
+
+  const fallbackApply = {
+    hi: 'आवेदन करें',
+    bn: 'আবেদন করুন',
+    ta: 'விண்ணப்பிக்க',
+    te: 'దరఖాస్తు చేసుకోండి',
+    en: 'Apply Now',
+  };
+
+  const fallbackSave = {
+    hi: 'योजना सहेजें',
+    bn: 'সংরক্ষণ করুন',
+    ta: 'சேமிக்கவும்',
+    te: 'సేవ్ చేయండి',
+    en: 'Save Scheme',
+  };
+
+  const fallbackSaved = {
+    hi: 'सहेजा गया',
+    bn: 'সংরক্ষিত',
+    ta: 'சேமிக்கப்பட்டது',
+    te: 'సేవ్ చేయబడింది',
+    en: 'Saved',
+  };
+
+  const btnDeepDive = t('schemes.deep_dive', fallbackDeepDive[lang] || fallbackDeepDive['en']);
+  const btnApply = t('schemes.apply_now', fallbackApply[lang] || fallbackApply['en']);
+  const btnSave = t('schemes.save_scheme', fallbackSave[lang] || fallbackSave['en']);
+  const btnSaved = t('schemes.saved', fallbackSaved[lang] || fallbackSaved['en']);
 
   const handleToggleSave = (e) => {
     e.stopPropagation();
@@ -118,9 +150,10 @@ export default function SchemeCard({ scheme }) {
 
           {/* Apply Now Action */}
           <a
-            href={scheme.applyUrl || '#'}
+            href={scheme.applyUrl && scheme.applyUrl !== '#' ? scheme.applyUrl : `https://www.myscheme.gov.in/search?q=${encodeURIComponent(scheme.name)}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
             className="flex-1 min-w-0 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-2xs hover:shadow-orange-500/20"
           >
             <ExternalLink className="w-3.5 h-3.5 shrink-0" />

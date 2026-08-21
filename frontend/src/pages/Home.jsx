@@ -39,8 +39,13 @@ export default function Home() {
   const startBtnText = localizedStart[currentLang] || localizedStart['en'];
   const heroBtnText = localizedHeroBtn[currentLang] || localizedHeroBtn['en'];
 
-  const goToAssistant = () => {
-    navigate(isAuthenticated ? '/assistant' : '/register-wall');
+  const goToAssistant = (query) => {
+    const textToSend = typeof query === 'string' ? query : situationText;
+    if (textToSend && textToSend.trim()) {
+      navigate('/assistant', { state: { initialQuery: textToSend.trim() } });
+    } else {
+      navigate('/assistant');
+    }
   };
 
   const handleStart = (e) => {

@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
 export default function DeepDiveModal({ scheme, onClose, colors }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const lang = (i18n.language || 'en').slice(0, 2);
   const { isSchemeSaved, saveScheme, removeSavedScheme } = useAuth();
 
@@ -23,7 +23,7 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
     documents: lang === 'hi' ? 'आवश्यक दस्तावेज' : lang === 'bn' ? 'প্রয়োজনীয় ডকুমেন্টস' : lang === 'ta' ? 'தேவையான ஆவணங்கள்' : lang === 'te' ? 'అవసరమైన పత్రాలు' : 'Required Documents',
     disclaimer: lang === 'hi' ? 'पात्रता राज्य नीतियों और योजना उपलब्धता के अनुसार भिन्न हो सकती है। आवेदन करने से पहले आधिकारिक पोर्टल पर वर्तमान मानदंडों की पुष्टि करें।' : lang === 'bn' ? 'যোগ্যতা রাজ্য নীতি এবং প্রকল্পের প্রাপ্যতার উপর নির্ভর করে পরিবর্তিত হতে পারে। আবেদন করার আগে অফিসিয়াল পোর্টালে বর্তমান মানদণ্ড যাচাই করুন।' : lang === 'ta' ? 'மாநில கொள்கைகள் மற்றும் திட்ட கிடைக்கும் தன்மைக்கு ஏற்ப தகுதி மாறுபடலாம். விண்ணப்பிக்கும் முன் அதிகாரப்பூர்வ தளத்தில் சரிபார்க்கவும்.' : lang === 'te' ? 'రాష్ట్ర విధానాలు మరియు పథకం లభ్యత ఆధారంగా అర్హత మారవచ్చు. దరఖాస్తు చేయడానికి ముందు అధికారిక పోర్టల్‌లో ప్రస్తుత నిబంధనలను ధృవీకరించండి.' : 'Eligibility may vary based on state policies and scheme availability. Visit the official portal to verify current criteria before applying.',
     close: lang === 'hi' ? 'बंद करें' : lang === 'bn' ? 'বন্ধ করুন' : lang === 'ta' ? 'மூடு' : lang === 'te' ? 'మూసివేయి' : 'Close',
-    apply: lang === 'hi' ? 'आधिकारिक पोर्टल' : lang === 'bn' ? 'অফিসিয়াল পোর্টাল' : lang === 'ta' ? 'அதிகாரப்பூர்வ தளம்' : lang === 'te' ? 'అధికారిక పోర్టల్' : 'Apply on Official Site',
+    apply: lang === 'hi' ? 'आधिकारिक पोर्टल पर आवेदन करें' : lang === 'bn' ? 'অফিসিয়াল পোর্টালে আবেদন করুন' : lang === 'ta' ? 'அதிகாரப்பூர்வ தளம்' : lang === 'te' ? 'అధికారిక పోర్టల్' : 'Apply on Official Site',
     saveScheme: lang === 'hi' ? 'योजना सहेजें' : lang === 'bn' ? 'সংরক্ষণ করুন' : lang === 'ta' ? 'சேமிக்கவும்' : lang === 'te' ? 'సేవ్ చేయండి' : 'Save Scheme',
     saved: lang === 'hi' ? 'सहेजा गया ✓' : lang === 'bn' ? 'সংরক্ষিত ✓' : lang === 'ta' ? 'சேமிக்கப்பட்டது ✓' : lang === 'te' ? 'సేవ్ చేయబడింది ✓' : 'Saved ✓',
     savedToast: lang === 'hi' ? 'योजना आपके बुकमार्क में सहेजी गई!' : lang === 'bn' ? 'প্রকল্পটি আপনার বুকমার্কে সংরক্ষিত হয়েছে!' : lang === 'ta' ? 'திட்டம் சேமிக்கப்பட்டது!' : lang === 'te' ? 'పథకం విజయవంతంగా సేవ్ చేయబడింది!' : 'Scheme saved to your bookmarks!',
@@ -183,9 +183,10 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
 
           {/* Apply on Official Site */}
           <a
-            href={scheme.applyUrl || '#'}
+            href={scheme.applyUrl && scheme.applyUrl !== '#' ? scheme.applyUrl : `https://www.myscheme.gov.in/search?q=${encodeURIComponent(scheme.name)}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
             className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 hover:shadow-orange-500/25 hover:shadow-md transition-all cursor-pointer"
           >
             <ExternalLink className="w-3.5 h-3.5" />
