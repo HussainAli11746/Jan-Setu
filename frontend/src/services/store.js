@@ -13,6 +13,7 @@ export const INITIAL_SCHEMES = [
     benefitDetail: 'Direct income support of ₹6,000 per year to farmer families in three equal installments of ₹2,000 directly into bank accounts.',
     matchStatus: 'eligible',
     matchReason: 'Your occupation and land details match the core eligibility criteria.',
+    applyUrl: 'https://pmkisan.gov.in',
     qualifications: [
       { text: 'Occupation matches profile', sub: 'Your profile indicates you are involved in farming/agriculture.' },
       { text: 'Income criteria likely met', sub: 'Based on self-declared income data.' },
@@ -41,6 +42,7 @@ export const INITIAL_SCHEMES = [
     benefitDetail: 'Financial assistance to build a pucca house with basic amenities for rural households without a permanent shelter.',
     matchStatus: 'eligible',
     matchReason: 'Your income level and current housing status align with scheme requirements.',
+    applyUrl: 'https://pmayg.nic.in',
     qualifications: [
       { text: 'Rural residency confirmed', sub: 'Living in a designated rural panchayat.' },
       { text: 'No existing pucca house', sub: 'Kutcha roof / temporary dwelling reported.' },
@@ -69,6 +71,7 @@ export const INITIAL_SCHEMES = [
     benefitDetail: 'Comprehensive crop insurance against non-preventable natural risks from pre-sowing to post-harvest stages.',
     matchStatus: 'partial',
     matchReason: 'We need additional details about your specific crop cycle to confirm eligibility.',
+    applyUrl: 'https://pmfby.gov.in',
     qualifications: [
       { text: 'Farmer with notified crop', sub: 'Cultivating crops covered under seasonal notification.' },
       { text: 'Valid land holding', sub: 'Owner or recorded tenant farmer.' }
@@ -96,6 +99,7 @@ export const INITIAL_SCHEMES = [
     benefitDetail: 'Affordable working capital loan up to ₹10,000 for 1st tranche, followed by ₹20,000 and ₹50,000 for timely repayment.',
     matchStatus: 'eligible',
     matchReason: 'Urban vendor livelihood aligns with working capital credit guidelines.',
+    applyUrl: 'https://pmsvanidhi.mohua.gov.in',
     qualifications: [
       { text: 'Vending certificate available', sub: 'Vending identity card or letter of recommendation from ULB.' }
     ],

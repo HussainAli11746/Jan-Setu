@@ -1,27 +1,33 @@
 # JanSetu AI 🇮🇳
 ### *AI-Powered Citizen Access to Government Welfare Schemes*
 
-> **JanSetu AI** is a voice-first, multilingual, consent-driven civic platform that bridges the gap between Indian citizens and government welfare schemes. Powered by **Google Gemini 2.5 Flash**, MongoDB Atlas, and a deterministic eligibility engine, it takes a citizen from a single spoken query to personalized scheme matching, deep-dive criteria verification, bookmarked schemes management, and step-by-step application guidance.
+> **JanSetu AI** is a voice-first, multilingual, consent-driven civic platform that bridges the gap between Indian citizens and government welfare schemes. Powered by **Google Gemini 2.5 Flash**, MongoDB Atlas, and a deterministic eligibility engine, it takes a citizen from a single spoken query to personalized scheme matching, deep-dive criteria verification, bookmarked schemes management, and direct official portal application guidance.
 
 ---
 
 ## 🌟 Key Features & Capabilities
 
-- 🤖 **Google Gemini 2.5 Flash Intelligence**: State-of-the-art conversational engine providing instant, domain-accurate welfare scheme discovery with multi-turn conversation history and demographic profile context injection.
-- 🎙️ **Voice-First & Multilingual Interaction**: Speak or type naturally in 5 languages (**English, हिन्दी, বাংলা, தமிழ், తెలుగు**). Real-time speech-to-text recognition with automatic interface and greeting synchronization.
+- 🤖 **Google Gemini 2.5 Flash Intelligence**: State-of-the-art conversational engine providing instant, domain-accurate welfare scheme discovery with multi-turn conversation history, intent detection, and demographic profile context injection.
+- 🎙️ **Voice-First & Multilingual Interaction**: Speak or type naturally in 5 languages (**English, हिन्दी, বাংলা, தமிழ், తెలుగు**). Real-time speech-to-text recognition with automatic interface translation and greeting synchronization.
+- 🎯 **Interactive Matched Schemes Hub**:
+  - Dedicated **Matched Schemes** view on citizen profile (`/profile?tab=matched`) showcasing curated schemes tailored to user demographics (state, age, income bracket, occupation).
+  - Hoverable, interactive stat cards with match confidence scores (e.g., `98% Match`) and match reasons.
 - 🔖 **Saved Schemes & Bookmarks Manager**:
-  - Save schemes with one click directly from AI chat cards, deep dive modals, or the catalog directory.
+  - Save schemes with one click directly from AI chat cards, deep-dive modals, or the catalog directory.
   - Dedicated **Saved Schemes** tab on citizen profile (`/profile?tab=saved`) and top navbar badge with live bookmark count.
   - Cloud persistence in MongoDB Atlas + optimistic local storage caching for offline accessibility.
 - 📖 **Deep Dive Scheme Intelligence**: Instant modal view for any scheme detailing:
   - Exact eligibility criteria & age/income qualification bars
-  - Required documents checklist
-  - Financial & social benefits
-  - Direct link to official government portal
-- 📐 **Modern, Balanced Grid UI**: Clean 2-column responsive layout without horizontal scrolling clutter, with responsive actions and clear typography.
-- 👤 **Citizen Demographic Profile & Onboarding**: Match schemes based on state of residence, age bracket, gender, annual income, occupation, and employment category.
+  - Pre-verified required documents checklist
+  - Financial & social benefit breakdowns
+  - Verified direct links to official government application portals
+- 🔗 **Verified Direct Government Application Portals**:
+  - All scheme application links are updated to official live portals (e.g. Ayushman Bharat Beneficiary Portal, Skill India Digital Hub, UdyamiMitra, JanSuraksha, PMAY Urban).
+- 📐 **Modern, Balanced Grid UI**: Clean 2-column responsive layout without horizontal scrolling clutter, with responsive action buttons and elegant typography.
+- 👤 **Citizen Demographic Profile**: Dynamic eligibility matching based on state of residence, age category, gender, annual income bracket, primary occupation, and employment status.
 - 📊 **Application Tracking Dashboard**: Track submitted applications through departmental review, document verification, and final DBT disbursement status.
 - 🔐 **Privacy-First & Secure**: Consent-driven processing with JWT authentication and secure credential hashing with zero raw identity document retention.
+- 🤖 **Apply Assist Co-Pilot** *(Chrome Extension)*: When a citizen clicks "Apply Now", the JanSetu Chrome extension auto-appears on the government portal. One click captures a screenshot, sends it to Gemini 2.5 Flash Vision, and returns a plain-language explanation of the current form section, which documents are needed at that exact step, and what to do next — spoken aloud in the citizen's language via `speechSynthesis`.
 
 ---
 
@@ -38,13 +44,20 @@
                                   ┌─────────────────────────────────────────┐
                                   │      Node.js / Express API Gateway      │
                                   │  Gemini 2.5 Flash · JWT Auth · Profiles │
+                                  │  /api/chat · /api/schemes · /api/copilot│
                                   └───────────────┬─────────────────┬───────┘
                                                   │                 │
                            ┌──────────────────────▼──────┐   ┌──────▼──────────────────────┐
                            │    Google Gemini 2.5 Flash  │   │      MongoDB Atlas Cloud    │
-                           │   Prompt & Context Pipeline │   │   Users · Profiles · Bookmarks│
-                           │  Domain Dataset Aggregation │   │   Applications · Audit Logs  │
+                           │   Text + Vision Multimodal  │   │   Users · Profiles · Schemes│
+                           │  Domain Dataset Aggregation │   │   Bookmarks · Matched Schemes│
                            └─────────────────────────────┘   └──────────────────────────────┘
+                                        ▲
+                           ┌────────────┴────────────────┐
+                           │  Chrome Extension (MV3)     │
+                           │  JanSetu Apply Assist       │
+                           │  Screenshot → Vision → Panel│
+                           └─────────────────────────────┘
 ```
 
 ---
@@ -53,30 +66,34 @@
 
 | Layer | Technology | Description |
 |---|---|---|
-| **AI / NLU** | Google Gemini 2.5 Flash (`@google/generative-ai`) | Real-time generative scheme recommendation and structured JSON responses |
-| **Frontend** | React 18, Vite 5, TailwindCSS, Lucide React | Modern responsive UI with accessible typography & dark-accent aesthetics |
+| **AI / NLU** | Google Gemini 2.5 Flash (`@google/generative-ai`) | Real-time generative scheme recommendation, structured JSON responses, and vision-based form analysis |
+| **Frontend** | React 18, Vite 5, TailwindCSS, Lucide React | Modern responsive UI with accessible typography & clean aesthetics |
 | **Localization** | `i18next`, `react-i18next`, Browser Language Detector | Full translation support across 5 Indian languages |
-| **Voice / Audio** | Web Speech API | Real-time speech-to-text recognition with regional locale mappings |
+| **Voice / Audio** | Web Speech API, `speechSynthesis` | Real-time speech-to-text + text-to-speech for form guidance |
 | **Backend API** | Node.js 20, Express, CORS, dotenv | Resilient RESTful API gateway with token-based authentication |
 | **Database** | MongoDB Atlas (Mongoose ODM) | Cloud database for user accounts, demographic profiles, and saved schemes |
 | **State & Storage** | React Context API, LocalStorage | Optimistic state updates and session persistence |
+| **Chrome Extension** | Manifest V3, `chrome.storage.session`, `captureVisibleTab` | Apply Assist Co-Pilot: screenshot → Gemini Vision → plain-language floating panel |
 
 ---
 
 ## 📋 Sample Welfare Schemes Supported
 
-| Category | Scheme | Ministry | Core Benefit |
+| Category | Scheme | Ministry | Official Portal Link |
 |---|---|---|---|
-| 🌾 **Agriculture** | **PM-KISAN** | Agriculture & Farmers Welfare | ₹6,000 / year direct income support |
-| 🌾 **Agriculture** | **PMFBY** | Agriculture & Farmers Welfare | Comprehensive seasonal crop insurance |
-| 🎓 **Education** | **National Scholarship Portal (NSP)** | Electronics & IT / Education | Central & state scholarship disbursements |
-| 🎓 **Education** | **Central Sector Interest Subsidy** | Education | Full interest subsidy on higher education loans |
-| 🎓 **Education** | **Post-Matric Scholarship (SC/OBC)** | Social Justice & Empowerment | Full academic tuition and maintenance allowance |
-| 🏠 **Housing** | **PMAY-G / PMAY-U** | Rural Development / Urban Affairs | Financial assistance for pucca housing (up to ₹1.3L – ₹2.5L) |
-| 🏥 **Health** | **Ayushman Bharat (PM-JAY)** | Health & Family Welfare | ₹5,00,000 / year secondary & tertiary health cover |
-| 💼 **Business** | **PM SVANidhi** | Housing & Urban Affairs | ₹10,000 – ₹50,000 working capital micro-credit |
-| ⚡ **Skills** | **PMKVY 4.0** | Skill Development & Entrepreneurship | Free skill certification & stipend training |
-| 🛡️ **Social** | **Atal Pension Yojana (APY)** | Finance | Guaranteed monthly pension of ₹1,000 – ₹5,000 post age 60 |
+| 🌾 **Agriculture** | **PM-KISAN** | Agriculture & Farmers Welfare | [pmkisan.gov.in](https://pmkisan.gov.in) |
+| 🌾 **Agriculture** | **PMFBY** | Agriculture & Farmers Welfare | [pmfby.gov.in](https://pmfby.gov.in) |
+| 🌾 **Agriculture** | **Kisan Credit Card (KCC)** | Agriculture & Farmers Welfare | [myscheme.gov.in](https://www.myscheme.gov.in/schemes/kcc) |
+| 🏠 **Housing** | **PMAY-G / PMAY-U** | Rural Development / Urban Affairs | [pmayg.nic.in](https://pmayg.nic.in) / [pmay-urban.gov.in](https://pmay-urban.gov.in) |
+| 🏥 **Health** | **Ayushman Bharat (PM-JAY)** | Health & Family Welfare | [beneficiary.nha.gov.in](https://beneficiary.nha.gov.in) |
+| 🏥 **Health** | **PM Suraksha Bima Yojana** | Finance | [jansuraksha.gov.in](https://www.jansuraksha.gov.in) |
+| 💼 **Business** | **PM SVANidhi** | Housing & Urban Affairs | [pmsvanidhi.mohua.gov.in](https://pmsvanidhi.mohua.gov.in) |
+| 💼 **Business** | **Pradhan Mantri MUDRA Yojana** | Finance | [udyamimitra.in](https://www.udyamimitra.in) |
+| ⚡ **Skills** | **PMKVY 4.0** | Skill Development & Entrepreneurship | [skillindiadigital.gov.in](https://www.skillindiadigital.gov.in) |
+| ⚡ **Skills** | **PM Vishwakarma** | MSME | [pmvishwakarma.gov.in](https://pmvishwakarma.gov.in) |
+| 🎓 **Education** | **Post-Matric Scholarship (SC)** | Social Justice & Empowerment | [scholarships.gov.in](https://scholarships.gov.in) |
+| 🎓 **Education** | **PM POSHAN Scheme** | Education | [pmposhan.education.gov.in](https://pmposhan.education.gov.in/index.html) |
+| 🛡️ **Social** | **Atal Pension Yojana (APY)** | Finance / PFRDA | [npscra.nsdl.co.in](https://www.npscra.nsdl.co.in/scheme-details.php) |
 
 ---
 
@@ -144,6 +161,7 @@ Jan-Setu/
 │   │   ├── pages/            # Home, Assistant, Profile, SchemesPage, Applications
 │   │   └── services/         # API connectors & storage utilities
 │   └── index.html
+├── rules-engine/             # Eligibility criteria rules engine definitions
 └── README.md
 ```
 

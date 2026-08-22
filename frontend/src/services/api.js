@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { INITIAL_SCHEMES, getApplications, saveApplication } from './store';
 
+const rawUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+const baseURL = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL,
   timeout: 8000,
 });
 

@@ -10,6 +10,7 @@ import { connectDB } from './db/db.js';
 import authRoutes from './routes/auth.js';
 import chatRoutes from './routes/chat.js';
 import schemesRoutes from './routes/schemes.js';
+import copilotRoutes from './routes/copilot.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -20,7 +21,19 @@ connectDB();
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  // Allow the Vite dev server, local prod, and the Chrome extension (all IDs)
+  origin: (origin, callback) => {
+    const allowed = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+    ];
+    // Allow Chrome extension origins (chrome-extension://<id>)
+    if (!origin || allowed.includes(origin) || origin.startsWith('chrome-extension://')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 app.use(express.json());
@@ -40,6 +53,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatLimiter, chatRoutes);
 app.use('/api/schemes', schemesRoutes);
+app.use('/api/copilot', copilotRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {

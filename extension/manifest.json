@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "JanSetu Apply Assist",
+  "short_name": "JanSetu",
+  "version": "1.0.1",
+  "description": "AI-powered co-pilot that guides citizens through government scheme applications in plain language.",
+  "icons": {
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "externally_connectable": {
+    "matches": [
+      "http://localhost:5173/*",
+      "http://localhost:3000/*",
+      "https://jansetu.example.com/*"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://pmkisan.gov.in/*",
+        "https://beneficiary.nha.gov.in/*",
+        "https://pmayg.nic.in/*",
+        "https://pmay-urban.gov.in/*",
+        "https://scholarships.gov.in/*",
+        "https://pmfby.gov.in/*",
+        "https://pmksy.gov.in/*",
+        "https://pmsvanidhi.mohua.gov.in/*",
+        "https://www.udyamimitra.in/*",
+        "https://www.standupmitra.in/*",
+        "https://nrega.nic.in/*",
+        "https://www.skillindiadigital.gov.in/*",
+        "https://pmvishwakarma.gov.in/*",
+        "https://pmjdy.gov.in/*",
+        "https://www.jansuraksha.gov.in/*",
+        "https://www.npscra.nsdl.co.in/*",
+        "https://www.myscheme.gov.in/*",
+        "https://pmposhan.education.gov.in/*",
+        "https://www.cbse.gov.in/*"
+      ],
+      "js": ["content-script.js"],
+      "css": ["panel.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "JanSetu Apply Assist",
+    "default_icon": "icons/icon48.png"
+  }
+}

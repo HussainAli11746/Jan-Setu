@@ -1,6 +1,7 @@
 import express from 'express';
 import User from '../models/User.js';
 import { generateToken, verifyToken } from '../middleware/auth.js';
+import { matchProfileSchemesWithGemini } from '../services/gemini.js';
 
 const router = express.Router();
 
@@ -91,6 +92,14 @@ router.get('/me', verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password');
     if (!user) return res.status(404).json({ error: 'User not found' });
+
+    let matchedSchemes = user.matchedSchemes || [];
+    if (matchedSchemes.length === 0 && user.profile && (user.profile.occupation || user.profile.state)) {
+      matchedSchemes = await matchProfileSchemesWithGemini(user.profile, user.language || 'en');
+      user.matchedSchemes = matchedSchemes;
+      await user.save();
+    }
+
     res.json({
       id: user._id,
       name: user.name,
@@ -98,13 +107,14 @@ router.get('/me', verifyToken, async (req, res) => {
       language: user.language || user.profile?.language || 'en',
       profile: user.profile,
       savedSchemes: user.savedSchemes || [],
+      matchedSchemes,
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch user' });
   }
 });
 
-// PATCH /api/auth/profile — save onboarding profile with language
+// PATCH /api/auth/profile — save onboarding profile with language and generate matched schemes with Gemini
 router.patch('/profile', verifyToken, async (req, res) => {
   try {
     const { ageCategory, gender, state, incomeBracket, occupation, employmentStatus, language } = req.body;
@@ -128,6 +138,10 @@ router.patch('/profile', verifyToken, async (req, res) => {
       onboardingComplete: true,
     };
 
+    // Generate AI matched schemes with Gemini based on updated profile
+    const matchedSchemes = await matchProfileSchemesWithGemini(user.profile, user.language);
+    user.matchedSchemes = matchedSchemes;
+
     await user.save();
 
     res.json({
@@ -137,10 +151,28 @@ router.patch('/profile', verifyToken, async (req, res) => {
       language: user.language,
       profile: user.profile,
       savedSchemes: user.savedSchemes || [],
+      matchedSchemes: user.matchedSchemes || [],
     });
   } catch (err) {
     console.error('Profile update error:', err);
     res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+// GET /api/auth/matched-schemes — retrieve or refresh AI matched schemes for authenticated user
+router.get('/matched-schemes', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const matchedSchemes = await matchProfileSchemesWithGemini(user.profile || {}, user.language || 'en');
+    user.matchedSchemes = matchedSchemes;
+    await user.save();
+
+    res.json({ matchedSchemes });
+  } catch (err) {
+    console.error('Failed to get matched schemes:', err);
+    res.status(500).json({ error: 'Failed to get matched schemes' });
   }
 });
 

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import DeepDiveModal from './DeepDiveModal';
 import toast from 'react-hot-toast';
+import { notifyExtension } from '../../services/copilotHandshake';
 
 const CATEGORY_COLORS = {
   agriculture: { bg: 'bg-emerald-50/70', border: 'border-emerald-200/80', text: 'text-emerald-700', badge: 'bg-emerald-100/70 text-emerald-800 border-emerald-300/50', dot: 'bg-emerald-500' },
@@ -19,7 +20,7 @@ const CATEGORY_COLORS = {
 export default function SchemeCard({ scheme }) {
   const [showModal, setShowModal] = useState(false);
   const { t, i18n } = useTranslation();
-  const { isSchemeSaved, saveScheme, removeSavedScheme } = useAuth();
+  const { isSchemeSaved, saveScheme, removeSavedScheme, token } = useAuth();
   const lang = (i18n.language || 'en').slice(0, 2);
   const colors = CATEGORY_COLORS[scheme.category] || CATEGORY_COLORS.social;
 
@@ -150,10 +151,17 @@ export default function SchemeCard({ scheme }) {
 
           {/* Apply Now Action */}
           <a
-            href={scheme.applyUrl && scheme.applyUrl !== '#' ? scheme.applyUrl : `https://www.myscheme.gov.in/search?q=${encodeURIComponent(scheme.name)}`}
+            href={
+              scheme.id === 'pm-poshan' || scheme.id === 'pmposhan'
+                ? 'https://pmposhan.education.gov.in/index.html'
+                : (scheme.applyUrl || scheme.apply_url || `https://www.myscheme.gov.in/search?q=${encodeURIComponent(scheme.name)}`)
+            }
             target="_blank"
             rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              notifyExtension(scheme.id, token, lang);
+            }}
             className="flex-1 min-w-0 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-2xs hover:shadow-orange-500/20"
           >
             <ExternalLink className="w-3.5 h-3.5 shrink-0" />

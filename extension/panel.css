@@ -1,0 +1,376 @@
+/*
+ * JanSetu Apply Assist — Panel & Button Styles
+ */
+
+:root {
+  --js-navy:    #0f172a;
+  --js-blue:    #1e40af;
+  --js-light:   #dbeafe;
+  --js-green:   #16a34a;
+  --js-amber:   #b45309;
+  --js-orange:  #ea580c;
+  --js-white:   #ffffff;
+  --js-grey:    #64748b;
+  --js-bg:      #f8fafc;
+  --js-border:  #e2e8f0;
+  --js-radius:  16px;
+  --js-shadow:  0 20px 60px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.12);
+  --js-font:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Visibility Control: Strict none */
+.js-hidden {
+  display: none !important;
+}
+
+/* Floating trigger button */
+#jansetu-assist-btn {
+  all: unset !important;
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 2147483646 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 12px 20px !important;
+  background: linear-gradient(135deg, #1e40af 0%, #0f172a 100%) !important;
+  color: #ffffff !important;
+  border-radius: 50px !important;
+  font-family: var(--js-font) !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: 0 8px 28px rgba(30,64,175,0.45), 0 2px 8px rgba(0,0,0,0.2) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  user-select: none !important;
+  white-space: nowrap !important;
+}
+
+#jansetu-assist-btn:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 12px 36px rgba(30,64,175,0.55), 0 4px 12px rgba(0,0,0,0.25) !important;
+}
+
+.js-btn-icon {
+  font-size: 17px !important;
+  line-height: 1 !important;
+}
+
+/* Floating panel container */
+#jansetu-panel {
+  all: unset !important;
+  position: fixed !important;
+  bottom: 84px !important;
+  right: 24px !important;
+  width: 360px !important;
+  max-width: calc(100vw - 48px) !important;
+  max-height: 80vh !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: var(--js-white) !important;
+  border-radius: var(--js-radius) !important;
+  box-shadow: var(--js-shadow) !important;
+  border: 1.5px solid var(--js-border) !important;
+  font-family: var(--js-font) !important;
+  overflow: hidden !important;
+  animation: js-slideUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+#jansetu-panel.js-hidden {
+  display: none !important;
+}
+
+@keyframes js-slideUp {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header */
+.js-panel-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 16px !important;
+  background: linear-gradient(135deg, #1e40af 0%, #0f172a 100%) !important;
+  color: var(--js-white) !important;
+  border-radius: var(--js-radius) var(--js-radius) 0 0 !important;
+  flex-shrink: 0 !important;
+}
+
+.js-panel-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+}
+
+.js-logo {
+  font-size: 16px !important;
+}
+
+.js-close-btn {
+  all: unset !important;
+  cursor: pointer !important;
+  font-size: 15px !important;
+  color: rgba(255,255,255,0.75) !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  transition: color 0.12s, background 0.12s !important;
+}
+.js-close-btn:hover {
+  color: var(--js-white) !important;
+  background: rgba(255,255,255,0.15) !important;
+}
+
+/* Body */
+.js-panel-body {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  background: var(--js-bg) !important;
+  max-height: calc(80vh - 80px) !important;
+}
+
+/* State Views */
+.js-state-view {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+.js-state-view.js-hidden {
+  display: none !important;
+}
+
+/* Loading */
+.js-loading-view {
+  align-items: center !important;
+  text-align: center !important;
+  padding: 24px 16px !important;
+  gap: 12px !important;
+}
+
+.js-spinner {
+  width: 36px !important;
+  height: 36px !important;
+  border: 3px solid var(--js-light) !important;
+  border-top-color: var(--js-blue) !important;
+  border-radius: 50% !important;
+  animation: js-spin 0.8s linear infinite !important;
+}
+
+@keyframes js-spin {
+  to { transform: rotate(360deg); }
+}
+
+.js-loading-text {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: var(--js-navy) !important;
+  margin: 0 !important;
+}
+
+.js-loading-sub {
+  font-size: 12px !important;
+  color: var(--js-grey) !important;
+  margin: 0 !important;
+}
+
+/* Error */
+.js-error-view {
+  align-items: center !important;
+  text-align: center !important;
+  padding: 20px 16px !important;
+  gap: 10px !important;
+}
+
+.js-error-icon {
+  font-size: 28px !important;
+}
+
+.js-error-view p {
+  font-size: 12.5px !important;
+  color: #991b1b !important;
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.js-retry-btn {
+  all: unset !important;
+  cursor: pointer !important;
+  padding: 8px 18px !important;
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  border-radius: 8px !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  border: 1px solid #fca5a5 !important;
+  transition: background 0.12s !important;
+}
+.js-retry-btn:hover {
+  background: #fca5a5 !important;
+}
+
+/* Welcome */
+.js-welcome-view {
+  align-items: center !important;
+  text-align: center !important;
+  padding: 20px 16px !important;
+  gap: 10px !important;
+}
+
+.js-welcome-icon {
+  font-size: 36px !important;
+}
+
+.js-welcome-title {
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  color: var(--js-navy) !important;
+  margin: 0 !important;
+}
+
+.js-welcome-sub {
+  font-size: 12px !important;
+  color: var(--js-grey) !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+}
+
+/* Buttons */
+.js-analyze-btn {
+  all: unset !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 10px 20px !important;
+  background: linear-gradient(135deg, var(--js-orange) 0%, #c2410c 100%) !important;
+  color: var(--js-white) !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(234,88,12,0.3) !important;
+  transition: transform 0.12s, box-shadow 0.12s !important;
+  margin-top: 4px !important;
+}
+
+.js-analyze-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(234,88,12,0.4) !important;
+}
+
+.js-reanalyze {
+  background: linear-gradient(135deg, #475569 0%, #1e293b 100%) !important;
+  box-shadow: 0 4px 14px rgba(71,85,105,0.25) !important;
+}
+
+/* Result Cards */
+.js-section-card,
+.js-docs-card,
+.js-action-card {
+  background: var(--js-white) !important;
+  border: 1.5px solid var(--js-border) !important;
+  border-radius: 10px !important;
+  padding: 12px 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+.js-section-label,
+.js-docs-label,
+.js-action-label {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--js-blue) !important;
+}
+
+.js-section-text,
+.js-action-text {
+  font-size: 13px !important;
+  color: var(--js-navy) !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+}
+
+/* Docs List */
+.js-docs-list {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+}
+
+.js-doc-item {
+  font-size: 12px !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 6px !important;
+  line-height: 1.4 !important;
+}
+
+.js-doc-needed {
+  color: var(--js-green) !important;
+  font-weight: 600 !important;
+}
+
+.js-doc-other {
+  color: #94a3b8 !important;
+  font-weight: 400 !important;
+}
+
+.js-doc-tick,
+.js-doc-dot {
+  flex-shrink: 0 !important;
+  font-size: 12px !important;
+}
+
+/* Result Footer */
+.js-result-footer {
+  display: flex !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+.js-listen-btn {
+  all: unset !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 9px 15px !important;
+  background: var(--js-light) !important;
+  color: var(--js-blue) !important;
+  border-radius: 8px !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  border: 1.5px solid #93c5fd !important;
+  transition: background 0.12s !important;
+}
+.js-listen-btn:hover {
+  background: #bfdbfe !important;
+}
+
+/* Footer */
+.js-panel-footer {
+  font-size: 10.5px !important;
+  color: #94a3b8 !important;
+  text-align: center !important;
+  padding: 8px 16px !important;
+  border-top: 1px solid var(--js-border) !important;
+  background: var(--js-white) !important;
+  flex-shrink: 0 !important;
+}

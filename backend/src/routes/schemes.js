@@ -1,4 +1,5 @@
 import express from 'express';
+import { matchProfileSchemesWithGemini } from '../services/gemini.js';
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ const SCHEMES_CATALOG = [
     benefit_amount: 'Credit up to ₹3 Lakh at 4% interest',
     benefit_description: 'Timely access to affordable credit for farmers to meet agriculture inputs and allied activities.',
     is_active: true,
-    apply_url: 'https://www.nabard.org',
+    apply_url: 'https://www.myscheme.gov.in/schemes/kcc',
   },
   {
     id: 'pmksy',
@@ -71,7 +72,7 @@ const SCHEMES_CATALOG = [
     benefit_amount: 'Up to ₹2.67 Lakh Interest Subsidy',
     benefit_description: 'Credit-linked subsidy scheme on home loans for economically weaker sections (EWS) and lower income groups (LIG).',
     is_active: true,
-    apply_url: 'https://pmaymis.gov.in',
+    apply_url: 'https://pmay-urban.gov.in',
   },
 
   // Health
@@ -84,7 +85,7 @@ const SCHEMES_CATALOG = [
     benefit_amount: '₹5 Lakh / family / year',
     benefit_description: 'Cashless and paperless access to secondary and tertiary healthcare services across empanelled public and private hospitals.',
     is_active: true,
-    apply_url: 'https://pmjay.gov.in',
+    apply_url: 'https://beneficiary.nha.gov.in',
   },
   {
     id: 'pmsby',
@@ -95,7 +96,7 @@ const SCHEMES_CATALOG = [
     benefit_amount: '₹2 Lakh Accidental Cover for ₹20/year',
     benefit_description: 'Accident insurance providing ₹2 Lakh coverage for accidental death and permanent full disability at an affordable ₹20/year.',
     is_active: true,
-    apply_url: 'https://financialservices.gov.in',
+    apply_url: 'https://www.jansuraksha.gov.in',
   },
 
   // Education
@@ -130,7 +131,18 @@ const SCHEMES_CATALOG = [
     benefit_amount: '₹500 / month for 2 years',
     benefit_description: 'Merit scholarship for single girl children who have passed CBSE Class X examination with 60% or more marks.',
     is_active: true,
-    apply_url: 'https://cbse.gov.in',
+    apply_url: 'https://www.cbse.gov.in/cbsenew/scholar.html',
+  },
+  {
+    id: 'pm-poshan',
+    name: 'PM POSHAN Scheme',
+    shortName: 'PM-POSHAN',
+    ministry: 'Ministry of Education',
+    category: 'education',
+    benefit_amount: 'Nutritional Support & Hot Meals',
+    benefit_description: 'National initiative providing hot cooked meals to children in primary and upper-primary government schools.',
+    is_active: true,
+    apply_url: 'https://pmposhan.education.gov.in/index.html',
   },
 
   // Business & Livelihood
@@ -154,7 +166,7 @@ const SCHEMES_CATALOG = [
     benefit_amount: 'Loans up to ₹10 Lakh (Shishu, Kishore, Tarun)',
     benefit_description: 'Collateral-free funding for micro and small non-corporate, non-farm enterprises.',
     is_active: true,
-    apply_url: 'https://www.mudra.org.in',
+    apply_url: 'https://www.udyamimitra.in',
   },
   {
     id: 'standup_india',
@@ -189,7 +201,7 @@ const SCHEMES_CATALOG = [
     benefit_amount: 'Free Industry Skill Training + Certification + ₹8,000',
     benefit_description: 'Skill certification scheme to enable Indian youth to take up industry-relevant skill training for better livelihoods.',
     is_active: true,
-    apply_url: 'https://pmkvyofficial.org',
+    apply_url: 'https://www.skillindiadigital.gov.in',
   },
   {
     id: 'pm_vishwakarma',
@@ -224,7 +236,7 @@ const SCHEMES_CATALOG = [
     benefit_amount: '₹2 Lakh Life Insurance for ₹436/year',
     benefit_description: 'One-year renewable life insurance scheme offering ₹2 Lakh coverage for death due to any reason.',
     is_active: true,
-    apply_url: 'https://financialservices.gov.in',
+    apply_url: 'https://www.jansuraksha.gov.in',
   },
   {
     id: 'apy',
@@ -235,7 +247,7 @@ const SCHEMES_CATALOG = [
     benefit_amount: 'Guaranteed pension of ₹1,000 to ₹5,000 / month',
     benefit_description: 'Government-backed pension scheme focused on unorganized sector workers with guaranteed minimum monthly pension after age 60.',
     is_active: true,
-    apply_url: 'https://www.npscra.nsdl.co.in',
+    apply_url: 'https://www.npscra.nsdl.co.in/scheme-details.php',
   },
   {
     id: 'sukanya_samriddhi',
@@ -246,7 +258,7 @@ const SCHEMES_CATALOG = [
     benefit_amount: 'High 8.2% Interest + Tax Exemption under 80C',
     benefit_description: 'Small deposit savings scheme targeted for girl child education and marriage expenses.',
     is_active: true,
-    apply_url: 'https://www.indiapost.gov.in',
+    apply_url: 'https://www.myscheme.gov.in/schemes/ssy',
   },
 ];
 
@@ -295,20 +307,17 @@ router.get('/:id', (req, res) => {
 });
 
 // POST /api/schemes/match
-router.post('/match', (req, res) => {
-  const { profile } = req.body;
-  if (!profile) return res.status(400).json({ error: 'Profile is required' });
+router.post('/match', async (req, res) => {
+  try {
+    const { profile, language = 'en' } = req.body;
+    if (!profile) return res.status(400).json({ error: 'Profile is required' });
 
-  const occ = (profile.occupation || '').toLowerCase();
-  const matched = SCHEMES_CATALOG.filter(s => {
-    if (occ.includes('farm')) return ['agriculture', 'social'].includes(s.category);
-    if (occ.includes('student')) return ['education', 'skill'].includes(s.category);
-    if (occ.includes('vendor') || occ.includes('business') || occ.includes('self')) return ['business', 'skill'].includes(s.category);
-    if (occ.includes('wage') || occ.includes('labour') || occ.includes('unemployed')) return ['employment', 'skill', 'social'].includes(s.category);
-    return true;
-  }).slice(0, 9);
-
-  res.json({ schemes: matched });
+    const schemes = await matchProfileSchemesWithGemini(profile, language);
+    res.json({ schemes });
+  } catch (err) {
+    console.error('Scheme match error:', err);
+    res.status(500).json({ error: 'Failed to match schemes' });
+  }
 });
 
 export default router;

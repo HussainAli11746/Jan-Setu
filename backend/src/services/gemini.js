@@ -729,3 +729,549 @@ const getLocalizedFallbackSchemes = (message, language = 'en') => {
     schemes: schemes.slice(0, 6),
   };
 };
+
+const OFFICIAL_URL_MAP = {
+  pmkisan: 'https://pmkisan.gov.in',
+  pmfby: 'https://pmfby.gov.in',
+  kcc: 'https://www.myscheme.gov.in/schemes/kcc',
+  pmksy: 'https://pmksy.gov.in',
+  pmayg: 'https://pmayg.nic.in',
+  pmayu: 'https://pmay-urban.gov.in',
+  pmjay: 'https://beneficiary.nha.gov.in',
+  ayushman: 'https://beneficiary.nha.gov.in',
+  pmsby: 'https://www.jansuraksha.gov.in',
+  pmjjby: 'https://www.jansuraksha.gov.in',
+  svanidhi: 'https://pmsvanidhi.mohua.gov.in',
+  mudra: 'https://www.udyamimitra.in',
+  'pm-mudra': 'https://www.udyamimitra.in',
+  standup_india: 'https://www.standupmitra.in',
+  mgnregs: 'https://nrega.nic.in',
+  pmkvy: 'https://www.skillindiadigital.gov.in',
+  pm_vishwakarma: 'https://pmvishwakarma.gov.in',
+  'pm-vishwakarma': 'https://pmvishwakarma.gov.in',
+  pmjdy: 'https://pmjdy.gov.in',
+  apy: 'https://www.npscra.nsdl.co.in/scheme-details.php',
+  sukanya_samriddhi: 'https://www.myscheme.gov.in/schemes/ssy',
+  sukanya: 'https://www.myscheme.gov.in/schemes/ssy',
+  postmatric_sch: 'https://scholarships.gov.in',
+  nsp_sc: 'https://scholarships.gov.in',
+  nmmss: 'https://scholarships.gov.in',
+  cbse_merit_single_girl: 'https://www.cbse.gov.in/cbsenew/scholar.html',
+  'pm-poshan': 'https://pmposhan.education.gov.in/index.html',
+  pmposhan: 'https://pmposhan.education.gov.in/index.html',
+  pmmvy: 'https://pmmvy.wcd.gov.in',
+  pmegp: 'https://www.kviconline.gov.in',
+};
+
+const enrichMatchedSchemeUrls = (scheme, profile) => {
+  const normId = (scheme.id || '').toLowerCase().replace(/[^a-z0-9_-]/g, '');
+  const applyUrl = OFFICIAL_URL_MAP[normId] || scheme.applyUrl || `https://www.myscheme.gov.in/search?q=${encodeURIComponent(scheme.name || '')}`;
+  return {
+    ...scheme,
+    id: normId || 'scheme_' + Math.random().toString(36).substring(2, 7),
+    applyUrl,
+    category: (scheme.category || 'social').toLowerCase(),
+    matchScore: scheme.matchScore || '92% Match',
+  };
+};
+
+/**
+ * AI-powered Welfare Scheme Matcher using Google Gemini 2.5 Flash.
+ * Analyzes citizen demographic attributes (state, occupation, income, gender, age, employment)
+ * and returns high-confidence matched government schemes with reasons, eligibility, and verified official apply links.
+ */
+export const matchProfileSchemesWithGemini = async (profile = {}, language = 'en') => {
+  const targetLanguageName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES['en'];
+
+  const model = getGeminiModel();
+  if (model) {
+    try {
+      const prompt = `You are JanSetu AI's core Citizen Eligibility Matching Engine.
+Analyze the following verified Indian citizen demographic profile:
+
+CITIZEN PROFILE:
+- Age Group: ${profile.ageCategory || '26-40'}
+- Gender: ${profile.gender || 'male'}
+- State of Residence: ${profile.state || 'India'}
+- Annual Family Income Bracket: ${profile.incomeBracket || '1-3L'}
+- Primary Occupation / Livelihood: ${profile.occupation || 'Self-Employed'}
+- Employment Status: ${profile.employmentStatus || 'self'}
+
+TARGET LANGUAGE: ${targetLanguageName} (Code: ${language})
+
+TASK:
+Match and return 6 to 10 active Central and State Government Welfare Schemes specifically applicable and beneficial to this citizen's occupation, income bracket, residential state, age category, and gender.
+
+CRITICAL REQUIREMENTS:
+1. Every scheme MUST be an active flagship Indian government scheme (e.g. PM-KISAN, Ayushman Bharat PM-JAY, PMAY-G, PM SVANidhi, PMKVY 4.0, MGNREGS, PMMY Mudra, Stand-Up India, Post-Matric Scholarship, PM Vishwakarma, APY, Sukanya Samriddhi, PM POSHAN, etc.).
+2. Tailor the schemes specifically:
+   - If occupation is Farmer: include PM-KISAN, PMFBY, KCC, PMKSY, PMAY-G.
+   - If occupation is Student: include Post-Matric Scholarship, PMKVY, NMMSS, PM Internship, Single Girl Child (if female).
+   - If occupation is Self-Employed or Street Vendor: include PM SVANidhi, PMMY Mudra, PM Vishwakarma, Stand-Up India (if female/SC/ST).
+   - If occupation is Daily Wage Worker / Unemployed: include MGNREGS, PMKVY, Ayushman Bharat, PMAY-G, APY.
+   - If occupation is Homemaker: include Sukanya Samriddhi, PMMVY, Ayushman Bharat, APY.
+   - If income is <1L or 1-3L: prioritize Ayushman Bharat (₹5 Lakh cover) and PMAY housing.
+3. For each scheme, provide:
+   - "id": lowercase unique slug string (e.g. "pmkisan", "pmjay", "pmayg", "svanidhi", "pmkvy", "mudra", "mgnregs", "postmatric_sch", "pm_vishwakarma", "apy", "sukanya", "pm-poshan")
+   - "name": Scheme name (e.g. "PM-KISAN", "PMAY-G", "Ayushman Bharat", etc.)
+   - "fullName": Full official name of the scheme
+   - "ministry": Name of the responsible central/state ministry
+   - "category": exactly one of ["agriculture", "education", "housing", "health", "business", "employment", "skill", "social"]
+   - "benefit": concise key benefit (e.g. "₹6,000 / year", "₹5 Lakhs health cover", "Collateral-free loan up to ₹50,000")
+   - "description": 2-3 sentence overview
+   - "matchScore": Confidence string percentage (e.g. "98% Match", "95% Match", "92% Match", "89% Match")
+   - "matchReason": Exactly 1 clear sentence explaining WHY this scheme matches this citizen's specific occupation, state, income, or gender
+   - "qualifications": Array of 2-3 objects: [{"text": "Qualification point", "sub": "Details"}]
+   - "requiredDocs": Array of 2-4 objects: [{"name": "Aadhaar Card", "status": "Pre-verified"}, {"name": "Income Certificate", "status": "Required"}]
+   - "officialEligibility": {"description": "Brief description", "exclusions": "Key exclusions"}
+   - "applyUrl": Direct official active Government of India portal URL
+
+RETURN STRICTLY RAW VALID JSON ONLY with no markdown formatting:
+{
+  "schemes": [ ... ]
+}`;
+
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      const parsed = JSON.parse(text);
+      if (parsed && Array.isArray(parsed.schemes) && parsed.schemes.length > 0) {
+        return parsed.schemes.map(s => enrichMatchedSchemeUrls(s, profile));
+      }
+    } catch (err) {
+      console.warn('Gemini scheme matching fallback invoked:', err.message);
+    }
+  }
+
+  // Deterministic fallback matcher
+  return getDeterministicMatchedSchemes(profile, language);
+};
+
+/**
+ * Intelligent deterministic fallback rule engine for scheme matching
+ */
+const getDeterministicMatchedSchemes = (profile = {}, language = 'en') => {
+  const occ = (profile.occupation || '').toLowerCase();
+  const gender = (profile.gender || '').toLowerCase();
+  const state = profile.state || 'India';
+  const inc = profile.incomeBracket || '1-3L';
+  const age = profile.ageCategory || '26-40';
+
+  const isFarmer = occ.includes('farm') || occ.includes('kisan') || occ.includes('agri');
+  const isStudent = occ.includes('student') || occ.includes('vidhyarthi') || occ.includes('study');
+  const isVendorOrBusiness = occ.includes('vendor') || occ.includes('shop') || occ.includes('self') || occ.includes('business');
+  const isWorkerOrUnemployed = occ.includes('wage') || occ.includes('labour') || occ.includes('worker') || occ.includes('unemployed');
+  const isHomemaker = occ.includes('home') || occ.includes('housewife') || occ.includes('grihini');
+  const isFemale = gender === 'female';
+  const isLowIncome = inc === '<1L' || inc === '1-3L';
+
+  const results = [];
+
+  // 1. Occupation-specific flagship matches
+  if (isFarmer) {
+    results.push({
+      id: 'pmkisan',
+      name: 'PM-KISAN',
+      fullName: 'Pradhan Mantri Kisan Samman Nidhi',
+      ministry: 'Ministry of Agriculture & Farmers Welfare',
+      category: 'agriculture',
+      benefit: '₹6,000 / year',
+      description: 'Direct income support of ₹6,000 per year paid in three equal installments to eligible farmer families across India.',
+      matchScore: '98% Match',
+      matchReason: `Matched with Farmer occupation & Land records in ${state}.`,
+      qualifications: [
+        { text: 'Landholding farmer family', sub: 'Cultivable land holding in applicant or family name.' },
+        { text: 'Active bank account', sub: 'Direct Benefit Transfer (DBT) enabled account.' }
+      ],
+      requiredDocs: [
+        { name: 'Aadhaar Card', status: 'Pre-verified' },
+        { name: 'Land Khatauni / Khasra', status: 'Required' },
+        { name: 'Bank Passbook', status: 'Active' }
+      ],
+      officialEligibility: {
+        description: 'All landholding farmers families, having cultivable landholding in their names are eligible.',
+        exclusions: 'Institutional landholders, high-income taxpayers, and government pension holders.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.pmkisan,
+    });
+
+    results.push({
+      id: 'pmfby',
+      name: 'PM Fasal Bima Yojana',
+      fullName: 'Pradhan Mantri Fasal Bima Yojana',
+      ministry: 'Ministry of Agriculture & Farmers Welfare',
+      category: 'agriculture',
+      benefit: 'Comprehensive Crop Insurance (2% Kharif)',
+      description: 'Financial support and comprehensive risk insurance against non-preventable natural crop damage.',
+      matchScore: '95% Match',
+      matchReason: `Matched for notified seasonal crops cultivated in ${state}.`,
+      qualifications: [
+        { text: 'Cultivating notified crops', sub: 'Owner or recorded tenant farmer.' }
+      ],
+      requiredDocs: [
+        { name: 'Aadhaar Card', status: 'Pre-verified' },
+        { name: 'Land Possession Certificate', status: 'Required' }
+      ],
+      officialEligibility: {
+        description: 'All farmers growing notified crops in notified areas are eligible.',
+        exclusions: 'Crops not covered under state seasonal notification.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.pmfby,
+    });
+
+    results.push({
+      id: 'kcc',
+      name: 'Kisan Credit Card (KCC)',
+      fullName: 'Kisan Credit Card Scheme',
+      ministry: 'Ministry of Agriculture & Farmers Welfare',
+      category: 'agriculture',
+      benefit: 'Credit up to ₹3 Lakh at 4% Interest',
+      description: 'Affordable institutional credit for farmers to purchase seeds, fertilizers, and agricultural inputs.',
+      matchScore: '93% Match',
+      matchReason: `Matched based on agricultural livelihood in ${state}.`,
+      qualifications: [
+        { text: 'Active farmer', sub: 'Owner cultivator, tenant farmer, or oral lessee.' }
+      ],
+      requiredDocs: [
+        { name: 'Aadhaar Card', status: 'Pre-verified' },
+        { name: 'Land Records', status: 'Required' }
+      ],
+      officialEligibility: {
+        description: 'All farmers, individuals or joint borrowers who are owner cultivators.',
+        exclusions: 'Defaulters of previous institutional farm loans.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.kcc,
+    });
+  }
+
+  if (isStudent) {
+    results.push({
+      id: 'postmatric_sch',
+      name: 'Post-Matric Scholarship Scheme',
+      fullName: 'Central Sector Post-Matric Scholarship',
+      ministry: 'Ministry of Social Justice and Empowerment',
+      category: 'education',
+      benefit: 'Full Tuition Fee + Monthly Allowance',
+      description: 'Direct scholarship and financial assistance for post-secondary and college education.',
+      matchScore: '98% Match',
+      matchReason: `Matched based on Student status & ${inc} annual family income bracket in ${state}.`,
+      qualifications: [
+        { text: 'Enrolled in recognized institution', sub: 'Pursuing post-matric / diploma / degree course.' },
+        { text: 'Income criteria met', sub: `Family income within ${inc} cap.` }
+      ],
+      requiredDocs: [
+        { name: 'Aadhaar Card', status: 'Pre-verified' },
+        { name: 'Income Certificate', status: 'Required' },
+        { name: 'College Admission / Fee Receipt', status: 'Required' }
+      ],
+      officialEligibility: {
+        description: 'Students pursuing post-matriculation courses in recognized institutions.',
+        exclusions: 'Students receiving multiple concurrent central scholarships.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.postmatric_sch,
+    });
+
+    results.push({
+      id: 'pmkvy',
+      name: 'PMKVY 4.0 (Skill India)',
+      fullName: 'Pradhan Mantri Kaushal Vikas Yojana',
+      ministry: 'Ministry of Skill Development and Entrepreneurship',
+      category: 'skill',
+      benefit: 'Free Skill Training + Certification',
+      description: 'Industry-aligned technical skill certification, stipend, and placement assistance.',
+      matchScore: '94% Match',
+      matchReason: `Matched for youth / student upskilling in ${state}.`,
+      qualifications: [
+        { text: 'Indian Youth', sub: 'Seeking job-oriented vocational skills.' }
+      ],
+      requiredDocs: [
+        { name: 'Aadhaar Card', status: 'Pre-verified' },
+        { name: '10th / 12th Certificate', status: 'Required' }
+      ],
+      officialEligibility: {
+        description: 'Any Indian youth looking to acquire employable industry skills.',
+        exclusions: 'Currently employed regular central government staff.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.pmkvy,
+    });
+
+    if (isFemale) {
+      results.push({
+        id: 'cbse_merit_single_girl',
+        name: 'CBSE Single Girl Child Scholarship',
+        fullName: 'CBSE Merit Scholarship for Single Girl Children',
+        ministry: 'Department of School Education & Literacy',
+        category: 'education',
+        benefit: '₹500 / month scholarship',
+        description: 'Merit scholarship supporting the higher secondary education of meritorious single girl children.',
+        matchScore: '92% Match',
+        matchReason: `Matched for Female student profile in ${state}.`,
+        qualifications: [
+          { text: 'Single girl child of parents', sub: 'Passed Class X with 60% or more marks.' }
+        ],
+        requiredDocs: [
+          { name: 'Aadhaar Card', status: 'Pre-verified' },
+          { name: 'Class X Marksheet', status: 'Required' },
+          { name: 'Single Girl Child Affidavit', status: 'Required' }
+        ],
+        officialEligibility: {
+          description: 'Single girl child who is the only child of her parents.',
+          exclusions: 'Students with siblings.'
+        },
+        applyUrl: OFFICIAL_URL_MAP.cbse_merit_single_girl,
+      });
+    }
+  }
+
+  if (isVendorOrBusiness) {
+    results.push({
+      id: 'svanidhi',
+      name: 'PM SVANidhi',
+      fullName: 'Prime Minister Street Vendor\'s AtmaNirbhar Nidhi',
+      ministry: 'Ministry of Housing and Urban Affairs',
+      category: 'business',
+      benefit: '₹10,000 – ₹50,000 Collateral Free',
+      description: 'Special micro-credit facility offering collateral-free working capital loans with 7% interest subsidy for small vendors.',
+      matchScore: '97% Match',
+      matchReason: `Matched based on Self-Employed / Vendor livelihood in ${state}.`,
+      qualifications: [
+        { text: 'Urban / Peri-urban vendor', sub: 'Vending certificate or letter of recommendation from ULB.' }
+      ],
+      requiredDocs: [
+        { name: 'Aadhaar Card', status: 'Pre-verified' },
+        { name: 'Vending ID / ULB Certificate', status: 'Required' }
+      ],
+      officialEligibility: {
+        description: 'Street vendors and small micro-entrepreneurs engaged in vending.',
+        exclusions: 'Defaulters of previous non-repaid government credit.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.svanidhi,
+    });
+
+    results.push({
+      id: 'mudra',
+      name: 'Pradhan Mantri MUDRA Yojana',
+      fullName: 'PMMY Shishu / Kishor / Tarun Micro Credit',
+      ministry: 'Ministry of Finance',
+      category: 'business',
+      benefit: 'Loans up to ₹10.00 Lakhs',
+      description: 'Collateral-free business loans for non-corporate, non-farm small and micro enterprises.',
+      matchScore: '94% Match',
+      matchReason: `Matched for small business entrepreneurship credit support in ${state}.`,
+      qualifications: [
+        { text: 'Non-farm enterprise', sub: 'Trading, manufacturing, or service business.' }
+      ],
+      requiredDocs: [
+        { name: 'Aadhaar / PAN Card', status: 'Pre-verified' },
+        { name: 'Business Registration / DPR', status: 'Required' }
+      ],
+      officialEligibility: {
+        description: 'Any Indian citizen with a business plan for non-farm income generation.',
+        exclusions: 'Large corporate entities.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.mudra,
+    });
+
+    results.push({
+      id: 'pm_vishwakarma',
+      name: 'PM Vishwakarma Scheme',
+      fullName: 'PM Vishwakarma Scheme for Traditional Artisans',
+      ministry: 'Ministry of MSME',
+      category: 'skill',
+      benefit: '₹15,000 Toolkit + ₹3 Lakh Loan at 5%',
+      description: 'Holistic support including skill verification, free modern toolkit grant, and subsidized collateral-free loans.',
+      matchScore: '92% Match',
+      matchReason: `Matched for artisan & skilled trade livelihood in ${state}.`,
+      qualifications: [
+        { text: 'Designated traditional trade', sub: 'Carpenters, blacksmiths, potters, tailors, etc.' }
+      ],
+      requiredDocs: [
+        { name: 'Aadhaar Card', status: 'Pre-verified' },
+        { name: 'Trade Proof / Self Declaration', status: 'Required' }
+      ],
+      officialEligibility: {
+        description: 'Traditional artisans and craftspeople working with hands and tools.',
+        exclusions: 'Government employees.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.pm_vishwakarma,
+    });
+  }
+
+  if (isWorkerOrUnemployed) {
+    results.push({
+      id: 'mgnregs',
+      name: 'MGNREGS',
+      fullName: 'Mahatma Gandhi National Rural Employment Guarantee Scheme',
+      ministry: 'Ministry of Rural Development',
+      category: 'employment',
+      benefit: '100 Days Guaranteed Wage Employment',
+      description: 'Guaranteed 100 days of wage employment per financial year to adult members of rural households.',
+      matchScore: '98% Match',
+      matchReason: `Matched based on daily wage / rural employment support in ${state}.`,
+      qualifications: [
+        { text: 'Adult resident', sub: 'Willing to undertake unskilled manual work.' }
+      ],
+      requiredDocs: [
+        { name: 'Job Card', status: 'Gram Panchayat issued' },
+        { name: 'Aadhaar Card', status: 'Pre-verified' }
+      ],
+      officialEligibility: {
+        description: 'All adult members of rural households willing to do manual work.',
+        exclusions: 'Permanent salaried employees.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.mgnregs,
+    });
+
+    results.push({
+      id: 'pmkvy',
+      name: 'PMKVY 4.0',
+      fullName: 'Pradhan Mantri Kaushal Vikas Yojana',
+      ministry: 'Ministry of Skill Development and Entrepreneurship',
+      category: 'skill',
+      benefit: 'Free Skill Training + ₹8,000 Reward',
+      description: 'Short term industry certified skill development to transition into salaried employment.',
+      matchScore: '93% Match',
+      matchReason: `Matched for vocational re-skilling and job placement in ${state}.`,
+      qualifications: [
+        { text: 'Seeking employment', sub: 'Eligible for NSDC certified training.' }
+      ],
+      requiredDocs: [
+        { name: 'Aadhaar Card', status: 'Pre-verified' },
+        { name: 'Bank Passbook', status: 'Active' }
+      ],
+      officialEligibility: {
+        description: 'Any unemployed or wage worker seeking career skills.',
+        exclusions: 'None.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.pmkvy,
+    });
+  }
+
+  if (isFemale || isHomemaker) {
+    results.push({
+      id: 'sukanya',
+      name: 'Sukanya Samriddhi Yojana',
+      fullName: 'Sukanya Samriddhi Account (SSA)',
+      ministry: 'Ministry of Women and Child Development',
+      category: 'social',
+      benefit: '8.2% Interest + Tax Exemption',
+      description: 'High-interest small deposit savings scheme aimed at securing the financial future of girl children.',
+      matchScore: '95% Match',
+      matchReason: `Matched for family social savings and high yield returns for female citizens in ${state}.`,
+      qualifications: [
+        { text: 'Girl child up to 10 years', sub: 'Account opened by parent or legal guardian.' }
+      ],
+      requiredDocs: [
+        { name: 'Birth Certificate of Girl Child', status: 'Required' },
+        { name: 'Guardian Aadhaar / PAN', status: 'Pre-verified' }
+      ],
+      officialEligibility: {
+        description: 'Parents or legal guardians of a girl child up to 10 years of age.',
+        exclusions: 'Girl child above 10 years at account opening.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.sukanya,
+    });
+  }
+
+  // 2. Health & Housing matches for Low / Medium Income
+  if (isLowIncome || results.length < 5) {
+    results.push({
+      id: 'ayushman',
+      name: 'Ayushman Bharat (PM-JAY)',
+      fullName: 'Ayushman Bharat Pradhan Mantri Jan Arogya Yojana',
+      ministry: 'Ministry of Health and Family Welfare',
+      category: 'health',
+      benefit: '₹5.00 Lakhs / family / year',
+      description: 'Free cashless health insurance coverage up to ₹5 Lakhs per family per year for hospitalization.',
+      matchScore: '96% Match',
+      matchReason: `Matched based on ${inc} annual income bracket & state entitlement in ${state}.`,
+      qualifications: [
+        { text: 'Eligible income category', sub: 'Identified under SECC / low-income entitlement card.' }
+      ],
+      requiredDocs: [
+        { name: 'Aadhaar Card', status: 'Pre-verified' },
+        { name: 'Ration Card / Ayushman Card', status: 'Required' }
+      ],
+      officialEligibility: {
+        description: 'Bottom 40% vulnerable and low income families across India.',
+        exclusions: 'Formal sector workers covered under CGHS/ESI.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.ayushman,
+    });
+
+    results.push({
+      id: 'pmayg',
+      name: 'PMAY-G / PMAY-U',
+      fullName: 'Pradhan Mantri Awas Yojana',
+      ministry: 'Ministry of Rural Development / MoHUA',
+      category: 'housing',
+      benefit: 'Up to ₹1.30 Lakhs – ₹2.67 Lakhs Grant',
+      description: 'Financial housing grant to build a durable permanent pucca house with basic amenities.',
+      matchScore: '93% Match',
+      matchReason: `Matched based on income bracket (${inc}) and residential status in ${state}.`,
+      qualifications: [
+        { text: 'Kutcha / temporary house', sub: 'No existing permanent pucca house in family.' }
+      ],
+      requiredDocs: [
+        { name: 'Aadhaar Card', status: 'Pre-verified' },
+        { name: 'Job Card / SECC Record', status: 'Panchayat list' }
+      ],
+      officialEligibility: {
+        description: 'Homeless families and households in kutcha or temporary houses.',
+        exclusions: 'Families owning motorized vehicles or earning above tax limits.'
+      },
+      applyUrl: OFFICIAL_URL_MAP.pmayg,
+    });
+  }
+
+  // 3. Social Security & Pension matches
+  results.push({
+    id: 'apy',
+    name: 'Atal Pension Yojana (APY)',
+    fullName: 'Atal Pension Yojana',
+    ministry: 'Ministry of Finance / PFRDA',
+    category: 'social',
+    benefit: '₹1,000 – ₹5,000 / month Pension',
+    description: 'Government-guaranteed pension scheme ensuring guaranteed monthly pension post age 60.',
+    matchScore: '91% Match',
+    matchReason: `Matched based on ${age} age category for retirement security in ${state}.`,
+    qualifications: [
+      { text: 'Age between 18 and 40 years', sub: 'Flexible auto-debit contribution.' }
+    ],
+    requiredDocs: [
+      { name: 'Aadhaar Card', status: 'Pre-verified' },
+      { name: 'Savings Bank Account', status: 'Auto-debit enabled' }
+    ],
+    officialEligibility: {
+      description: 'All unorganized sector workers aged between 18 and 40 years.',
+      exclusions: 'Income tax payers.'
+    },
+    applyUrl: OFFICIAL_URL_MAP.apy,
+  });
+
+  // 4. PM POSHAN / Education match
+  results.push({
+    id: 'pm-poshan',
+    name: 'PM POSHAN Scheme',
+    fullName: 'Pradhan Mantri Poshan Shakti Nirman',
+    ministry: 'Ministry of Education',
+    category: 'education',
+    benefit: 'Nutritional Support & Meal Allowance',
+    description: 'National initiative providing hot cooked meals to children in primary and upper-primary government schools.',
+    matchScore: '88% Match',
+    matchReason: `Matched for family child welfare and education nutrition benefits in ${state}.`,
+    qualifications: [
+      { text: 'Government School Enrolment', sub: 'Enrolled in Class I to VIII.' }
+    ],
+    requiredDocs: [
+      { name: 'School Enrolment Number', status: 'Pre-verified' }
+    ],
+    officialEligibility: {
+      description: 'All children studying in Classes I–VIII in Government and aided schools.',
+      exclusions: 'Private non-aided fee-paying schools.'
+    },
+    applyUrl: OFFICIAL_URL_MAP['pm-poshan'],
+  });
+
+  return results.map(s => enrichMatchedSchemeUrls(s, profile));
+};
+

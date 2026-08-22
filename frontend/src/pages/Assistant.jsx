@@ -8,7 +8,8 @@ import SchemeSlider from '../components/Chat/SchemeSlider';
 import LanguageChangeModal from '../components/Common/LanguageChangeModal';
 import toast from 'react-hot-toast';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const rawUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const API_BASE = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
 
 const LANGUAGES = [
   { code: 'en', label: 'English', native: 'English' },

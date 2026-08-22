@@ -3,7 +3,8 @@ import i18n from '../i18n';
 
 const AuthContext = createContext(null);
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const rawUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const API_BASE = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -15,9 +16,17 @@ export function AuthProvider({ children }) {
       return [];
     }
   });
+  const [matchedSchemes, setMatchedSchemes] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('jansetu_matched_schemes') || '[]');
+    } catch {
+      return [];
+    }
+  });
   const [loading, setLoading] = useState(true);
+  const [matchingSchemesLoading, setMatchingSchemesLoading] = useState(false);
 
-  // On mount, verify token and rehydrate user + sync language and saved schemes
+  // On mount, verify token and rehydrate user + sync language, saved schemes and AI matched schemes
   useEffect(() => {
     const storedToken = localStorage.getItem('jansetu_token');
     const storedUser = localStorage.getItem('jansetu_user');
@@ -32,11 +41,41 @@ export function AuthProvider({ children }) {
           localStorage.setItem('jansetu_saved_schemes', JSON.stringify(parsed.savedSchemes));
         }
 
+        if (Array.isArray(parsed.matchedSchemes) && parsed.matchedSchemes.length > 0) {
+          setMatchedSchemes(parsed.matchedSchemes);
+          localStorage.setItem('jansetu_matched_schemes', JSON.stringify(parsed.matchedSchemes));
+        }
+
         const userLang = parsed.language || parsed.profile?.language;
         if (userLang && userLang !== i18n.language) {
           i18n.changeLanguage(userLang);
           localStorage.setItem('i18nextLng', userLang);
         }
+
+        // Fetch fresh profile & matched schemes from server
+        fetch(`${API_BASE}/auth/me`, {
+          headers: { Authorization: `Bearer ${storedToken}` }
+        })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (data) {
+              const updatedUser = {
+                ...parsed,
+                ...data,
+              };
+              setUser(updatedUser);
+              localStorage.setItem('jansetu_user', JSON.stringify(updatedUser));
+              if (Array.isArray(data.matchedSchemes) && data.matchedSchemes.length > 0) {
+                setMatchedSchemes(data.matchedSchemes);
+                localStorage.setItem('jansetu_matched_schemes', JSON.stringify(data.matchedSchemes));
+              }
+              if (Array.isArray(data.savedSchemes)) {
+                setSavedSchemes(data.savedSchemes);
+                localStorage.setItem('jansetu_saved_schemes', JSON.stringify(data.savedSchemes));
+              }
+            }
+          })
+          .catch(() => {});
       } catch {
         localStorage.removeItem('jansetu_token');
         localStorage.removeItem('jansetu_user');
@@ -76,6 +115,11 @@ export function AuthProvider({ children }) {
       localStorage.setItem('jansetu_saved_schemes', JSON.stringify(data.user.savedSchemes));
     }
 
+    if (Array.isArray(data.user.matchedSchemes)) {
+      setMatchedSchemes(data.user.matchedSchemes);
+      localStorage.setItem('jansetu_matched_schemes', JSON.stringify(data.user.matchedSchemes));
+    }
+
     const userLang = data.user.language || data.user.profile?.language;
     if (userLang) {
       i18n.changeLanguage(userLang);
@@ -85,31 +129,78 @@ export function AuthProvider({ children }) {
   };
 
   const saveProfile = async (profileData) => {
-    const storedToken = localStorage.getItem('jansetu_token') || token;
-    const res = await fetch(`${API_BASE}/auth/profile`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${storedToken}`,
-      },
-      body: JSON.stringify(profileData),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Profile update failed');
+    setMatchingSchemesLoading(true);
+    try {
+      const storedToken = localStorage.getItem('jansetu_token') || token;
+      const res = await fetch(`${API_BASE}/auth/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${storedToken}`,
+        },
+        body: JSON.stringify(profileData),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Profile update failed');
 
-    const updated = {
-      ...user,
-      language: data.language || profileData.language || user?.language,
-      profile: data.profile,
-    };
-    setUser(updated);
-    localStorage.setItem('jansetu_user', JSON.stringify(updated));
+      const updated = {
+        ...user,
+        language: data.language || profileData.language || user?.language,
+        profile: data.profile,
+        matchedSchemes: data.matchedSchemes || [],
+      };
+      setUser(updated);
+      localStorage.setItem('jansetu_user', JSON.stringify(updated));
 
-    if (profileData.language) {
-      i18n.changeLanguage(profileData.language);
-      localStorage.setItem('i18nextLng', profileData.language);
+      if (Array.isArray(data.matchedSchemes)) {
+        setMatchedSchemes(data.matchedSchemes);
+        localStorage.setItem('jansetu_matched_schemes', JSON.stringify(data.matchedSchemes));
+      }
+
+      if (profileData.language) {
+        i18n.changeLanguage(profileData.language);
+        localStorage.setItem('i18nextLng', profileData.language);
+      }
+      return data;
+    } finally {
+      setMatchingSchemesLoading(false);
     }
-    return data;
+  };
+
+  // Fetch or force regenerate matched schemes with Gemini
+  const fetchMatchedSchemes = async (overrideProfile = null) => {
+    setMatchingSchemesLoading(true);
+    try {
+      const storedToken = localStorage.getItem('jansetu_token') || token;
+      if (overrideProfile) {
+        const res = await fetch(`${API_BASE}/schemes/match`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profile: overrideProfile, language: i18n.language || 'en' }),
+        });
+        const data = await res.json();
+        if (data && Array.isArray(data.schemes)) {
+          setMatchedSchemes(data.schemes);
+          localStorage.setItem('jansetu_matched_schemes', JSON.stringify(data.schemes));
+          return data.schemes;
+        }
+      } else if (storedToken) {
+        const res = await fetch(`${API_BASE}/auth/matched-schemes`, {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        });
+        const data = await res.json();
+        if (data && Array.isArray(data.matchedSchemes)) {
+          setMatchedSchemes(data.matchedSchemes);
+          localStorage.setItem('jansetu_matched_schemes', JSON.stringify(data.matchedSchemes));
+          return data.matchedSchemes;
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch matched schemes:', err);
+    } finally {
+      setMatchingSchemesLoading(false);
+    }
+    return matchedSchemes;
   };
 
   // Change language in i18n, localStorage, and DB
@@ -213,8 +304,12 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setUser(null);
     setToken(null);
+    setMatchedSchemes([]);
+    setSavedSchemes([]);
     localStorage.removeItem('jansetu_token');
     localStorage.removeItem('jansetu_user');
+    localStorage.removeItem('jansetu_matched_schemes');
+    localStorage.removeItem('jansetu_saved_schemes');
   };
 
   const _persist = (tok, usr) => {
@@ -233,6 +328,9 @@ export function AuthProvider({ children }) {
       token,
       loading,
       savedSchemes,
+      matchedSchemes,
+      matchingSchemesLoading,
+      fetchMatchedSchemes,
       saveScheme,
       removeSavedScheme,
       isSchemeSaved,

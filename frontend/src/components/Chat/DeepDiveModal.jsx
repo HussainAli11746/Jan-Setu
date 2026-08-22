@@ -3,11 +3,12 @@ import { X, ExternalLink, CheckCircle2, FileText, AlertCircle, Bookmark, Bookmar
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
+import { notifyExtension } from '../../services/copilotHandshake';
 
 export default function DeepDiveModal({ scheme, onClose, colors }) {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language || 'en').slice(0, 2);
-  const { isSchemeSaved, saveScheme, removeSavedScheme } = useAuth();
+  const { isSchemeSaved, saveScheme, removeSavedScheme, token } = useAuth();
 
   const isSaved = isSchemeSaved(scheme.id);
 
@@ -98,22 +99,30 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
             <p className="text-sm text-slate-700 leading-relaxed">{scheme.description}</p>
           </div>
 
-          {/* Eligibility criteria */}
-          {scheme.eligibility && scheme.eligibility.length > 0 && (
+          {/* Eligibility criteria / Qualifications */}
+          {((scheme.eligibility && scheme.eligibility.length > 0) || (scheme.qualifications && scheme.qualifications.length > 0)) && (
             <div>
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                 {labels.eligibility}
               </h3>
               <ul className="flex flex-col gap-2">
-                {scheme.eligibility.map((criterion, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
-                    <div className="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-[9px] font-bold text-emerald-600">{i + 1}</span>
-                    </div>
-                    <span className="leading-relaxed">{criterion}</span>
-                  </li>
-                ))}
+                {(scheme.eligibility || scheme.qualifications).map((criterion, i) => {
+                  const isObj = typeof criterion === 'object' && criterion !== null;
+                  const text = isObj ? (criterion.text || criterion.name || criterion.description) : criterion;
+                  const sub = isObj ? criterion.sub : null;
+                  return (
+                    <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
+                      <div className="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-[9px] font-bold text-emerald-600">{i + 1}</span>
+                      </div>
+                      <div className="flex flex-col leading-snug">
+                        <span className="font-semibold text-slate-800">{text}</span>
+                        {sub && <span className="text-xs text-slate-500 mt-0.5">{sub}</span>}
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
@@ -126,15 +135,25 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
                 {labels.documents}
               </h3>
               <div className="flex flex-wrap gap-2">
-                {scheme.requiredDocs.map((doc, i) => (
-                  <span
-                    key={i}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-xs font-medium text-blue-700"
-                  >
-                    <FileText className="w-3 h-3" />
-                    {doc}
-                  </span>
-                ))}
+                {scheme.requiredDocs.map((doc, i) => {
+                  const isObj = typeof doc === 'object' && doc !== null;
+                  const docName = isObj ? (doc.name || doc.title || JSON.stringify(doc)) : doc;
+                  const docStatus = isObj ? doc.status : null;
+                  return (
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-xs font-medium text-blue-700"
+                    >
+                      <FileText className="w-3 h-3" />
+                      <span>{docName}</span>
+                      {docStatus && (
+                        <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded">
+                          {docStatus}
+                        </span>
+                      )}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -183,10 +202,17 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
 
           {/* Apply on Official Site */}
           <a
-            href={scheme.applyUrl && scheme.applyUrl !== '#' ? scheme.applyUrl : `https://www.myscheme.gov.in/search?q=${encodeURIComponent(scheme.name)}`}
+            href={
+              scheme.id === 'pm-poshan' || scheme.id === 'pmposhan'
+                ? 'https://pmposhan.education.gov.in/index.html'
+                : (scheme.applyUrl || scheme.apply_url || `https://www.myscheme.gov.in/search?q=${encodeURIComponent(scheme.name)}`)
+            }
             target="_blank"
             rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              notifyExtension(scheme.id, token, lang);
+            }}
             className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 hover:shadow-orange-500/25 hover:shadow-md transition-all cursor-pointer"
           >
             <ExternalLink className="w-3.5 h-3.5" />
