@@ -19,30 +19,30 @@ const PORT = process.env.PORT || 3001;
 connectDB();
 
 // Middleware
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
-  // Allow the Vite dev server, local prod, and the Chrome extension (all IDs)
-  origin: (origin, callback) => {
-    const allowed = [
-      'http://localhost:5173',
-      'http://localhost:3000',
-    ];
-    // Allow Chrome / Edge / Brave extension origins
-    if (!origin || allowed.includes(origin) || origin.startsWith('chrome-extension://') || origin.startsWith('extension://') || origin.startsWith('ms-browser-extension://')) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true,
   credentials: true,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rate limiting
-const generalLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
-const chatLimiter = rateLimit({ windowMs: 60 * 1000, max: 25 });
-app.use(generalLimiter);
+// Ensure Database is connected for Serverless Invocations
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database connection error in middleware:', err.message);
+    next();
+  }
+});
+
+// Rate limiting (only in production server, bypassed in serverless to avoid memory leaks)
+if (!process.env.VERCEL) {
+  const generalLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
+  app.use(generalLimiter);
+}
 
 // Health check
 app.get(['/health', '/api/health', '/api'], (req, res) => {
@@ -51,7 +51,7 @@ app.get(['/health', '/api/health', '/api'], (req, res) => {
 
 // Routes (support both /api prefix and direct paths)
 app.use(['/api/auth', '/auth'], authRoutes);
-app.use(['/api/chat', '/chat'], chatLimiter, chatRoutes);
+app.use(['/api/chat', '/chat'], chatRoutes);
 app.use(['/api/schemes', '/schemes'], schemesRoutes);
 app.use(['/api/copilot', '/copilot'], copilotRoutes);
 

@@ -2,23 +2,27 @@ import mongoose from 'mongoose';
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://alihussain11746_db_user:q61WuCZm1vgw8ywt@cluster0.ehyemo8.mongodb.net/jansetu';
 
-let isConnected = false;
+let cachedPromise = null;
 
 export const connectDB = async () => {
-  if (isConnected || mongoose.connection.readyState >= 1) {
-    return;
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
   }
 
-  try {
-    const db = await mongoose.connect(MONGO_URI, {
-      serverSelectionTimeoutMS: 5000,
+  if (!cachedPromise) {
+    const opts = {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 8000,
+    };
+    cachedPromise = mongoose.connect(MONGO_URI, opts).then((mongooseInstance) => {
+      console.log('MongoDB connected');
+      return mongooseInstance;
+    }).catch(err => {
+      cachedPromise = null;
+      console.error('MongoDB connection error:', err.message);
+      throw err;
     });
-    isConnected = db.connections[0].readyState >= 1;
-    console.log('MongoDB connected');
-  } catch (err) {
-    console.error('MongoDB connection error:', err.message);
-    if (!process.env.VERCEL) {
-      process.exit(1);
-    }
   }
+
+  return cachedPromise;
 };
