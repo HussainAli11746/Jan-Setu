@@ -3,7 +3,7 @@ import i18n from '../i18n';
 
 const AuthContext = createContext(null);
 
-const rawUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const rawUrl = import.meta.env.VITE_API_BASE_URL || '/api';
 const API_BASE = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
 
 export function AuthProvider({ children }) {
