@@ -10,6 +10,12 @@ export default function SchemeDetails() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+
+  // State must be declared before any usage
+  const [scheme, setScheme] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const OFFICIAL_PORTALS = {
     pmkisan: 'https://pmkisan.gov.in/',
     pmfby: 'https://pmfby.gov.in/',
@@ -31,6 +37,21 @@ export default function SchemeDetails() {
 
   const { saveScheme, removeSavedScheme, isSchemeSaved } = useAuth();
   const isSaved = scheme ? isSchemeSaved(scheme.id) : false;
+
+  useEffect(() => {
+    async function loadScheme() {
+      try {
+        const data = await fetchSchemeDetails(id);
+        setScheme(data);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to load scheme details');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadScheme();
+  }, [id]);
 
   const handleSave = () => {
     if (!scheme) return;
