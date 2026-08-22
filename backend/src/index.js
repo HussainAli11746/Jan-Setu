@@ -24,8 +24,8 @@ app.use(cors({
   origin: true,
   credentials: true,
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ limit: '20mb', extended: true }));
 
 // Ensure Database is connected for Serverless Invocations
 app.use(async (req, res, next) => {

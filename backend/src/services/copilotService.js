@@ -13,10 +13,17 @@ if (process.env.GEMINI_API_KEY) {
 
 // Candidate active vision models with auto-fallback
 const VISION_MODELS = [
-  "gemini-2.5-flash",
+  "gemini-1.5-flash",
+  "gemini-2.0-flash",
   "gemini-flash-latest",
-  "gemini-2.5-pro",
-  "gemini-flash-lite-latest",
+  "gemini-1.5-pro",
+];
+
+const TEXT_MODELS = [
+  "gemini-1.5-flash",
+  "gemini-2.0-flash",
+  "gemini-flash-latest",
+  "gemini-1.5-pro",
 ];
 
 const SCHEME_GROUNDING = {
