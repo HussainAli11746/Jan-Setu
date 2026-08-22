@@ -97,4 +97,40 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     return true; // Keep message channel open for async response
   }
+
+  // 4. ASK_REQUEST (free-text question from user)
+  if (message?.type === "ASK_REQUEST") {
+    const { schemeId, question, lang, token } = message;
+
+    if (!question || !token) {
+      sendResponse({ ok: false, error: "Missing question or token." });
+      return true;
+    }
+
+    fetch(`${BACKEND}/api/copilot/ask`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ schemeId, question, lang: lang || "en" }),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Server returned HTTP ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        sendResponse({ ok: true, answer: data.answer });
+      })
+      .catch((err) => {
+        const errMsg = err.message || "Failed to get answer from JanSetu AI.";
+        console.error("[JanSetu BG] ask error:", errMsg);
+        sendResponse({ ok: false, error: errMsg });
+      });
+
+    return true;
+  }
 });
