@@ -27,8 +27,8 @@ app.use(cors({
       'http://localhost:5173',
       'http://localhost:3000',
     ];
-    // Allow Chrome extension origins (chrome-extension://<id>)
-    if (!origin || allowed.includes(origin) || origin.startsWith('chrome-extension://')) {
+    // Allow Chrome / Edge / Brave extension origins
+    if (!origin || allowed.includes(origin) || origin.startsWith('chrome-extension://') || origin.startsWith('extension://') || origin.startsWith('ms-browser-extension://')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));

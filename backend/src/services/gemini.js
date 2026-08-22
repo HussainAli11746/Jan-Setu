@@ -13,12 +13,13 @@ if (process.env.GEMINI_API_KEY) {
 
 const getGeminiModel = () => {
   if (!genAI) return null;
-  // Use gemini-2.5-flash which is the active supported model for this API key
+  // Use gemini-2.5-flash with low latency optimization
   return genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
     generationConfig: {
       responseMimeType: 'application/json',
-      temperature: 0.3,
+      temperature: 0.15,
+      maxOutputTokens: 750,
     },
   });
 };

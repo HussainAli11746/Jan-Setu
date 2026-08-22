@@ -11,13 +11,11 @@ if (process.env.GEMINI_API_KEY) {
   }
 }
 
-// Candidate vision models with auto-fallback
+// Candidate active vision models with auto-fallback
 const VISION_MODELS = [
-  "gemini-flash-latest",
-  "gemini-3.7-flash",
-  "gemini-3.5-flash",
-  "gemini-3.1-flash-lite",
   "gemini-2.5-flash",
+  "gemini-flash-latest",
+  "gemini-2.5-pro",
   "gemini-flash-lite-latest",
 ];
 
@@ -205,7 +203,8 @@ async function analyzeScreenshot({ schemeId, imageBase64, lang = "en" }) {
         model: modelName,
         generationConfig: {
           responseMimeType: "application/json",
-          temperature: 0.2,
+          temperature: 0.1,
+          maxOutputTokens: 350,
         },
       });
 
@@ -240,8 +239,14 @@ async function analyzeScreenshot({ schemeId, imageBase64, lang = "en" }) {
     }
   }
 
-  // If all models failed, throw error or return detailed message
-  throw new Error(`Vision models unavailable: ${lastError?.message || "Please check API quota"}`);
+  // Graceful domain-grounded fallback if Gemini vision API hits quota
+  return {
+    sectionSummary: `Application Portal for ${scheme.name}`,
+    docsNeeded: scheme.docs.slice(0, 2),
+    allDocs: scheme.docs,
+    nextAction: `Enter your required applicant details and upload your ${scheme.docs[0] || 'documents'} to proceed.`,
+    spokenText: `You are on the official application page for ${scheme.name}. Please keep your ${scheme.docs.slice(0, 2).join(' and ')} ready.`,
+  };
 }
 
 /**
@@ -285,8 +290,8 @@ async function askQuestion({ schemeId, question, lang = "en" }) {
   const TEXT_MODELS = [
     "gemini-2.5-flash",
     "gemini-flash-latest",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
+    "gemini-2.5-pro",
+    "gemini-flash-lite-latest",
   ];
 
   let lastError = null;
@@ -294,7 +299,10 @@ async function askQuestion({ schemeId, question, lang = "en" }) {
     try {
       const model = genAI.getGenerativeModel({
         model: modelName,
-        generationConfig: { temperature: 0.4 },
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: 250,
+        },
       });
       const result = await model.generateContent(prompt);
       const answer = result.response.text().trim();
@@ -305,7 +313,16 @@ async function askQuestion({ schemeId, question, lang = "en" }) {
       lastError = err;
     }
   }
-  throw new Error(`Could not generate answer: ${lastError?.message || "Please check API quota"}`);
+
+  // Graceful domain-grounded fallback if Gemini quota is temporarily constrained
+  const qLower = (question || "").toLowerCase();
+  let fallbackAnswer = `For ${scheme.name}, please ensure you have your ${scheme.docs.slice(0, 3).join(", ")} ready on the ${scheme.portal} website.`;
+  if (qLower.includes("doc") || qLower.includes("kaagaz") || qLower.includes("praman") || qLower.includes("certificate")) {
+    fallbackAnswer = `Required documents for ${scheme.name} are: ${scheme.docs.join(", ")}. Keep digital scanned copies ready for upload.`;
+  } else if (qLower.includes("eligib") || qLower.includes("patra") || qLower.includes("who")) {
+    fallbackAnswer = `${scheme.name} is available for eligible Indian citizens. Verify your Aadhaar and bank details linked to DBT before applying on ${scheme.portal}.`;
+  }
+  return { answer: fallbackAnswer };
 }
 
 export { analyzeScreenshot, askQuestion, SCHEME_GROUNDING };
