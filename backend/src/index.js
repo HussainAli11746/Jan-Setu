@@ -45,15 +45,15 @@ const chatLimiter = rateLimit({ windowMs: 60 * 1000, max: 25 });
 app.use(generalLimiter);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get(['/health', '/api/health', '/api'], (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.0.0' });
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/chat', chatLimiter, chatRoutes);
-app.use('/api/schemes', schemesRoutes);
-app.use('/api/copilot', copilotRoutes);
+// Routes (support both /api prefix and direct paths)
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/chat', '/chat'], chatLimiter, chatRoutes);
+app.use(['/api/schemes', '/schemes'], schemesRoutes);
+app.use(['/api/copilot', '/copilot'], copilotRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
