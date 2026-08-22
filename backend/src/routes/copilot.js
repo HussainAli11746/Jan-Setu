@@ -1,6 +1,6 @@
 import express from "express";
 import { rateLimit } from "express-rate-limit";
-import { verifyToken } from "../middleware/auth.js";
+import { optionalAuth } from "../middleware/auth.js";
 import { analyzeScreenshot, askQuestion } from "../services/copilotService.js";
 
 const router = express.Router();
@@ -17,10 +17,9 @@ const copilotLimiter = rateLimit({
 
 /**
  * POST /api/copilot/analyze
- * Body: { schemeId: string, imageBase64: string, lang?: string }
- * Auth: Bearer <JWT>
+ * Body: { schemeId: string, imageBase64: string, lang?: string, currentUrl?: string, pageTitle?: string }
  */
-router.post("/analyze", verifyToken, copilotLimiter, async (req, res) => {
+router.post("/analyze", optionalAuth, copilotLimiter, async (req, res) => {
   try {
     const { schemeId, imageBase64, lang = "en", currentUrl, pageTitle } = req.body;
 
@@ -39,9 +38,8 @@ router.post("/analyze", verifyToken, copilotLimiter, async (req, res) => {
 /**
  * POST /api/copilot/ask
  * Body: { schemeId: string, question: string, lang?: string, currentUrl?: string, pageTitle?: string }
- * Auth: Bearer <JWT>
  */
-router.post("/ask", verifyToken, copilotLimiter, async (req, res) => {
+router.post("/ask", optionalAuth, copilotLimiter, async (req, res) => {
   try {
     const { schemeId, question, lang = "en", currentUrl, pageTitle } = req.body;
 
