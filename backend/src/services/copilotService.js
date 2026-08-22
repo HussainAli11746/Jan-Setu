@@ -160,7 +160,38 @@ function normalizeSchemeId(id) {
   return id;
 }
 
-async function analyzeScreenshot({ schemeId, imageBase64, lang = "en" }) {
+function resolveScheme({ schemeId, currentUrl }) {
+  if (currentUrl) {
+    const u = String(currentUrl).toLowerCase();
+    if (u.includes("pmkisan")) return SCHEME_GROUNDING.pmkisan;
+    if (u.includes("pmfby")) return SCHEME_GROUNDING.pmfby;
+    if (u.includes("pmayg") || u.includes("pmay-g")) return SCHEME_GROUNDING.pmayg;
+    if (u.includes("pmay-urban") || u.includes("pmayu")) return SCHEME_GROUNDING.pmayu;
+    if (u.includes("beneficiary.nha") || u.includes("pmjay") || u.includes("ayushman")) return SCHEME_GROUNDING.pmjay;
+    if (u.includes("pmsvanidhi") || u.includes("svanidhi")) return SCHEME_GROUNDING.svanidhi;
+    if (u.includes("skillindiadigital") || u.includes("pmkvy")) return SCHEME_GROUNDING.pmkvy;
+    if (u.includes("pmvishwakarma") || u.includes("vishwakarma")) return SCHEME_GROUNDING.pm_vishwakarma;
+    if (u.includes("nrega") || u.includes("mgnregs")) return SCHEME_GROUNDING.mgnregs;
+    if (u.includes("udyamimitra") || u.includes("mudra")) return SCHEME_GROUNDING.mudra;
+    if (u.includes("standupmitra") || u.includes("standup")) return SCHEME_GROUNDING.standup_india;
+    if (u.includes("pmjdy")) return SCHEME_GROUNDING.pmjdy;
+    if (u.includes("jansuraksha")) return SCHEME_GROUNDING.pmsby;
+    if (u.includes("npscra") || u.includes("apy")) return SCHEME_GROUNDING.apy;
+    if (u.includes("scholarships.gov.in")) return SCHEME_GROUNDING.nsp_sc;
+    if (u.includes("cbse.gov.in")) return SCHEME_GROUNDING.cbse_merit_single_girl;
+    if (u.includes("pmposhan")) return SCHEME_GROUNDING["pm-poshan"];
+    if (u.includes("/schemes/kcc") || u.includes("kcc")) return SCHEME_GROUNDING.kcc;
+    if (u.includes("/schemes/ssy") || u.includes("sukanya")) return SCHEME_GROUNDING.sukanya_samriddhi;
+  }
+  const key = normalizeSchemeId(schemeId);
+  return SCHEME_GROUNDING[key] || {
+    name: schemeId ? String(schemeId).toUpperCase() : "Government Welfare Scheme",
+    portal: "Official Government Portal",
+    docs: ["Aadhaar Card", "Bank Account Details", "Income Proof"],
+  };
+}
+
+async function analyzeScreenshot({ schemeId, imageBase64, lang = "en", currentUrl, pageTitle }) {
   if (!genAI) {
     if (process.env.GEMINI_API_KEY) {
       genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -169,21 +200,18 @@ async function analyzeScreenshot({ schemeId, imageBase64, lang = "en" }) {
     }
   }
 
-  const normalizedKey = normalizeSchemeId(schemeId);
-  const scheme = SCHEME_GROUNDING[normalizedKey] || {
-    name: schemeId ? String(schemeId).toUpperCase() : "Government Welfare Scheme",
-    portal: "Official Government Portal",
-    docs: ["Aadhaar Card", "Bank Account Details", "Income Proof", "Identity Document", "Mobile Number (OTP)"],
-  };
-
+  const scheme = resolveScheme({ schemeId, currentUrl });
   const langName = LANG_NAMES[lang] || LANG_NAMES["en"];
 
   const prompt = [
     `You are JanSetu AI Apply Assist, an expert AI visual co-pilot helping an Indian citizen navigate the application website for "${scheme.name}".`,
+    `Current portal URL: ${currentUrl || scheme.portal}.`,
+    pageTitle ? `Current page title: ${pageTitle}.` : ``,
     `Verified documents required for this scheme: ${scheme.docs.join(", ")}.`,
     `Language instruction: You MUST respond in ${langName}. If ${langName} is not English, write in that language's native script.`,
     ``,
     `Look carefully at the attached real screenshot of the government portal. Identify the exact visible text, dropdowns, input fields, buttons, and banners shown on the screen.`,
+    `Strict Context Rule: Stay focused ONLY on "${scheme.name}" on "${scheme.portal}". Do not confuse with any other scheme.`,
     ``,
     `Return ONLY a JSON object matching this schema with high precision:`,
     `{`,
@@ -192,7 +220,7 @@ async function analyzeScreenshot({ schemeId, imageBase64, lang = "en" }) {
     `  "nextAction": "Actionable, crystal-clear instructions on what field to fill or button/dropdown to click next (mention exact on-screen button labels or dropdown names visible in the image)",`,
     `  "spokenText": "A warm, clear 2-3 sentence audio summary guiding the citizen on what to do next on this screen"`,
     `}`
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 
   let lastError = null;
 
@@ -253,9 +281,11 @@ async function analyzeScreenshot({ schemeId, imageBase64, lang = "en" }) {
  * @param {string} opts.schemeId
  * @param {string} opts.question  - The user's free-text question
  * @param {string} [opts.lang]    - ISO 639-1 language code
+ * @param {string} [opts.currentUrl]
+ * @param {string} [opts.pageTitle]
  * @returns {Promise<{answer: string}>}
  */
-async function askQuestion({ schemeId, question, lang = "en" }) {
+async function askQuestion({ schemeId, question, lang = "en", currentUrl, pageTitle }) {
   if (!genAI) {
     if (process.env.GEMINI_API_KEY) {
       genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -264,26 +294,25 @@ async function askQuestion({ schemeId, question, lang = "en" }) {
     }
   }
 
-  const normalizedKey = normalizeSchemeId(schemeId);
-  const scheme = SCHEME_GROUNDING[normalizedKey] || {
-    name: schemeId ? String(schemeId).toUpperCase() : "Government Welfare Scheme",
-    portal: "Official Government Portal",
-    docs: ["Aadhaar Card", "Bank Account Details", "Income Proof"],
-  };
-
+  const scheme = resolveScheme({ schemeId, currentUrl });
   const langName = LANG_NAMES[lang] || LANG_NAMES["en"];
 
   const prompt = [
-    `You are JanSetu AI Apply Assist, a helpful and friendly AI guide for Indian citizens applying to government welfare schemes.`,
-    `The citizen is currently applying for: "${scheme.name}" on ${scheme.portal}.`,
+    `You are JanSetu AI Apply Assist, a helpful, accurate, and friendly AI guide for Indian citizens on official government portals.`,
+    `The citizen is currently on the official portal for: "${scheme.name}" (${scheme.portal}).`,
+    currentUrl ? `Current Page URL: ${currentUrl}` : ``,
+    pageTitle ? `Current Page Title: ${pageTitle}` : ``,
     `Documents required for this scheme: ${scheme.docs.join(", ")}.`,
     `Language instruction: You MUST respond in ${langName}. If ${langName} is not English, write in that language's native script.`,
     ``,
     `The citizen's question is: "${question}"`,
     ``,
-    `Answer in 2-4 sentences. Be warm, simple, and direct. Avoid technical jargon.`,
-    `If the question is unrelated to this scheme or government services, politely redirect them to ask about the scheme.`,
-  ].join("\n");
+    `CRITICAL INSTRUCTIONS:`,
+    `1. Answer specifically for "${scheme.name}" on its portal "${scheme.portal}".`,
+    `2. Do NOT confuse this scheme with any scholarship, PM-KISAN, or unrelated schemes unless specifically asked.`,
+    `3. Answer in 2-4 simple, direct sentences. Be warm, accurate, and encouraging.`,
+    `4. If the question asks where to find a Point of Contact (POC), helpline, or nodal officer for this scheme, provide the exact local authority or helpline relevant to "${scheme.name}" (for example: for PM-KISAN, mention the local Patwari/Lekhpal, District Agriculture Officer, or PM-Kisan Helpline 155261 / 011-24300606; for PMAY, mention the Gram Panchayat or Block Development Office).`,
+  ].filter(Boolean).join("\n");
 
   const TEXT_MODELS = [
     "gemini-2.5-flash",

@@ -60,7 +60,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   // 3. ANALYZE_REQUEST (proxies fetch to backend — no CORS issues)
   if (message?.type === "ANALYZE_REQUEST") {
-    const { schemeId, imageBase64, lang, token } = message;
+    const { schemeId, imageBase64, lang, token, currentUrl, pageTitle } = message;
 
     if (!schemeId || !imageBase64 || !token) {
       sendResponse({ ok: false, error: "Missing required fields for analysis." });
@@ -77,6 +77,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         schemeId,
         imageBase64,
         lang: lang || "en",
+        currentUrl,
+        pageTitle,
       }),
     })
       .then(async (res) => {
@@ -100,7 +102,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   // 4. ASK_REQUEST (free-text question from user)
   if (message?.type === "ASK_REQUEST") {
-    const { schemeId, question, lang, token } = message;
+    const { schemeId, question, lang, token, currentUrl, pageTitle } = message;
 
     if (!question || !token) {
       sendResponse({ ok: false, error: "Missing question or token." });
@@ -113,7 +115,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
       },
-      body: JSON.stringify({ schemeId, question, lang: lang || "en" }),
+      body: JSON.stringify({ schemeId, question, lang: lang || "en", currentUrl, pageTitle }),
     })
       .then(async (res) => {
         if (!res.ok) {

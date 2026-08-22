@@ -22,13 +22,13 @@ const copilotLimiter = rateLimit({
  */
 router.post("/analyze", verifyToken, copilotLimiter, async (req, res) => {
   try {
-    const { schemeId, imageBase64, lang = "en" } = req.body;
+    const { schemeId, imageBase64, lang = "en", currentUrl, pageTitle } = req.body;
 
     if (!imageBase64 || typeof imageBase64 !== "string") {
       return res.status(400).json({ error: "imageBase64 screenshot data is required." });
     }
 
-    const result = await analyzeScreenshot({ schemeId, imageBase64, lang });
+    const result = await analyzeScreenshot({ schemeId, imageBase64, lang, currentUrl, pageTitle });
     res.json(result);
   } catch (err) {
     console.error("[copilot/analyze] Handler Error:", err.message || err);
@@ -38,18 +38,18 @@ router.post("/analyze", verifyToken, copilotLimiter, async (req, res) => {
 
 /**
  * POST /api/copilot/ask
- * Body: { schemeId: string, question: string, lang?: string }
+ * Body: { schemeId: string, question: string, lang?: string, currentUrl?: string, pageTitle?: string }
  * Auth: Bearer <JWT>
  */
 router.post("/ask", verifyToken, copilotLimiter, async (req, res) => {
   try {
-    const { schemeId, question, lang = "en" } = req.body;
+    const { schemeId, question, lang = "en", currentUrl, pageTitle } = req.body;
 
     if (!question || typeof question !== "string" || question.trim().length === 0) {
       return res.status(400).json({ error: "question is required." });
     }
 
-    const result = await askQuestion({ schemeId, question: question.trim(), lang });
+    const result = await askQuestion({ schemeId, question: question.trim(), lang, currentUrl, pageTitle });
     res.json(result);
   } catch (err) {
     console.error("[copilot/ask] Handler Error:", err.message || err);

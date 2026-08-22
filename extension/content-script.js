@@ -207,6 +207,31 @@
     return I18N[l] ? l : "en";
   }
 
+  function detectSchemeFromUrl() {
+    var host = (window.location.hostname || "").toLowerCase();
+    var href = (window.location.href || "").toLowerCase();
+    if (host.includes("pmkisan")) return "pmkisan";
+    if (host.includes("pmfby")) return "pmfby";
+    if (host.includes("pmayg") || host.includes("pmay-g")) return "pmayg";
+    if (host.includes("pmay-urban") || host.includes("pmayu")) return "pmayu";
+    if (host.includes("beneficiary.nha") || host.includes("pmjay") || host.includes("ayushman")) return "pmjay";
+    if (host.includes("pmsvanidhi") || host.includes("svanidhi")) return "svanidhi";
+    if (host.includes("skillindiadigital") || host.includes("pmkvy")) return "pmkvy";
+    if (host.includes("pmvishwakarma") || host.includes("vishwakarma")) return "pm_vishwakarma";
+    if (host.includes("nrega") || host.includes("mgnregs")) return "mgnregs";
+    if (host.includes("udyamimitra") || host.includes("mudra")) return "mudra";
+    if (host.includes("standupmitra") || host.includes("standup")) return "standup_india";
+    if (host.includes("pmjdy")) return "pmjdy";
+    if (host.includes("jansuraksha")) return "pmsby";
+    if (host.includes("npscra") || host.includes("apy")) return "apy";
+    if (host.includes("scholarships.gov.in")) return "nsp_sc";
+    if (host.includes("cbse.gov.in")) return "cbse_merit_single_girl";
+    if (host.includes("pmposhan")) return "pmposhan";
+    if (href.includes("/schemes/kcc") || host.includes("kcc")) return "kcc";
+    if (href.includes("/schemes/ssy") || host.includes("sukanya")) return "sukanya_samriddhi";
+    return null;
+  }
+
   function getContext() {
     return new Promise(function(resolve) {
       try {
@@ -491,6 +516,8 @@
           chrome.runtime.sendMessage({
             type: "ANALYZE_REQUEST",
             schemeId: ctx.schemeId,
+            currentUrl: window.location.href,
+            pageTitle: document.title,
             imageBase64: imageBase64,
             lang: l,
             token: ctx.token,
@@ -563,6 +590,8 @@
       chrome.runtime.sendMessage({
         type: "ASK_REQUEST",
         schemeId: ctx.schemeId,
+        currentUrl: window.location.href,
+        pageTitle: document.title,
         question: question,
         lang: l,
         token: ctx.token,
@@ -627,10 +656,20 @@
 
   function init() {
     getContext().then(function(ctx) {
-      _ctx = ctx || { schemeId: "general", lang: "hi", token: "guest" };
+      var detectedScheme = detectSchemeFromUrl();
+      // If current portal clearly matches a known scheme (e.g. pmkisan.gov.in -> pmkisan),
+      // we ALWAYS prioritize the actual website domain over stale stored sessions!
+      var activeSchemeId = detectedScheme || (ctx && ctx.schemeId) || "pmkisan";
+      _ctx = {
+        schemeId: activeSchemeId,
+        lang: (ctx && ctx.lang) || "en",
+        token: (ctx && ctx.token) || "guest",
+        currentUrl: window.location.href,
+        pageTitle: document.title
+      };
       var activeLang = getLang(_ctx);
 
-      console.log("[JanSetu] Co-Pilot active for scheme:", _ctx.schemeId, "| lang:", activeLang);
+      console.log("[JanSetu] Co-Pilot active for scheme:", _ctx.schemeId, "| site:", window.location.hostname, "| lang:", activeLang);
 
       var btn   = createFloatingButton(activeLang);
       var panel = createPanel(activeLang);
