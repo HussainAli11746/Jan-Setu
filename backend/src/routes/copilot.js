@@ -1,7 +1,7 @@
 import express from "express";
 import { rateLimit } from "express-rate-limit";
 import { verifyToken } from "../middleware/auth.js";
-import { analyzeScreenshot } from "../services/copilotService.js";
+import { analyzeScreenshot, askQuestion } from "../services/copilotService.js";
 
 const router = express.Router();
 
@@ -36,4 +36,25 @@ router.post("/analyze", verifyToken, copilotLimiter, async (req, res) => {
   }
 });
 
-export default router;
+/**
+ * POST /api/copilot/ask
+ * Body: { schemeId: string, question: string, lang?: string }
+ * Auth: Bearer <JWT>
+ */
+router.post("/ask", verifyToken, copilotLimiter, async (req, res) => {
+  try {
+    const { schemeId, question, lang = "en" } = req.body;
+
+    if (!question || typeof question !== "string" || question.trim().length === 0) {
+      return res.status(400).json({ error: "question is required." });
+    }
+
+    const result = await askQuestion({ schemeId, question: question.trim(), lang });
+    res.json(result);
+  } catch (err) {
+    console.error("[copilot/ask] Handler Error:", err.message || err);
+    res.status(500).json({ error: err.message || "Failed to answer question." });
+  }
+});
+
+export default router;

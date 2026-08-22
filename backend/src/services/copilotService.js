@@ -244,4 +244,68 @@ async function analyzeScreenshot({ schemeId, imageBase64, lang = "en" }) {
   throw new Error(`Vision models unavailable: ${lastError?.message || "Please check API quota"}`);
 }
 
-export { analyzeScreenshot, SCHEME_GROUNDING };
+/**
+ * Answer a free-text question from the citizen, grounded in the scheme context.
+ * @param {object} opts
+ * @param {string} opts.schemeId
+ * @param {string} opts.question  - The user's free-text question
+ * @param {string} [opts.lang]    - ISO 639-1 language code
+ * @returns {Promise<{answer: string}>}
+ */
+async function askQuestion({ schemeId, question, lang = "en" }) {
+  if (!genAI) {
+    if (process.env.GEMINI_API_KEY) {
+      genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    } else {
+      throw new Error("GEMINI_API_KEY is not configured on server.");
+    }
+  }
+
+  const normalizedKey = normalizeSchemeId(schemeId);
+  const scheme = SCHEME_GROUNDING[normalizedKey] || {
+    name: schemeId ? String(schemeId).toUpperCase() : "Government Welfare Scheme",
+    portal: "Official Government Portal",
+    docs: ["Aadhaar Card", "Bank Account Details", "Income Proof"],
+  };
+
+  const langName = LANG_NAMES[lang] || LANG_NAMES["en"];
+
+  const prompt = [
+    `You are JanSetu AI Apply Assist, a helpful and friendly AI guide for Indian citizens applying to government welfare schemes.`,
+    `The citizen is currently applying for: "${scheme.name}" on ${scheme.portal}.`,
+    `Documents required for this scheme: ${scheme.docs.join(", ")}.`,
+    `Language instruction: You MUST respond in ${langName}. If ${langName} is not English, write in that language's native script.`,
+    ``,
+    `The citizen's question is: "${question}"`,
+    ``,
+    `Answer in 2-4 sentences. Be warm, simple, and direct. Avoid technical jargon.`,
+    `If the question is unrelated to this scheme or government services, politely redirect them to ask about the scheme.`,
+  ].join("\n");
+
+  const TEXT_MODELS = [
+    "gemini-2.5-flash",
+    "gemini-flash-latest",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+  ];
+
+  let lastError = null;
+  for (const modelName of TEXT_MODELS) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: { temperature: 0.4 },
+      });
+      const result = await model.generateContent(prompt);
+      const answer = result.response.text().trim();
+      console.log(`[copilotService] askQuestion successful via ${modelName}`);
+      return { answer };
+    } catch (err) {
+      console.warn(`[copilotService] askQuestion model ${modelName} failed: ${err.message}`);
+      lastError = err;
+    }
+  }
+  throw new Error(`Could not generate answer: ${lastError?.message || "Please check API quota"}`);
+}
+
+export { analyzeScreenshot, askQuestion, SCHEME_GROUNDING };

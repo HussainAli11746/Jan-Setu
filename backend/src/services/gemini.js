@@ -35,13 +35,40 @@ const LANGUAGE_NAMES = {
 
 // Off-topic guard
 const OFF_TOPIC_PATTERNS = [
-  /\b(cricket|football|movie|film|song|music|actor|actress|celebrity)\b/i,
-  /\b(recipe|cook|restaurant|hotel)\b/i,
-  /\b(weather|temperature|rain)\b/i,
-  /\b(joke|funny|comedy)\b/i,
-  /\b(girlfriend|boyfriend|love|marriage|wedding)\b/i,
-  /\b(stock|crypto|bitcoin|share market|trading)\b/i,
-  /\b(game|gaming|pubg|fortnite)\b/i,
+  // Sports & games
+  /\b(cricket|football|soccer|hockey|tennis|badminton|kabaddi|basketball|volleyball|chess)\b/i,
+  /\b(icc|bcci|ipl|fifa|olympics|world cup|t20|odi|test match|premier league|champions league)\b/i,
+  /\b(player|batsman|bowler|wicket|goal|match|tournament|medal|trophy|squad|team india)\b/i,
+  /\b(game|gaming|pubg|fortnite|minecraft|valorant|free fire|esports)\b/i,
+  /\b(score|scorecard|points table|standings|fixture|schedule|series)\b/i,
+
+  // Entertainment & celebrities
+  /\b(movie|film|cinema|bollywood|hollywood|web series|ott|netflix|amazon prime|hotstar)\b/i,
+  /\b(song|music|album|singer|actor|actress|celebrity|hero|heroine|director|producer)\b/i,
+  /\b(tv show|reality show|bigg boss|kbc|dance|comedy)\b/i,
+
+  // General knowledge & trivia
+  /\b(who won|who is the|who are the|who became|which team|which country|which player)\b/i,
+  /\b(capital of|population of|history of|distance between|how far|what is the speed)\b/i,
+  /\b(president of|prime minister of|king of|queen of|ceo of|founder of)\b/i,
+
+  // News & politics (non-scheme)
+  /\b(news|latest news|current affairs|breaking news|today news)\b/i,
+  /\b(election|vote|party|bjp|congress|aap|parliament|lok sabha|rajya sabha)\b/i,
+
+  // Food & lifestyle
+  /\b(recipe|cook|restaurant|hotel|food|dish|cuisine|biryani|pizza|burger)\b/i,
+  /\b(fashion|clothes|shopping|brand|sale|discount|flipkart|amazon|meesho)\b/i,
+
+  // Finance (non-government)
+  /\b(stock|crypto|bitcoin|share market|trading|nifty|sensex|mutual fund|sip)\b/i,
+
+  // Weather & geography
+  /\b(weather|temperature|rain|forecast|climate|monsoon|flood|earthquake)\b/i,
+
+  // Relationships & personal
+  /\b(girlfriend|boyfriend|love|marriage|wedding|divorce|breakup|dating)\b/i,
+  /\b(joke|funny|comedy|meme|roast|troll)\b/i,
 ];
 
 const isOffTopic = (msg) => OFF_TOPIC_PATTERNS.some((p) => p.test(msg));
@@ -98,6 +125,7 @@ LATEST CITIZEN QUERY / PROMPT:
 TARGET LANGUAGE: ${targetLanguageName} (Code: ${language})
 
 CRITICAL MANDATORY INSTRUCTIONS:
+0. OFF-TOPIC REJECTION: If the user's query is NOT related to Indian government welfare schemes, subsidies, eligibility, documents, or application help — you MUST respond with ONLY this JSON: {"reply": "${getOffTopicReply(language)}", "schemes": []}. Do NOT answer questions about sports, cricket, entertainment, celebrities, news, politics, weather, recipes, shopping, general knowledge, trivia, or anything unrelated to government welfare.
 1. OUTPUT MUST BE STRICTLY VALID JSON matching the schema below.
 2. RELEVANCE: Search and return 5 to 6 Indian central/state government schemes or initiatives that DIRECTLY match what the user is asking in "${userMessage}".
    - If user asks for "internship" / "apprenticeship" / "skills", return Prime Minister's Internship Scheme (PMIS), NATS, NAPS, PMKVY 4.0, TULIP (The Urban Learning Internship Program), etc.
@@ -124,6 +152,7 @@ JSON SCHEMA TO RETURN:
     }
   ]
 }`;
+
 
   const model = getGeminiModel();
   if (model) {

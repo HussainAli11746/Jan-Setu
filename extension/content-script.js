@@ -81,7 +81,14 @@
         '<button class="js-close-btn" id="jansetu-close-btn" aria-label="Close">\u2715</button>' +
       '</div>' +
 
-      '<div class="js-panel-body" id="jansetu-body">' +
+      // Tab bar
+      '<div class="js-tab-bar">' +
+        '<button class="js-tab js-tab-active" id="jansetu-tab-analyze" data-tab="analyze">' + E_CAMERA + ' Analyze</button>' +
+        '<button class="js-tab" id="jansetu-tab-ask" data-tab="ask">\uD83D\uDCAC Ask AI</button>' +
+      '</div>' +
+
+      // ── Tab: Analyze Screen ──────────────────────────────────────
+      '<div class="js-tab-content js-panel-body" id="jansetu-tab-content-analyze">' +
 
         // 1. Welcome view
         '<div id="jansetu-welcome" class="js-state-view js-welcome-view">' +
@@ -126,6 +133,16 @@
         '</div>' +
 
       '</div>' +
+
+      // ── Tab: Ask AI ──────────────────────────────────────────────
+      '<div class="js-tab-content js-panel-body js-hidden" id="jansetu-tab-content-ask">' +
+        '<div id="jansetu-chat-messages" class="js-chat-messages"></div>' +
+        '<div class="js-chat-input-row">' +
+          '<input type="text" id="jansetu-chat-input" class="js-chat-input" placeholder="Ask anything about this form\u2026" maxlength="300" />' +
+          '<button id="jansetu-chat-send" class="js-chat-send-btn" aria-label="Send">\u27A4</button>' +
+        '</div>' +
+      '</div>' +
+
       '<div class="js-panel-footer">Powered by JanSetu AI \u00B7 No data stored</div>';
 
     document.body.appendChild(panel);
@@ -260,6 +277,90 @@
     }
   }
 
+  // ── Chat helpers ────────────────────────────────────────────────
+  function appendChatMessage(panel, role, text) {
+    var container = panel.querySelector("#jansetu-chat-messages");
+    var msg = document.createElement("div");
+    msg.className = "js-chat-msg js-chat-msg-" + role;
+    msg.textContent = text;
+    container.appendChild(msg);
+    container.scrollTop = container.scrollHeight;
+    return msg;
+  }
+
+  function runAsk(panel, ctx, question) {
+    var input = panel.querySelector("#jansetu-chat-input");
+    var sendBtn = panel.querySelector("#jansetu-chat-send");
+    if (input) input.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
+
+    appendChatMessage(panel, "user", question);
+    var thinkingMsg = appendChatMessage(panel, "ai", "\u231B Thinking\u2026");
+
+    try {
+      chrome.runtime.sendMessage({
+        type: "ASK_REQUEST",
+        schemeId: ctx.schemeId,
+        question: question,
+        lang: ctx.lang || "en",
+        token: ctx.token,
+      }, function(res) {
+        thinkingMsg.remove();
+        if (chrome.runtime.lastError) {
+          appendChatMessage(panel, "ai-error", "\u26A0\uFE0F " + (chrome.runtime.lastError.message || "Connection error."));
+        } else if (!res || !res.ok) {
+          appendChatMessage(panel, "ai-error", "\u26A0\uFE0F " + (res ? res.error : "No response from AI."));
+        } else {
+          appendChatMessage(panel, "ai", res.answer);
+        }
+        if (input) { input.disabled = false; input.focus(); }
+        if (sendBtn) sendBtn.disabled = false;
+      });
+    } catch (e) {
+      thinkingMsg.remove();
+      appendChatMessage(panel, "ai-error", "\u26A0\uFE0F Extension error: " + (e.message || "Unknown error"));
+      if (input) input.disabled = false;
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function initChat(panel, ctx) {
+    var input   = panel.querySelector("#jansetu-chat-input");
+    var sendBtn = panel.querySelector("#jansetu-chat-send");
+
+    // Welcome message
+    appendChatMessage(panel, "ai", "\uD83D\uDC4B I'm your JanSetu AI guide! Ask me anything about this form or scheme.");
+
+    function handleSend() {
+      var q = input.value.trim();
+      if (!q) return;
+      input.value = "";
+      runAsk(panel, ctx, q);
+    }
+
+    sendBtn.addEventListener("click", handleSend);
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+    });
+  }
+
+  // ── Tab switching ───────────────────────────────────────────────
+  function initTabs(panel) {
+    var tabs = panel.querySelectorAll(".js-tab");
+    tabs.forEach(function(tab) {
+      tab.addEventListener("click", function() {
+        tabs.forEach(function(t) { t.classList.remove("js-tab-active"); });
+        tab.classList.add("js-tab-active");
+        var target = tab.getAttribute("data-tab");
+        panel.querySelectorAll(".js-tab-content").forEach(function(tc) {
+          tc.classList.add("js-hidden");
+        });
+        var activeContent = panel.querySelector("#jansetu-tab-content-" + target);
+        if (activeContent) activeContent.classList.remove("js-hidden");
+      });
+    });
+  }
+
   function init() {
     getContext().then(function(ctx) {
       _ctx = ctx;
@@ -293,6 +394,8 @@
       var btnRetry = panel.querySelector("#jansetu-retry-btn");
       if (btnRetry) btnRetry.addEventListener("click", function() { runAnalysis(panel, _ctx); });
 
+      initTabs(panel);
+      initChat(panel, _ctx);
       makeDraggable(panel);
     });
   }
@@ -302,4 +405,4 @@
   } else {
     init();
   }
-})();
+})();

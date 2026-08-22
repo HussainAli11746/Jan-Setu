@@ -374,3 +374,160 @@
   background: var(--js-white) !important;
   flex-shrink: 0 !important;
 }
+
+/* ── Tab Bar ─────────────────────────────────────────── */
+.js-tab-bar {
+  display: flex !important;
+  flex-shrink: 0 !important;
+  background: #f1f5f9 !important;
+  border-bottom: 1.5px solid var(--js-border) !important;
+}
+
+.js-tab {
+  all: unset !important;
+  flex: 1 !important;
+  cursor: pointer !important;
+  padding: 9px 0 !important;
+  text-align: center !important;
+  font-family: var(--js-font) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: var(--js-grey) !important;
+  border-bottom: 2.5px solid transparent !important;
+  transition: color 0.15s, border-color 0.15s !important;
+  user-select: none !important;
+}
+
+.js-tab:hover {
+  color: var(--js-blue) !important;
+}
+
+.js-tab-active {
+  color: var(--js-blue) !important;
+  border-bottom-color: var(--js-blue) !important;
+  background: var(--js-white) !important;
+}
+
+/* Tab content wrapper (shares panel-body styling) */
+.js-tab-content {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  background: var(--js-bg) !important;
+  max-height: calc(80vh - 110px) !important;
+}
+
+.js-tab-content.js-hidden {
+  display: none !important;
+}
+
+/* ── Chat Messages ───────────────────────────────────── */
+.js-chat-messages {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  padding: 14px 14px 8px !important;
+  min-height: 120px !important;
+}
+
+.js-chat-msg {
+  max-width: 88% !important;
+  padding: 9px 13px !important;
+  border-radius: 14px !important;
+  font-size: 12.5px !important;
+  line-height: 1.55 !important;
+  word-break: break-word !important;
+  font-family: var(--js-font) !important;
+}
+
+.js-chat-msg-user {
+  align-self: flex-end !important;
+  background: linear-gradient(135deg, #1e40af 0%, #0f172a 100%) !important;
+  color: #ffffff !important;
+  border-bottom-right-radius: 4px !important;
+}
+
+.js-chat-msg-ai {
+  align-self: flex-start !important;
+  background: var(--js-white) !important;
+  color: var(--js-navy) !important;
+  border: 1.5px solid var(--js-border) !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+.js-chat-msg-ai-error {
+  align-self: flex-start !important;
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  border: 1.5px solid #fca5a5 !important;
+  border-bottom-left-radius: 4px !important;
+  font-size: 12px !important;
+}
+
+/* ── Chat Input Row ──────────────────────────────────── */
+.js-chat-input-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 12px !important;
+  border-top: 1.5px solid var(--js-border) !important;
+  background: var(--js-white) !important;
+  flex-shrink: 0 !important;
+}
+
+.js-chat-input {
+  all: unset !important;
+  flex: 1 !important;
+  font-family: var(--js-font) !important;
+  font-size: 13px !important;
+  color: var(--js-navy) !important;
+  background: #f1f5f9 !important;
+  border: 1.5px solid var(--js-border) !important;
+  border-radius: 20px !important;
+  padding: 8px 14px !important;
+  outline: none !important;
+  transition: border-color 0.15s !important;
+  box-sizing: border-box !important;
+}
+
+.js-chat-input:focus {
+  border-color: var(--js-blue) !important;
+  background: var(--js-white) !important;
+}
+
+.js-chat-input:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.js-chat-send-btn {
+  all: unset !important;
+  cursor: pointer !important;
+  width: 36px !important;
+  height: 36px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(135deg, #1e40af 0%, #0f172a 100%) !important;
+  color: var(--js-white) !important;
+  border-radius: 50% !important;
+  font-size: 15px !important;
+  box-shadow: 0 3px 10px rgba(30,64,175,0.35) !important;
+  transition: transform 0.12s, box-shadow 0.12s !important;
+}
+
+.js-chat-send-btn:hover {
+  transform: scale(1.08) !important;
+  box-shadow: 0 5px 14px rgba(30,64,175,0.45) !important;
+}
+
+.js-chat-send-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
