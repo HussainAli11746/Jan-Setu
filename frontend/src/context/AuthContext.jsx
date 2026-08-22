@@ -321,7 +321,8 @@ export function AuthProvider({ children }) {
   };
 
   const isSchemeSaved = (schemeId) => {
-    return savedSchemes.some(s => s.id === schemeId);
+    if (!schemeId || !Array.isArray(savedSchemes)) return false;
+    return savedSchemes.some(s => s && (s.id === schemeId || s._id === schemeId));
   };
 
   const logout = () => {
