@@ -203,8 +203,6 @@ async function analyzeScreenshot({ schemeId, imageBase64, lang = "en" }) {
         model: modelName,
         generationConfig: {
           responseMimeType: "application/json",
-          temperature: 0.1,
-          maxOutputTokens: 350,
         },
       });
 
@@ -299,10 +297,7 @@ async function askQuestion({ schemeId, question, lang = "en" }) {
     try {
       const model = genAI.getGenerativeModel({
         model: modelName,
-        generationConfig: {
-          temperature: 0.2,
-          maxOutputTokens: 250,
-        },
+        generationConfig: {},
       });
       const result = await model.generateContent(prompt);
       const answer = result.response.text().trim();

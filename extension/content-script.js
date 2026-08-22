@@ -223,24 +223,6 @@
     });
   }
 
-  function downscaleBase64(base64, maxWidth) {
-    return new Promise(function(resolve) {
-      var img = new Image();
-      img.onload = function() {
-        var targetWidth = maxWidth || 640;
-        var scale = img.width > targetWidth ? targetWidth / img.width : 1;
-        var canvas = document.createElement("canvas");
-        canvas.width  = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", 0.65).replace(/^data:image\/\w+;base64,/, ""));
-      };
-      img.onerror = function() { resolve(base64); };
-      img.src = "data:image/jpeg;base64," + base64;
-    });
-  }
-
   function createFloatingButton(lang) {
     var l = lang || "en";
     var t = I18N[l] || I18N.en;
@@ -505,7 +487,7 @@
           return;
         }
 
-        downscaleBase64(captureRes.base64, 640).then(function(imageBase64) {
+        var imageBase64 = captureRes.base64;
           chrome.runtime.sendMessage({
             type: "ANALYZE_REQUEST",
             schemeId: ctx.schemeId,
@@ -523,9 +505,6 @@
             }
             renderResult(panel, analyzeRes.data, ctx);
           });
-        }).catch(function(err) {
-          showError(panel, err.message || "Failed to process screenshot.", l);
-        });
       });
     } catch (e) {
       showError(panel, e.message || "Extension connection error.", l);
