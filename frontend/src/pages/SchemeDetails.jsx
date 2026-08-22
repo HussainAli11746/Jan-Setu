@@ -1,37 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, CheckCircle2, Bookmark, Info, FileText, Landmark, CreditCard, ShieldCheck, Tractor, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Bookmark, BookmarkCheck, Info, FileText, Landmark, CreditCard, ShieldCheck, Tractor, Loader2, AlertCircle, ExternalLink } from 'lucide-react';
 import { fetchSchemeDetails } from '../services/api';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 export default function SchemeDetails() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isSaved, setIsSaved] = useState(false);
-  const [scheme, setScheme] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const OFFICIAL_PORTALS = {
+    pmkisan: 'https://pmkisan.gov.in/',
+    pmfby: 'https://pmfby.gov.in/',
+    pmayg: 'https://pmayg.nic.in/',
+    ayushman: 'https://beneficiary.nha.gov.in',
+    svanidhi: 'https://pmsvanidhi.mohua.gov.in/',
+    pmkvy: 'https://www.skillindiadigital.gov.in',
+    mgnregs: 'https://nrega.nic.in/',
+    mudra: 'https://www.udyamimitra.in',
+    ssy: 'https://www.myscheme.gov.in/schemes/ssy',
+    nps_lite: 'https://www.npscra.nsdl.co.in/scheme-details.php',
+    nsp_postmatric_sc: 'https://scholarships.gov.in/',
+    nsp_postmatric_obc: 'https://scholarships.gov.in/',
+    pmvishwakarma: 'https://pmvishwakarma.gov.in/',
+    kcc: 'https://myscheme.gov.in/schemes/kcc',
+    pmjjby: 'https://jansuraksha.gov.in/',
+    pmsby: 'https://jansuraksha.gov.in/',
+  };
 
-  useEffect(() => {
-    async function loadScheme() {
-      try {
-        const data = await fetchSchemeDetails(id);
-        setScheme(data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to load scheme details');
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadScheme();
-  }, [id]);
+  const { saveScheme, removeSavedScheme, isSchemeSaved } = useAuth();
+  const isSaved = scheme ? isSchemeSaved(scheme.id) : false;
 
   const handleSave = () => {
-    setIsSaved(!isSaved);
-    toast.success(!isSaved ? 'Scheme saved to your bookmarks' : 'Scheme removed from bookmarks');
+    if (!scheme) return;
+    if (isSaved) {
+      removeSavedScheme(scheme.id);
+      toast('Scheme removed from saved bookmarks', { icon: '🗑️' });
+    } else {
+      saveScheme(scheme);
+      toast.success('Scheme saved to your bookmarks! 🔖');
+    }
+  };
+
+  const handleApply = () => {
+    if (!scheme) return;
+    const url = scheme.applyUrl
+      || scheme.apply_url
+      || OFFICIAL_PORTALS[scheme.id]
+      || `https://www.myscheme.gov.in/search?q=${encodeURIComponent(scheme.fullName || scheme.name || '')}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   if (loading) {
@@ -217,18 +235,22 @@ export default function SchemeDetails() {
         <div className="flex items-center justify-center gap-4 pt-4">
           <button
             onClick={handleSave}
-            className="w-44 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold py-3.5 px-5 rounded-xl border border-slate-300 flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer"
+            className={`w-44 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold py-3.5 px-5 rounded-xl border flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer ${
+              isSaved ? 'border-amber-400 text-amber-700' : 'border-slate-300'
+            }`}
           >
-            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-orange-500 text-orange-500' : ''}`} />
+            {isSaved
+              ? <BookmarkCheck className="w-4 h-4 fill-amber-500 text-amber-600" />
+              : <Bookmark className="w-4 h-4" />}
             <span>{isSaved ? t('details.saved', 'Saved') : t('details.save_scheme', 'Save Scheme')}</span>
           </button>
 
           <button
-            onClick={() => navigate(`/apply/${scheme.id}`)}
+            onClick={handleApply}
             className="w-56 bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
           >
             <span>{t('details.apply_now', 'Apply Now')}</span>
-            <ArrowRight className="w-4 h-4" />
+            <ExternalLink className="w-4 h-4" />
           </button>
         </div>
 
