@@ -69,9 +69,30 @@ export function AuthProvider({ children }) {
                 setMatchedSchemes(data.matchedSchemes);
                 localStorage.setItem('jansetu_matched_schemes', JSON.stringify(data.matchedSchemes));
               }
+              // Only update savedSchemes from server if server has MORE schemes than local
+              // This prevents a failed /api sync from wiping locally saved schemes
               if (Array.isArray(data.savedSchemes)) {
-                setSavedSchemes(data.savedSchemes);
-                localStorage.setItem('jansetu_saved_schemes', JSON.stringify(data.savedSchemes));
+                const localSchemes = (() => {
+                  try { return JSON.parse(localStorage.getItem('jansetu_saved_schemes') || '[]'); } catch { return []; }
+                })();
+                if (data.savedSchemes.length >= localSchemes.length) {
+                  setSavedSchemes(data.savedSchemes);
+                  localStorage.setItem('jansetu_saved_schemes', JSON.stringify(data.savedSchemes));
+                } else {
+                  // Local has more schemes — sync them back to server in background
+                  const storedTok = localStorage.getItem('jansetu_token');
+                  if (storedTok) {
+                    localSchemes.forEach(scheme => {
+                      if (!data.savedSchemes.some(s => s.id === scheme.id)) {
+                        fetch(`${API_BASE}/auth/saved-schemes`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${storedTok}` },
+                          body: JSON.stringify({ scheme }),
+                        }).catch(() => {});
+                      }
+                    });
+                  }
+                }
               }
             }
           })
@@ -248,30 +269,32 @@ export function AuthProvider({ children }) {
       benefit: scheme.benefit,
       eligibility: scheme.eligibility || [],
       requiredDocs: scheme.requiredDocs || [],
-      applyUrl: scheme.applyUrl,
+      applyUrl: scheme.applyUrl || scheme.apply_url || `https://www.myscheme.gov.in/search?q=${encodeURIComponent(scheme.name || '')}`,
       savedAt: new Date().toISOString(),
     };
 
-    const exists = savedSchemes.some(s => s.id === scheme.id);
+    const currentLocal = (() => {
+      try { return JSON.parse(localStorage.getItem('jansetu_saved_schemes') || '[]'); } catch { return []; }
+    })();
+
+    const exists = currentLocal.some(s => s.id === scheme.id);
     if (!exists) {
-      const updated = [item, ...savedSchemes];
+      const updated = [item, ...currentLocal];
+      // Immediately update both state and localStorage — this is the source of truth
       setSavedSchemes(updated);
       localStorage.setItem('jansetu_saved_schemes', JSON.stringify(updated));
 
       const storedToken = localStorage.getItem('jansetu_token') || token;
       if (storedToken) {
-        try {
-          await fetch(`${API_BASE}/auth/saved-schemes`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${storedToken}`,
-            },
-            body: JSON.stringify({ scheme: item }),
-          });
-        } catch (err) {
-          console.warn('Failed to sync saved scheme to DB:', err);
-        }
+        // Sync to DB in background — failure is OK, localStorage is the fallback
+        fetch(`${API_BASE}/auth/saved-schemes`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${storedToken}`,
+          },
+          body: JSON.stringify({ scheme: item }),
+        }).catch(err => console.warn('Failed to sync saved scheme to DB (will retry on next login):', err));
       }
     }
   };
