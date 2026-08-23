@@ -1,91 +1,178 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Filter, Plus, ArrowRight, Tractor, Home as HomeIcon, GraduationCap, CheckCircle2, Clock, Loader2, Sparkles, Inbox } from 'lucide-react';
+import {
+  Sparkles,
+  Construction,
+  Clock,
+  ArrowRight,
+  ShieldCheck,
+  FileCheck2,
+  BellRing,
+  ExternalLink,
+  Layers,
+  Inbox,
+  CheckCircle2,
+  Compass,
+  Zap,
+} from 'lucide-react';
 import { fetchUserApplications } from '../services/api';
 import { useTranslation } from 'react-i18next';
 
 const APPS_I18N = {
   hi: {
-    badge: 'डैशबोर्ड',
-    title: 'मेरे आवेदन',
-    filter: 'फ़िल्टर',
-    newApp: 'नया आवेदन',
-    emptyTitle: 'अभी तक कोई आवेदन नहीं है',
-    emptyDesc: 'आपने अभी तक किसी भी योजना के लिए आवेदन जमा नहीं किया है। अपने लिए योजनाएं खोजने के लिए AI सहायक का उपयोग करें।',
-    emptyBtn: 'मेरे लिए योजनाएं खोजें',
-    lastUpdated: 'अंतिम अपडेट',
-    viewStatus: 'स्थिति देखें',
-    viewDetails: 'विवरण देखें',
+    badge: 'विकासशील सुविधा',
+    title: 'आवेदन ट्रैकर',
+    futureNoticeTag: '🚀 आगामी सुविधा (Coming Soon)',
+    futureNoticeTitle: 'एकीकृत सरकारी आवेदन ट्रैकिंग सुविधा प्रगति पर है',
+    futureNoticeDesc:
+      'विभिन्न सरकारी पोर्टलों से सीधे आवेदन जमा करना और डिजिलॉकर (DigiLocker) के माध्यम से रीयल-टाइम स्थिति ट्रैक करने की सुविधा अभी विकास के अधीन है। वर्तमान में आप सीधे आधिकारिक सरकारी पोर्टलों पर आवेदन कर सकते हैं और जन-सेतु एक्सटेंशन द्वारा लाइव सहायता प्राप्त कर सकते हैं।',
+    roadmap1Title: 'डिजिलॉकर दस्तावेज़ ऑटो-फ़िल',
+    roadmap1Desc: 'सरकारी फॉर्मों में आधार और आय प्रमाण पत्र स्वचालित रूप से भरे जाएंगे।',
+    roadmap2Title: 'प्रत्यक्ष लाभ (DBT) स्टेटस सिंक',
+    roadmap2Desc: 'आपके बैंक खाते में भेजी जाने वाली सरकारी किस्तों का लाइव स्टेटस।',
+    roadmap3Title: 'व्हाट्सएप एवं SMS अलर्ट',
+    roadmap3Desc: 'आवेदन स्वीकृत होते ही तुरंत मोबाइल पर सूचना प्राप्त होगी।',
+    browseSchemesBtn: 'योजनाएं खोजें और आवेदन करें',
+    askAiBtn: 'AI सहायक से पूछें',
+    sampleTitle: 'भविष्य में इस प्रकार दिखेगा आपका डैशबोर्ड:',
+    demoTag: 'पूर्वावलोकन (Preview)',
     approved: 'स्वीकृत',
     pendingVerification: 'सत्यापन लंबित',
     underReview: 'विभागीय समीक्षाधीन',
+    lastUpdated: 'अंतिम अपडेट',
+    viewStatus: 'स्थिति देखें',
     loading: 'आवेदन लोड हो रहे हैं...',
   },
   bn: {
-    badge: 'ড্যাশবোর্ড',
-    title: 'আমার আবেদনসমূহ',
-    filter: 'ফিল্টার',
-    newApp: 'নতুন আবেদন',
-    emptyTitle: 'এখনও কোনো আবেদন নেই',
-    emptyDesc: 'আপনি এখনও কোনো প্রকল্পের জন্য আবেদন করেননি। প্রকল্প খুঁজতে AI সহকারী ব্যবহার করুন।',
-    emptyBtn: 'আমার জন্য প্রকল্প খুঁজুন',
-    lastUpdated: 'সর্বশেষ আপডেট',
-    viewStatus: 'স্ট্যাটাস দেখুন',
-    viewDetails: 'বিস্তারিত দেখুন',
+    badge: 'আসন্ন বৈশিষ্ট্য',
+    title: 'আবেদন ট্র্যাকার',
+    futureNoticeTag: '🚀 আসন্ন বৈশিষ্ট্য (Coming Soon)',
+    futureNoticeTitle: 'একত্রিত সরকারি আবেদন ট্র্যাকিং সিস্টেম তৈরি হচ্ছে',
+    futureNoticeDesc:
+      'বিভিন্ন সরকারি পোর্টাল থেকে সরাসরি আবেদন এবং ডিজিডিজিটাল লকারের মাধ্যমে রিয়েল-টাইম স্ট্যাটাস দেখার সুবিধা শীঘ্রই আসছে। বর্তমানে আপনি সরাসরি সরকারি পোর্টালে আবেদন করতে পারেন এবং জনসেতু এক্সটেনশন দিয়ে এআই গাইড ব্যবহার করতে পারেন।',
+    roadmap1Title: 'ডিজিলকার অটো-ফিল',
+    roadmap1Desc: 'সরকারি ফর্মে আধার ও আয়ের নথি স্বয়ংক্রিয়ভাবে যুক্ত হবে।',
+    roadmap2Title: 'ডিবিটি (DBT) স্ট্যাটাস ট্র্যাকিং',
+    roadmap2Desc: 'ব্যাংক অ্যাকাউন্টে টাকা পাঠানোর সরাসরি স্ট্যাটাস দেখা যাবে।',
+    roadmap3Title: 'এসএমএস ও হোয়াটসঅ্যাপ নোটিফিকেশন',
+    roadmap3Desc: 'আবেদন অনুমোদিত হলে তৎক্ষণাৎ মোবাইলে বার্তা পাবেন।',
+    browseSchemesBtn: 'প্রকল্প দেখুন ও আবেদন করুন',
+    askAiBtn: 'AI সহকারীকে জিজ্ঞাসা করুন',
+    sampleTitle: 'ভবিষ্যতে আপনার ড্যাশবোর্ড যেভাবে দেখাবে:',
+    demoTag: 'প্রিভিউ (Preview)',
     approved: 'অনুমোদিত',
     pendingVerification: 'যাচাইকরণ বাকি',
     underReview: 'পর্যালোচনাধীন',
+    lastUpdated: 'সর্বশেষ আপডেট',
+    viewStatus: 'স্ট্যাটাস দেখুন',
     loading: 'আবেদন লোড হচ্ছে...',
   },
   ta: {
-    badge: 'டாஷ்போர்டு',
-    title: 'எனது விண்ணப்பங்கள்',
-    filter: 'வடிகட்டு',
-    newApp: 'புதிய விண்ணப்பம்',
-    emptyTitle: 'விண்ணப்பங்கள் எதுவும் இல்லை',
-    emptyDesc: 'நீங்கள் இதுவரை எந்த திட்டத்திற்கும் விண்ணப்பிக்கவில்லை. திட்டங்களை கண்டறிய AI உதவியாளரைப் பயன்படுத்தவும்.',
-    emptyBtn: 'திட்டங்களை தேடுங்கள்',
-    lastUpdated: 'கடைசி புதுப்பிப்பு',
-    viewStatus: 'நிலையைக் காண்க',
-    viewDetails: 'விவரங்களைக் காண்க',
+    badge: 'வரவிருக்கும் அம்சம்',
+    title: 'விண்ணப்ப கண்காணிப்பு',
+    futureNoticeTag: '🚀 வரவிருக்கும் வசதி (Coming Soon)',
+    futureNoticeTitle: 'ஒருங்கிணைந்த அரசு விண்ணப்ப கண்காணிப்பு வசதி தயாராகிறது',
+    futureNoticeDesc:
+      'பல்வேறு அரசு இணையதளங்களின் விண்ணப்ப நிலையை ஒரே இடத்தில் கண்டறியும் முறை தற்போது உருவாக்கப்பட்டு வருகிறது. தற்போது நீங்கள் அதிகாரப்பூர்வ அரசு இணையதளங்களில் நேரடியாக விண்ணப்பித்து ஜன-சேது வழிகாட்டியைப் பயன்படுத்தலாம்.',
+    roadmap1Title: 'டிஜிலாக்கர் ஆவண தானியங்கி நிரப்புதல்',
+    roadmap1Desc: 'படிவங்களில் தேவையான ஆவணங்கள் தானாகவே இணைக்கப்படும்.',
+    roadmap2Title: 'நேரடி பலன் (DBT) கண்காணிப்பு',
+    roadmap2Desc: 'வங்கி கணக்கில் செலுத்தப்படும் தொகையின் நேரடி நிலவரம்.',
+    roadmap3Title: 'வாட்ஸ்அப் & எஸ்எம்எஸ் எச்சரிக்கைகள்',
+    roadmap3Desc: 'விண்ணப்பம் ஏற்கப்பட்டவுடன் உடனுக்குடன் செய்தி வரும்.',
+    browseSchemesBtn: 'திட்டங்களை காண்க',
+    askAiBtn: 'AI உதவியாளரிடம் கேளுங்கள்',
+    sampleTitle: 'எதிர்காலத்தில் உங்கள் டேஷ்போர்டு இவ்வாறு தோன்றும்:',
+    demoTag: 'முன்னோட்டம் (Preview)',
     approved: 'ஏற்கப்பட்டது',
     pendingVerification: 'சரிபார்ப்பு நிலுவையில்',
     underReview: 'ஆய்வில் உள்ளது',
+    lastUpdated: 'கடைசி புதுப்பிப்பு',
+    viewStatus: 'நிலையைக் காண்க',
     loading: 'ஏற்றப்படுகிறது...',
   },
   te: {
-    badge: 'డ్యాష్‌బోర్డ్',
-    title: 'నా దరఖాస్తులు',
-    filter: 'ఫిల్టర్',
-    newApp: 'కొత్త దరఖాస్తు',
-    emptyTitle: 'ఇంకా ఎలాంటి దరఖాస్తులు లేవు',
-    emptyDesc: 'మీరు ఇంకా ఎలాంటి పథకాలకు దరఖాస్తు చేసుకోలేదు. పథకాలను కనుగొనడానికి AI అసిస్టెంట్‌ని ఉపయోగించండి.',
-    emptyBtn: 'పథకాలను శోధించండి',
-    lastUpdated: 'చివరి నవీకరణ',
-    viewStatus: 'స్థితిని చూడండి',
-    viewDetails: 'వివరాలు చూడండి',
+    badge: 'రాబోయే ఫీచర్',
+    title: 'దరఖాస్తు ట్రాకర్',
+    futureNoticeTag: '🚀 రాబోయే ఫీచర్ (Coming Soon)',
+    futureNoticeTitle: 'సమగ్ర ప్రభుత్వ దరఖాస్తు ట్రాకింగ్ వ్యవస్థ త్వరలో అందుబాటులోకి రానుంది',
+    futureNoticeDesc:
+      'వివిధ ప్రభుత్వ పోర్టల్‌ల నుండి ఒకే చోట దరఖాస్తుల స్థితిని ట్రాక్ చేసే వ్యవస్థ ప్రస్తుతం నిర్మాణంలో ఉంది. ప్రస్తుతం మీరు నేరుగా అధికారిక ప్రభుత్వ వెబ్‌సైట్‌లలో దరఖాస్తు చేసుకోవచ్చు మరియు జన-సేతు AI గైడ్ సహాయం పొందవచ్చు.',
+    roadmap1Title: 'డిజిలాకర్ డాక్యుమెంట్ ఆటో-ఫిల్',
+    roadmap1Desc: 'దరఖాస్తు ఫారమ్‌లలో అవసరమైన పత్రాలు ఆటోమేటిక్‌గా జతచేయబడతాయి.',
+    roadmap2Title: 'ప్రత్యక్ష బదిలీ (DBT) స్థితి ట్రాకింగ్',
+    roadmap2Desc: 'బ్యాంక్ ఖాతాలో జమ అయ్యే సహాయ నిధుల ప్రత్యక్ష స్థితి.',
+    roadmap3Title: 'వాట్సాప్ & SMS నోటిఫికేషన్లు',
+    roadmap3Desc: 'దరఖాస్తు ఆమోదం పొందగానే వెంటనే మొబైల్‌కి సమాచారం అందుతుంది.',
+    browseSchemesBtn: 'పథకాలను బ్రౌజ్ చేయండి',
+    askAiBtn: 'AI అసిస్టెంట్‌ని అడగండి',
+    sampleTitle: 'భవిష్యత్తులో మీ డాష్‌బోర్డ్ ఇలా కనిపిస్తుంది:',
+    demoTag: 'ప్రివ్యూ (Preview)',
     approved: 'ఆమోదించబడింది',
     pendingVerification: 'ధృవీకరణ పెండింగ్‌లో ఉంది',
     underReview: 'సమీక్షలో ఉంది',
+    lastUpdated: 'చివరి నవీకరణ',
+    viewStatus: 'స్థితిని చూడండి',
     loading: 'దరఖాస్తులు లోడ్ అవుతున్నాయి...',
   },
   en: {
-    badge: 'DASHBOARD',
-    title: 'My Applications',
-    filter: 'Filter',
-    newApp: 'New Application',
-    emptyTitle: 'No applications yet',
-    emptyDesc: "You haven't submitted any scheme applications yet. Start with our AI assistant to find and apply for schemes.",
-    emptyBtn: 'Find Schemes for Me',
-    lastUpdated: 'Last updated',
-    viewStatus: 'View Status',
-    viewDetails: 'View Details',
+    badge: 'FEATURE IN DEVELOPMENT',
+    title: 'Applications Tracker',
+    futureNoticeTag: '🚀 UPCOMING FEATURE · UNDER ACTIVE DEVELOPMENT',
+    futureNoticeTitle: 'Unified Government Application Status Hub (Coming Soon)',
+    futureNoticeDesc:
+      'Direct cross-portal tracking, automated DigiLocker document synchronization, and centralized government scheme submissions are currently being integrated. In the meantime, you can apply directly on official government portals with live step-by-step assistance from the JanSetu Chrome Extension!',
+    roadmap1Title: 'DigiLocker Form Auto-Fill',
+    roadmap1Desc: 'Verified Aadhaar, Income & Caste certificates linked automatically.',
+    roadmap2Title: 'Real-Time DBT Status Webhooks',
+    roadmap2Desc: 'Live tracking of direct bank transfer installments from PFMS & state treasuries.',
+    roadmap3Title: 'Instant WhatsApp & SMS Alerts',
+    roadmap3Desc: 'Get notified immediately as your application clears departmental stages.',
+    browseSchemesBtn: 'Browse Schemes & Apply',
+    askAiBtn: 'Ask AI Assistant',
+    sampleTitle: 'Preview: How your unified applications hub will look:',
+    demoTag: 'Interactive Prototype',
     approved: 'Approved',
     pendingVerification: 'Pending Verification',
     underReview: 'Under Department Review',
+    lastUpdated: 'Last updated',
+    viewStatus: 'View Status',
     loading: 'Loading applications...',
   },
 };
+
+const DEMO_APPLICATIONS = [
+  {
+    id: 'PMK-2026-98124',
+    schemeName: 'PM-KISAN Samman Nidhi',
+    category: 'agriculture',
+    status: 'approved',
+    progressPercent: 100,
+    updatedAt: '2 days ago',
+    benefit: '₹6,000 / year (Next installment: ₹2,000)',
+    portal: 'pmkisan.gov.in',
+  },
+  {
+    id: 'PMAY-G-882103',
+    schemeName: 'Pradhan Mantri Awas Yojana (Gramin)',
+    category: 'housing',
+    status: 'under_review',
+    progressPercent: 65,
+    updatedAt: 'Yesterday',
+    benefit: '₹1.20 Lakh Housing Grant',
+    portal: 'pmayg.nic.in',
+  },
+  {
+    id: 'NSP-CSSS-449102',
+    schemeName: 'Central Sector Scholarship (CSSS)',
+    category: 'education',
+    status: 'pending_verification',
+    progressPercent: 40,
+    updatedAt: '3 hours ago',
+    benefit: '₹20,000 / year college scholarship',
+    portal: 'scholarships.gov.in',
+  },
+];
 
 export default function MyApplications() {
   const { i18n } = useTranslation();
@@ -100,10 +187,14 @@ export default function MyApplications() {
     async function load() {
       try {
         const data = await fetchUserApplications();
-        setApplications(data || []);
+        if (data && data.length > 0) {
+          setApplications(data);
+        } else {
+          setApplications(DEMO_APPLICATIONS);
+        }
       } catch (err) {
         console.error(err);
-        setApplications([]);
+        setApplications(DEMO_APPLICATIONS);
       } finally {
         setLoading(false);
       }
@@ -111,33 +202,26 @@ export default function MyApplications() {
     load();
   }, []);
 
-  const getIcon = (schemeId = '') => {
-    const s = String(schemeId).toLowerCase();
-    if (s.includes('kisan') || s.includes('farmer') || s.includes('agriculture')) return <Tractor className="w-4 h-4 text-orange-700" />;
-    if (s.includes('pmay') || s.includes('housing') || s.includes('awas')) return <HomeIcon className="w-4 h-4 text-blue-700" />;
-    return <GraduationCap className="w-4 h-4 text-emerald-700" />;
-  };
-
-  const getStatusBadge = (app) => {
-    switch (app.status) {
+  const getStatusBadge = (status) => {
+    switch (status) {
       case 'approved':
         return (
-          <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 text-[11px] font-semibold px-2.5 py-1 rounded-full border border-emerald-200/60">
-            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+          <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 text-[11px] font-bold px-3 py-1 rounded-full border border-emerald-200">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
             <span>{t.approved}</span>
           </span>
         );
       case 'pending_verification':
         return (
-          <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 text-[11px] font-semibold px-2.5 py-1 rounded-full border border-slate-200">
-            <Clock className="w-3 h-3 text-slate-500" />
+          <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-800 text-[11px] font-bold px-3 py-1 rounded-full border border-amber-200">
+            <Clock className="w-3.5 h-3.5 text-amber-600" />
             <span>{t.pendingVerification}</span>
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 bg-[#FDEEE7] text-[#9A3412] text-[11px] font-semibold px-2.5 py-1 rounded-full border border-[#FAD6C5]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#EA580C]"></span>
+          <span className="inline-flex items-center gap-1.5 bg-orange-50 text-orange-800 text-[11px] font-bold px-3 py-1 rounded-full border border-orange-200">
+            <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
             <span>{t.underReview}</span>
           </span>
         );
@@ -145,133 +229,168 @@ export default function MyApplications() {
   };
 
   const getProgressBarColor = (status) => {
-    if (status === 'approved') return 'bg-emerald-800';
-    if (status === 'pending_verification') return 'bg-slate-400';
-    return 'bg-[#8C3A0A]';
+    if (status === 'approved') return 'bg-emerald-600';
+    if (status === 'pending_verification') return 'bg-amber-500';
+    return 'bg-orange-500';
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#FBFBFA] flex flex-col items-center justify-center gap-3">
-        <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
-        <span className="text-xs text-slate-500 font-medium">{t.loading}</span>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-[#FBFBFA] py-10 px-4 sm:px-6">
+    <div className="min-h-screen bg-[#FBFBFA] py-8 sm:py-12 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto flex flex-col gap-8">
-        
-        {/* Header & Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-900 block mb-1">
-              {t.badge}
-            </span>
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {t.title}
-            </h1>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => {}}
-              className="bg-slate-100/90 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl border border-slate-200 flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <Filter className="w-3.5 h-3.5 text-slate-500" />
-              <span>{t.filter}</span>
-            </button>
+        {/* ── Main Upcoming Feature Announcement Card ────────────────────────── */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#0A1633] via-[#0F234D] to-[#1E293B] rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-slate-700/50">
+          {/* Subtle Background Glow */}
+          <div className="absolute -top-24 -right-24 w-72 h-72 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
-            <button
-              onClick={() => navigate('/assistant')}
-              className="bg-[#0A1633] hover:bg-slate-900 text-white text-xs font-bold px-5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>{t.newApp}</span>
-            </button>
+          <div className="relative z-10 flex flex-col gap-5">
+            {/* Badge */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-400/30 text-[11px] font-black uppercase tracking-wider">
+                <Construction className="w-3.5 h-3.5 text-orange-400" />
+                {t.futureNoticeTag}
+              </span>
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/10 text-slate-200 text-[11px] font-semibold border border-white/10">
+                <Layers className="w-3.5 h-3.5 text-indigo-300" />
+                <span>Roadmap 2026</span>
+              </span>
+            </div>
+
+            {/* Title & Description */}
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug mb-3">
+                {t.futureNoticeTitle}
+              </h1>
+              <p className="text-sm sm:text-[15px] text-slate-300 leading-relaxed max-w-3xl">
+                {t.futureNoticeDesc}
+              </p>
+            </div>
+
+            {/* Feature Highlights Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-2">
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0 mt-0.5 border border-orange-500/30">
+                  <FileCheck2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white mb-0.5">{t.roadmap1Title}</h4>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">{t.roadmap1Desc}</p>
+                </div>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 border border-emerald-500/30">
+                  <Zap className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white mb-0.5">{t.roadmap2Title}</h4>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">{t.roadmap2Desc}</p>
+                </div>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 border border-indigo-500/30">
+                  <BellRing className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white mb-0.5">{t.roadmap3Title}</h4>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">{t.roadmap3Desc}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Action CTAs */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => navigate('/schemes')}
+                className="bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white text-xs sm:text-sm font-bold px-5 py-3 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-orange-500/30 transition-all cursor-pointer"
+              >
+                <Compass className="w-4 h-4" />
+                <span>{t.browseSchemesBtn}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate('/assistant')}
+                className="bg-white/10 hover:bg-white/15 text-white text-xs sm:text-sm font-bold px-5 py-3 rounded-xl border border-white/20 flex items-center gap-2 transition-all cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-orange-400" />
+                <span>{t.askAiBtn}</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* 3-Column Applications Grid or Empty State */}
-        {applications.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 shadow-2xs flex flex-col items-center justify-center max-w-lg mx-auto w-full my-8">
-            <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-4">
-              <Inbox className="w-7 h-7" />
+        {/* ── Prototype Preview Section ────────────────────────────────────────── */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900">
+                {t.sampleTitle}
+              </h2>
+              <span className="text-[10px] font-black uppercase tracking-wider bg-slate-200/80 text-slate-700 px-2.5 py-0.5 rounded-full">
+                {t.demoTag}
+              </span>
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2">
-              {t.emptyTitle}
-            </h3>
-            <p className="text-xs text-slate-500 max-w-sm mb-6 leading-relaxed">
-              {t.emptyDesc}
-            </p>
-            <button
-              onClick={() => navigate('/assistant')}
-              className="bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>{t.emptyBtn}</span>
-            </button>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {applications.map((app) => (
               <div
-                key={app.id || app.reference_number}
-                className={`bg-white rounded-2xl p-6 border shadow-2xs flex flex-col justify-between hover:shadow-md transition-all ${
-                  app.status === 'approved'
-                    ? 'border-t-4 border-t-emerald-800 border-slate-200/90'
-                    : app.status === 'pending_verification'
-                    ? 'border-t-4 border-t-slate-400 border-slate-200/90'
-                    : 'border-t-4 border-t-[#EA580C] border-slate-200/90'
-                }`}
+                key={app.id}
+                className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
               >
                 <div>
-                  {/* Card Top: Icon & Status Badge */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                      {getIcon(app.schemeId || app.scheme_id)}
-                    </div>
-                    {getStatusBadge(app)}
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">
+                      {app.id}
+                    </span>
+                    {getStatusBadge(app.status)}
                   </div>
 
-                  {/* Scheme Name & Ref ID */}
-                  <h3 className="text-base font-bold text-slate-900 leading-tight mb-1">
-                    {app.schemeName || app.scheme_id}
+                  <h3 className="text-sm font-bold text-slate-900 mb-1 leading-snug">
+                    {app.schemeName}
                   </h3>
-                  <p className="text-[11px] font-mono text-slate-400 mb-6">
-                    {app.id || app.reference_number}
+
+                  <p className="text-xs text-emerald-700 font-semibold mb-4">
+                    {app.benefit}
                   </p>
 
-                  {/* Progress Bar */}
-                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-6">
+                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-2">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${getProgressBarColor(app.status)}`}
-                      style={{ width: `${app.progressPercent || 65}%` }}
+                      className={`h-full rounded-full transition-all duration-500 ${getProgressBarColor(
+                        app.status
+                      )}`}
+                      style={{ width: `${app.progressPercent}%` }}
                     ></div>
                   </div>
-                </div>
-
-                {/* Card Footer: Last Updated & View Status */}
-                <div className="flex items-end justify-between pt-2">
-                  <div>
-                    <span className="text-[10px] text-slate-400 uppercase font-bold block">{t.lastUpdated}</span>
-                    <p className="text-xs font-bold text-slate-700 mt-0.5">{app.updatedAt || 'Recently'}</p>
+                  <div className="flex items-center justify-between text-[10px] text-slate-400 mb-4">
+                    <span>{t.lastUpdated}: {app.updatedAt}</span>
+                    <span className="font-bold text-slate-600">{app.progressPercent}%</span>
                   </div>
-
-                  <button
-                    onClick={() => navigate(`/track/${app.id || app.reference_number}`)}
-                    className="text-xs font-bold text-indigo-900 hover:text-orange-600 flex items-center gap-1 transition-colors cursor-pointer"
-                  >
-                    <span>{app.status === 'approved' ? t.viewDetails : t.viewStatus}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
                 </div>
 
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-slate-500">
+                    {app.portal}
+                  </span>
+                  <a
+                    href={`https://${app.portal}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-bold text-indigo-900 hover:text-orange-600 flex items-center gap-1 transition-colors"
+                  >
+                    <span>{t.viewStatus}</span>
+                    <ExternalLink className="w-3 h-3 text-slate-400" />
+                  </a>
+                </div>
               </div>
             ))}
           </div>
-        )}
+        </div>
 
       </div>
     </div>
