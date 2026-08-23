@@ -17,7 +17,7 @@ const WALL_I18N = {
     signInLink: 'साइन इन करें',
     backHome: '← होम पर वापस जाएं',
     chatSampleUser: 'मुझे अपनी बेटी की उच्च शिक्षा के लिए योजनाएं चाहिए',
-    chatSampleBot: '✨ 4 योजनाएं मिलीं: सुकन्या समृद्धि, सीबीएसई मेरिट, पोस्ट मैट्रिक...',
+    chatSampleBot: '4 योजनाएं मिलीं: सुकन्या समृद्धि, सीबीएसई मेरिट, पोस्ट मैट्रिक...',
   },
   bn: {
     badge: 'AI-চালিত প্রকল্প সহকারী',
@@ -32,7 +32,7 @@ const WALL_I18N = {
     signInLink: 'সাইন ইন করুন',
     backHome: '← হোমে ফিরে যান',
     chatSampleUser: 'আমি আমার মেয়ের শিক্ষার জন্য প্রকল্প খুঁজছি',
-    chatSampleBot: '✨ ৪টি প্রকল্প পাওয়া গেছে: সুকন্যা সমৃদ্ধি, এনএসপি স্কলারশিপ...',
+    chatSampleBot: '৪টি প্রকল্প পাওয়া গেছে: সুকন্যা সমৃদ্ধি, এনএসপি স্কলারশিপ...',
   },
   ta: {
     badge: 'AI-இயங்கும் திட்ட உதவியாளர்',
@@ -47,7 +47,7 @@ const WALL_I18N = {
     signInLink: 'உள்நுழைக',
     backHome: '← முகப்புக்குத் திரும்பு',
     chatSampleUser: 'மகளின் கல்விக்கான திட்டங்கள் தேவை',
-    chatSampleBot: '✨ 4 திட்டங்கள் கிடைத்துள்ளன: சுகன்யா சம்ரிதி, உதவித்தொகை...',
+    chatSampleBot: '4 திட்டங்கள் கிடைத்துள்ளன: சுகன்யா சம்ரிதி, உதவித்தொகை...',
   },
   te: {
     badge: 'AI-ఆధారిత పథకాల అసిస్టెంట్',
@@ -62,7 +62,7 @@ const WALL_I18N = {
     signInLink: 'సైన్ ఇన్ చేయండి',
     backHome: '← హోమ్‌కి తిరిగి వెళ్లండి',
     chatSampleUser: 'నా కుమార్తె చదువు కోసం పథకాలు కావాలి',
-    chatSampleBot: '✨ 4 పథకాలు లభించాయి: సుకన్య సమృద్ధి, స్కాలర్‌షిప్...',
+    chatSampleBot: '4 పథకాలు లభించాయి: సుకన్య సమృద్ధి, స్కాలర్‌షిప్...',
   },
   en: {
     badge: 'AI-Powered Scheme Assistant',
@@ -77,7 +77,7 @@ const WALL_I18N = {
     signInLink: 'Sign In',
     backHome: '← Back to home',
     chatSampleUser: 'I want education-related schemes for my daughter',
-    chatSampleBot: '✨ Found 4 schemes: Sukanya Samriddhi, NSP Scholarship, CBSE Merit Award...',
+    chatSampleBot: 'Found 4 schemes: Sukanya Samriddhi, NSP Scholarship, CBSE Merit Award...',
   },
 };
 

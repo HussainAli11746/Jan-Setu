@@ -175,7 +175,7 @@ export default function ApplicationStatus() {
                 }`}
               >
                 <Bell className="w-3.5 h-3.5" />
-                <span>{reminded ? t('track.reminded', 'Alerts Activated ✓') : t('track.btn_remind', 'Remind me when status changes')}</span>
+                <span>{reminded ? t('track.reminded', 'Alerts Activated') : t('track.btn_remind', 'Remind me when status changes')}</span>
               </button>
             </div>
 

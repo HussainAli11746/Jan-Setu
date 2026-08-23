@@ -82,10 +82,10 @@ export default function SchemeDetails() {
     if (!scheme || !saveScheme) return;
     if (isSaved) {
       if (removeSavedScheme) removeSavedScheme(scheme.id);
-      toast('Scheme removed from saved bookmarks', { icon: '🗑️' });
+      toast('Scheme removed from saved bookmarks');
     } else {
       saveScheme(scheme);
-      toast.success('Scheme saved to your bookmarks! 🔖');
+      toast.success('Scheme saved to your bookmarks!');
     }
   };
 

@@ -129,7 +129,7 @@ export default function Login() {
   };
 
   const handleVoiceLogin = () => {
-    toast(currentLang === 'hi' ? 'वॉयस लॉगिन प्रारंभ हुआ...' : 'Voice login initiated. Please speak your name or email…', { icon: '🎙️' });
+    toast(currentLang === 'hi' ? 'वॉयस लॉगिन प्रारंभ हुआ...' : 'Voice login initiated. Please speak your name or email…');
   };
 
   return (

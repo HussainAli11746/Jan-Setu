@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
-  Construction,
+  Rocket, Construction,
   Clock,
   ArrowRight,
   ShieldCheck,
@@ -22,7 +22,7 @@ const APPS_I18N = {
   hi: {
     badge: 'विकासशील सुविधा',
     title: 'आवेदन ट्रैकर',
-    futureNoticeTag: '🚀 आगामी सुविधा (Coming Soon)',
+    futureNoticeTag: 'आगामी सुविधा (Coming Soon)',
     futureNoticeTitle: 'एकीकृत सरकारी आवेदन ट्रैकिंग सुविधा प्रगति पर है',
     futureNoticeDesc:
       'विभिन्न सरकारी पोर्टलों से सीधे आवेदन जमा करना और डिजिलॉकर (DigiLocker) के माध्यम से रीयल-टाइम स्थिति ट्रैक करने की सुविधा अभी विकास के अधीन है। वर्तमान में आप सीधे आधिकारिक सरकारी पोर्टलों पर आवेदन कर सकते हैं और जन-सेतु एक्सटेंशन द्वारा लाइव सहायता प्राप्त कर सकते हैं।',
@@ -46,7 +46,7 @@ const APPS_I18N = {
   bn: {
     badge: 'আসন্ন বৈশিষ্ট্য',
     title: 'আবেদন ট্র্যাকার',
-    futureNoticeTag: '🚀 আসন্ন বৈশিষ্ট্য (Coming Soon)',
+    futureNoticeTag: 'আসন্ন বৈশিষ্ট্য (Coming Soon)',
     futureNoticeTitle: 'একত্রিত সরকারি আবেদন ট্র্যাকিং সিস্টেম তৈরি হচ্ছে',
     futureNoticeDesc:
       'বিভিন্ন সরকারি পোর্টাল থেকে সরাসরি আবেদন এবং ডিজিডিজিটাল লকারের মাধ্যমে রিয়েল-টাইম স্ট্যাটাস দেখার সুবিধা শীঘ্রই আসছে। বর্তমানে আপনি সরাসরি সরকারি পোর্টালে আবেদন করতে পারেন এবং জনসেতু এক্সটেনশন দিয়ে এআই গাইড ব্যবহার করতে পারেন।',
@@ -70,7 +70,7 @@ const APPS_I18N = {
   ta: {
     badge: 'வரவிருக்கும் அம்சம்',
     title: 'விண்ணப்ப கண்காணிப்பு',
-    futureNoticeTag: '🚀 வரவிருக்கும் வசதி (Coming Soon)',
+    futureNoticeTag: 'வரவிருக்கும் வசதி (Coming Soon)',
     futureNoticeTitle: 'ஒருங்கிணைந்த அரசு விண்ணப்ப கண்காணிப்பு வசதி தயாராகிறது',
     futureNoticeDesc:
       'பல்வேறு அரசு இணையதளங்களின் விண்ணப்ப நிலையை ஒரே இடத்தில் கண்டறியும் முறை தற்போது உருவாக்கப்பட்டு வருகிறது. தற்போது நீங்கள் அதிகாரப்பூர்வ அரசு இணையதளங்களில் நேரடியாக விண்ணப்பித்து ஜன-சேது வழிகாட்டியைப் பயன்படுத்தலாம்.',
@@ -94,7 +94,7 @@ const APPS_I18N = {
   te: {
     badge: 'రాబోయే ఫీచర్',
     title: 'దరఖాస్తు ట్రాకర్',
-    futureNoticeTag: '🚀 రాబోయే ఫీచర్ (Coming Soon)',
+    futureNoticeTag: 'రాబోయే ఫీచర్ (Coming Soon)',
     futureNoticeTitle: 'సమగ్ర ప్రభుత్వ దరఖాస్తు ట్రాకింగ్ వ్యవస్థ త్వరలో అందుబాటులోకి రానుంది',
     futureNoticeDesc:
       'వివిధ ప్రభుత్వ పోర్టల్‌ల నుండి ఒకే చోట దరఖాస్తుల స్థితిని ట్రాక్ చేసే వ్యవస్థ ప్రస్తుతం నిర్మాణంలో ఉంది. ప్రస్తుతం మీరు నేరుగా అధికారిక ప్రభుత్వ వెబ్‌సైట్‌లలో దరఖాస్తు చేసుకోవచ్చు మరియు జన-సేతు AI గైడ్ సహాయం పొందవచ్చు.',
@@ -118,7 +118,7 @@ const APPS_I18N = {
   en: {
     badge: 'FEATURE IN DEVELOPMENT',
     title: 'Applications Tracker',
-    futureNoticeTag: '🚀 UPCOMING FEATURE · UNDER ACTIVE DEVELOPMENT',
+    futureNoticeTag: 'UPCOMING FEATURE · UNDER ACTIVE DEVELOPMENT',
     futureNoticeTitle: 'Unified Government Application Status Hub (Coming Soon)',
     futureNoticeDesc:
       'Direct cross-portal tracking, automated DigiLocker document synchronization, and centralized government scheme submissions are currently being integrated. In the meantime, you can apply directly on official government portals with live step-by-step assistance from the JanSetu Chrome Extension!',
@@ -248,7 +248,7 @@ export default function MyApplications() {
             {/* Badge */}
             <div className="flex items-center gap-2 flex-wrap">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-400/30 text-[11px] font-black uppercase tracking-wider">
-                <Construction className="w-3.5 h-3.5 text-orange-400" />
+                <Rocket className="w-3.5 h-3.5 text-orange-400" />
                 {t.futureNoticeTag}
               </span>
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/10 text-slate-200 text-[11px] font-semibold border border-white/10">

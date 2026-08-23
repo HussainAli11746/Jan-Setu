@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
   User, Mail, MapPin, CheckCircle2, Shield, Calendar, Key, Globe,
-  Briefcase, DollarSign, Award, Bookmark, BookmarkCheck, FileText, PieChart,
+  Briefcase, DollarSign, Award, Target, Bookmark, BookmarkCheck, FileText, PieChart,
   Edit3, Check, Loader2, LogOut, ArrowRight, Sparkles, Trash2, BookOpen, ExternalLink, Tag
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -75,7 +75,7 @@ const PROFILE_I18N = {
     employmentLabel: 'रोजगार की स्थिति',
     saveBtn: 'प्रोफ़ाइल सहेजें',
     savingBtn: 'सहेजी जा रही है...',
-    saveSuccess: 'प्रोफ़ाइल सफलतापूर्वक सहेज ली गई! ✨',
+    saveSuccess: 'प्रोफ़ाइल सफलतापूर्वक सहेज ली गई!',
     pwdResetSent: 'पासवर्ड रीसेट लिंक आपके ईमेल पर भेज दिया गया है',
     ageOptions: [
       { value: '18-25', label: '18 – 25 वर्ष (युवा)' },
@@ -155,7 +155,7 @@ const PROFILE_I18N = {
     employmentLabel: 'কর্মসংস্থানের অবস্থা',
     saveBtn: 'প্রোফাইল সেভ করুন',
     savingBtn: 'সংরক্ষণ হচ্ছে...',
-    saveSuccess: 'প্রোফাইল সফলভাবে সংরক্ষিত হয়েছে! ✨',
+    saveSuccess: 'প্রোফাইল সফলভাবে সংরক্ষিত হয়েছে!',
     pwdResetSent: 'পাসওয়ার্ড রিসেট ইমেল পাঠানো হয়েছে',
     ageOptions: [
       { value: '18-25', label: '১৮ – ২৫ বছর' },
@@ -235,7 +235,7 @@ const PROFILE_I18N = {
     employmentLabel: 'வேலை நிலை',
     saveBtn: 'சுயவிவரத்தை சேமி',
     savingBtn: 'சேமிக்கப்படுகிறது...',
-    saveSuccess: 'சுயவிவரம் புதுப்பிக்கப்பட்டது! ✨',
+    saveSuccess: 'சுயவிவரம் புதுப்பிக்கப்பட்டது!',
     pwdResetSent: 'கடவுச்சொல் மீட்டமைப்பு இணைப்பு அனுப்பப்பட்டது',
     ageOptions: [
       { value: '18-25', label: '18 – 25 ஆண்டுகள்' },
@@ -315,7 +315,7 @@ const PROFILE_I18N = {
     employmentLabel: 'ఉద్యోగ స్థితి',
     saveBtn: 'ప్రొఫైల్‌ను సేవ్ చేయండి',
     savingBtn: 'సేవ్ అవుతోంది...',
-    saveSuccess: 'ప్రొఫైల్ విజయవంతంగా నవీకరించబడింది! ✨',
+    saveSuccess: 'ప్రొఫైల్ విజయవంతంగా నవీకరించబడింది!',
     pwdResetSent: 'పాస్‌వర్డ్ రీసెట్ లింక్ ఇమెయిల్‌కి పంపబడింది',
     ageOptions: [
       { value: '18-25', label: '18 – 25 సంవత్సరాలు' },
@@ -395,7 +395,7 @@ const PROFILE_I18N = {
     employmentLabel: 'Employment Status',
     saveBtn: 'Save Profile',
     savingBtn: 'Saving Profile...',
-    saveSuccess: 'Profile updated successfully! ✨',
+    saveSuccess: 'Profile updated successfully!',
     pwdResetSent: 'Password reset verification email sent to your email',
     ageOptions: [
       { value: '18-25', label: '18 – 25 Years' },
@@ -872,8 +872,8 @@ export default function Profile() {
       const matchCount = res?.matchedSchemes?.length || activeMatchedSchemes.length;
       toast.success(
         selectedLang === 'hi'
-          ? `प्रोफ़ाइल सहेजी गई और ${matchCount} योजनाएं AI द्वारा मैच की गईं! ✨`
-          : `Profile saved & ${matchCount} personalized schemes matched with JanSetu AI! ✨`
+          ? `प्रोफ़ाइल सहेजी गई और ${matchCount} योजनाएं AI द्वारा मैच की गईं!`
+          : `Profile saved & ${matchCount} personalized schemes matched with JanSetu AI!`
       );
     } catch (err) {
       toast.error(err.message || 'Failed to update profile');
@@ -883,22 +883,22 @@ export default function Profile() {
   };
 
   const handlePasswordReset = () => {
-    toast.success(tProfile.pwdResetSent, { icon: '📧' });
+    toast.success(tProfile.pwdResetSent);
   };
 
   const handleRemoveScheme = (schemeId) => {
     removeSavedScheme(schemeId);
-    toast(selectedLang === 'hi' ? 'योजना सहेजी गई सूची से हटा दी गई' : 'Scheme removed from saved bookmarks', { icon: '🗑️' });
+    toast(selectedLang === 'hi' ? 'योजना सहेजी गई सूची से हटा दी गई' : 'Scheme removed from saved bookmarks');
   };
 
   const handleToggleSaveMatched = (scheme) => {
     const isSaved = isSchemeSaved ? isSchemeSaved(scheme.id) : savedSchemes.some(s => s.id === scheme.id);
     if (isSaved) {
       removeSavedScheme(scheme.id);
-      toast(selectedLang === 'hi' ? 'योजना सहेजी गई सूची से हटा दी गई' : 'Scheme removed from saved bookmarks', { icon: '🗑️' });
+      toast(selectedLang === 'hi' ? 'योजना सहेजी गई सूची से हटा दी गई' : 'Scheme removed from saved bookmarks');
     } else {
       saveScheme(scheme);
-      toast.success(selectedLang === 'hi' ? 'योजना आपके बुकमार्क में सहेजी गई!' : 'Scheme saved to your bookmarks! ✨');
+      toast.success(selectedLang === 'hi' ? 'योजना आपके बुकमार्क में सहेजी गई!' : 'Scheme saved to your bookmarks!');
     }
   };
 
@@ -1235,7 +1235,7 @@ export default function Profile() {
                           {/* Match Reason Tag */}
                           {scheme.matchReason && (
                             <div className="text-xs sm:text-[12.5px] font-semibold text-blue-800 dark:text-blue-200 bg-blue-50/95 dark:bg-blue-950/60 border border-blue-200/70 dark:border-blue-800/50 rounded-2xl p-3.5 mb-4 leading-relaxed flex items-start gap-2 shadow-2xs">
-                              <span className="shrink-0 text-sm">🎯</span>
+                              <Target className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                               <span>{scheme.matchReason}</span>
                             </div>
                           )}

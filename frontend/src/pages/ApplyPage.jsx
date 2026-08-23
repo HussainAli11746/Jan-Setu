@@ -159,7 +159,7 @@ export default function ApplyPage() {
                 onClick={handleConnectDigiLocker}
                 className="w-full sm:w-auto bg-[#0A1633] dark:bg-orange-600 hover:bg-slate-900 dark:hover:bg-orange-500 text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer shrink-0"
               >
-                <span>{digiLockerConnected ? t('apply.btn_connected', 'Connected ✓') : t('apply.btn_connect_dl', 'Connect DigiLocker')}</span>
+                <span>{digiLockerConnected ? t('apply.btn_connected', 'Connected') : t('apply.btn_connect_dl', 'Connect DigiLocker')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

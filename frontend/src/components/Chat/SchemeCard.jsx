@@ -68,10 +68,10 @@ export default function SchemeCard({ scheme }) {
     if (isSaved) {
       removeSavedScheme(scheme.id);
       const unsavedMsg = lang === 'hi' ? 'योजना सहेजी गई सूची से हटा दी गई' : lang === 'bn' ? 'প্রকল্প বুকমার্ক থেকে সরানো হয়েছে' : lang === 'ta' ? 'திட்டம் நீக்கப்பட்டது' : lang === 'te' ? 'పథకం తొలగించబడింది' : 'Scheme removed from bookmarks';
-      toast(unsavedMsg, { icon: '🗑️' });
+      toast(unsavedMsg);
     } else {
       saveScheme(scheme);
-      const savedMsg = lang === 'hi' ? 'योजना सफलतापूर्वक सहेज ली गई!' : lang === 'bn' ? 'প্রকল্প সংরক্ষিত হয়েছে!' : lang === 'ta' ? 'திட்டம் சேமிக்கப்பட்டது!' : lang === 'te' ? 'పథకం సేవ్ చేయబడింది!' : 'Scheme saved to your bookmarks! 🔖';
+      const savedMsg = lang === 'hi' ? 'योजना सफलतापूर्वक सहेज ली गई!' : lang === 'bn' ? 'প্রকল্প সংরক্ষিত হয়েছে!' : lang === 'ta' ? 'திட்டம் சேமிக்கப்பட்டது!' : lang === 'te' ? 'పథకం సేవ్ చేయబడింది!' : 'Scheme saved to your bookmarks!';
       toast.success(savedMsg);
     }
   };

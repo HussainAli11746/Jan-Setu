@@ -58,11 +58,11 @@ const QUICK_PROMPTS_BY_LANG = {
 };
 
 const GREETINGS_BY_LANG = {
-  hi: (name) => `नमस्ते${name ? `, ${name}` : ''}! 👋 मैं जन-सेतु AI हूँ। आप किस प्रकार की सरकारी योजनाएँ खोजना चाहते हैं?\n\nआप पूछ सकते हैं: *"मुझे शिक्षा संबंधित योजनाएँ चाहिए"* या *"किसानों के लिए योजनाएं दिखाएं"*।`,
-  bn: (name) => `নমস্কার${name ? `, ${name}` : ''}! 👋 আমি জন-সেতু AI। আপনি কোন ধরনের সরকারি প্রকল্প খুঁজছেন?\n\nআপনি বলতে পারেন: *"আমাকে শিক্ষা সম্পর্কিত প্রকল্প দেখান"*।`,
-  ta: (name) => `வணக்கம்${name ? `, ${name}` : ''}! 👋 நான் ஜன-சேது AI. உங்களுக்கு என்ன அரசு நலத்திட்டங்கள் தேவை?\n\nஉதாரணம்: *"கல்வி உதவித்தொகை திட்டங்களை காட்டுங்கள்"*।`,
-  te: (name) => `నమస్తే${name ? `, ${name}` : ''}! 👋 నేను జన-సేతు AI. మీరు ఎలాంటి ప్రభుత్వ సంక్షేమ పథకాల కోసం చూస్తున్నారు?\n\nఉదాహరణ: *"నాకు విద్య పథకాలు కావాలి"*।`,
-  en: (name) => `Namaste${name ? `, ${name}` : ''}! 👋 I'm JanSetu AI. Tell me what kind of government schemes you're looking for and I'll find the most relevant ones for you.\n\nYou can ask things like *"I want education schemes"* or *"Show me farming schemes"*.`,
+  hi: (name) => `नमस्ते${name ? `, ${name}` : ''}! मैं जन-सेतु AI हूँ। आप किस प्रकार की सरकारी योजनाएँ खोजना चाहते हैं?\n\nआप पूछ सकते हैं: *"मुझे शिक्षा संबंधित योजनाएँ चाहिए"* या *"किसानों के लिए योजनाएं दिखाएं"*।`,
+  bn: (name) => `নমস্কার${name ? `, ${name}` : ''}! আমি জন-সেতু AI। আপনি কোন ধরনের সরকারি প্রকল্প খুঁজছেন?\n\nআপনি বলতে পারেন: *"আমাকে শিক্ষা সম্পর্কিত প্রকল্প দেখান"*।`,
+  ta: (name) => `வணக்கம்${name ? `, ${name}` : ''}! நான் ஜன-சேது AI. உங்களுக்கு என்ன அரசு நலத்திட்டங்கள் தேவை?\n\nஉதாரணம்: *"கல்வி உதவித்தொகை திட்டங்களை காட்டுங்கள்"*।`,
+  te: (name) => `నమస్తే${name ? `, ${name}` : ''}! నేను జన-సేతు AI. మీరు ఎలాంటి ప్రభుత్వ సంక్షేమ పథకాల కోసం చూస్తున్నారు?\n\nఉదాహరణ: *"నాకు విద్య పథకాలు కావాలి"*।`,
+  en: (name) => `Namaste${name ? `, ${name}` : ''}! I'm JanSetu AI. Tell me what kind of government schemes you're looking for and I'll find the most relevant ones for you.\n\nYou can ask things like *"I want education schemes"* or *"Show me farming schemes"*.`,
 };
 
 function getProfileSummary(profile) {
@@ -281,7 +281,7 @@ export default function Assistant() {
     recognition.lang = langMap[currentLang] || 'en-IN';
     recognition.interimResults = false;
     setIsListening(true);
-    toast(currentLang === 'hi' ? '🎙️ सुन रहे हैं... बोलिए' : '🎙️ Listening… speak now', { duration: 3000 });
+    toast(currentLang === 'hi' ? 'सुन रहे हैं... बोलिए' : 'Listening… speak now', { duration: 3000 });
     recognition.start();
     recognition.onresult = (e) => {
       const transcript = e.results[0][0].transcript;
@@ -300,7 +300,7 @@ export default function Assistant() {
       text: getGreeting(currentLang),
       schemes: [],
     }]);
-    toast(currentLang === 'hi' ? 'नई चैट प्रारंभ की गई' : 'New chat started', { icon: '🔄' });
+    toast.success(currentLang === 'hi' ? 'नई चैट प्रारंभ की गई' : 'New chat started');
   };
 
   const quickPrompts = QUICK_PROMPTS_BY_LANG[currentLang] || QUICK_PROMPTS_BY_LANG['en'];

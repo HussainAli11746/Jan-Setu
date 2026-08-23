@@ -33,7 +33,7 @@ const I18N_ONBOARDING = {
     finishBtn: 'सेटअप पूरा करें और होम पेज पर जाएं',
     savingBtn: 'प्रोफ़ाइल सहेजी जा रही है...',
     stateError: 'कृपया अपना राज्य चुनें',
-    successToast: 'प्रोफ़ाइल सफलतापूर्वक सहेज ली गई! जन-सेतु में आपका स्वागत है 🎉',
+    successToast: 'प्रोफ़ाइल सफलतापूर्वक सहेज ली गई! जन-सेतु में आपका स्वागत है',
     fields: [
       {
         id: 'ageCategory',
@@ -106,7 +106,7 @@ const I18N_ONBOARDING = {
     finishBtn: 'সম্পূর্ণ করুন ও হোমে যান',
     savingBtn: 'প্রোফাইল সেভ হচ্ছে...',
     stateError: 'অনুগ্রহ করে আপনার রাজ্য নির্বাচন করুন',
-    successToast: 'প্রোফাইল সফলভাবে সংরক্ষিত হয়েছে! জন-সেতুতে স্বাগতম 🎉',
+    successToast: 'প্রোফাইল সফলভাবে সংরক্ষিত হয়েছে! জন-সেতুতে স্বাগতম',
     fields: [
       {
         id: 'ageCategory',
@@ -178,7 +178,7 @@ const I18N_ONBOARDING = {
     finishBtn: 'முடிக்கவும்',
     savingBtn: 'சேமிக்கப்படுகிறது...',
     stateError: 'உங்கள் மாநிலத்தை தேர்வு செய்க',
-    successToast: 'விவரங்கள் சேமிக்கப்பட்டன! ஜன-சேதுவிற்கு நல்வரவு 🎉',
+    successToast: 'விவரங்கள் சேமிக்கப்பட்டன! ஜன-சேதுவிற்கு நல்வரவு',
     fields: [
       {
         id: 'ageCategory',
@@ -250,7 +250,7 @@ const I18N_ONBOARDING = {
     finishBtn: 'పూర్తి చేసి హోమ్‌కు వెళ్లండి',
     savingBtn: 'సేవ్ చేయబడుతోంది...',
     stateError: 'దయచేసి మీ రాష్ట్రాన్ని ఎంచుకోండి',
-    successToast: 'వివరాలు విజయవంతంగా సేవ్ చేయబడ్డాయి! 🎉',
+    successToast: 'వివరాలు విజయవంతంగా సేవ్ చేయబడ్డాయి!',
     fields: [
       {
         id: 'ageCategory',
@@ -322,7 +322,7 @@ const I18N_ONBOARDING = {
     finishBtn: 'Complete & Go to Home',
     savingBtn: 'Saving profile...',
     stateError: 'Please select your state',
-    successToast: 'Profile saved! Welcome to JanSetu 🎉',
+    successToast: 'Profile saved! Welcome to JanSetu',
     fields: [
       {
         id: 'ageCategory',

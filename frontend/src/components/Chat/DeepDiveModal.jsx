@@ -26,7 +26,7 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
     close: lang === 'hi' ? 'बंद करें' : lang === 'bn' ? 'বন্ধ করুন' : lang === 'ta' ? 'மூடு' : lang === 'te' ? 'మూసివేయి' : 'Close',
     apply: lang === 'hi' ? 'आधिकारिक पोर्टल पर आवेदन करें' : lang === 'bn' ? 'অফিসিয়াল পোর্টালে আবেদন করুন' : lang === 'ta' ? 'அதிகாரப்பூர்வ தளம்' : lang === 'te' ? 'అధికారిక పోర్టల్' : 'Apply on Official Site',
     saveScheme: lang === 'hi' ? 'योजना सहेजें' : lang === 'bn' ? 'সংরক্ষণ করুন' : lang === 'ta' ? 'சேமிக்கவும்' : lang === 'te' ? 'సేవ్ చేయండి' : 'Save Scheme',
-    saved: lang === 'hi' ? 'सहेजा गया ✓' : lang === 'bn' ? 'সংরক্ষিত ✓' : lang === 'ta' ? 'சேமிக்கப்பட்டது ✓' : lang === 'te' ? 'సేవ్ చేయబడింది ✓' : 'Saved ✓',
+    saved: lang === 'hi' ? 'सहेजा गया' : lang === 'bn' ? 'সংরক্ষিত' : lang === 'ta' ? 'சேமிக்கப்பட்டது' : lang === 'te' ? 'సేవ్ చేయబడింది' : 'Saved',
     savedToast: lang === 'hi' ? 'योजना आपके बुकमार्क में सहेजी गई!' : lang === 'bn' ? 'প্রকল্পটি আপনার বুকমার্কে সংরক্ষিত হয়েছে!' : lang === 'ta' ? 'திட்டம் சேமிக்கப்பட்டது!' : lang === 'te' ? 'పథకం విజయవంతంగా సేవ్ చేయబడింది!' : 'Scheme saved to your bookmarks!',
     unsavedToast: lang === 'hi' ? 'योजना बुकमार्क से हटाई गई' : lang === 'bn' ? 'প্রকল্প বুকমার্ক থেকে সরানো হয়েছে' : lang === 'ta' ? 'திட்டம் நீக்கப்பட்டது' : lang === 'te' ? 'పథకం తొలగించబడింది' : 'Scheme removed from bookmarks',
     keyBenefit: lang === 'hi' ? 'मुख्य लाभ' : lang === 'bn' ? 'মূল সুবিধা' : lang === 'ta' ? 'முக்கிய நன்மை' : lang === 'te' ? 'ప్రధాన ప్రయోజనం' : 'Key Benefit',
@@ -35,7 +35,7 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
   const handleToggleSave = () => {
     if (isSaved) {
       removeSavedScheme(scheme.id);
-      toast(labels.unsavedToast, { icon: '🗑️' });
+      toast(labels.unsavedToast);
     } else {
       saveScheme(scheme);
       toast.success(labels.savedToast);
