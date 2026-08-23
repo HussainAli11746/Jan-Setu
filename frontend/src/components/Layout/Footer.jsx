@@ -17,7 +17,7 @@ export default function Footer() {
             <span className="text-white">S</span>
           </div>
           <p className="text-xs text-slate-500 font-medium">
-            {t('nav.copyright', '© 2024 JanSetu AI. Empowering citizen access to governance.')}
+            {t('nav.copyright', '© 2026 JanSetu AI. Empowering citizen access to governance.')}
           </p>
         </div>
 
