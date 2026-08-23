@@ -1182,34 +1182,26 @@ export default function Profile() {
                 )}
 
                 {/* Matched Schemes Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                   {activeMatchedSchemes.map((scheme) => {
                     const colors = CATEGORY_COLORS[scheme.category] || CATEGORY_COLORS.social;
                     const isSaved = isSchemeSaved ? isSchemeSaved(scheme.id) : savedSchemes.some(s => s.id === scheme.id);
                     return (
                       <div
                         key={scheme.id}
-                        className={`rounded-3xl border ${colors.border} ${colors.bg} p-6 sm:p-7 flex flex-col justify-between gap-5 shadow-2xs hover:shadow-md transition-all`}
+                        className={`rounded-3xl border ${colors.border} ${colors.bg} p-7 sm:p-8 flex flex-col justify-between shadow-xs hover:shadow-lg transition-all`}
                       >
-                        <div>
-                          {/* Card Header */}
-                          <div className="flex items-start justify-between gap-3 mb-3">
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2 flex-wrap mb-2">
-                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-800 border ${colors.border} ${colors.text} inline-block`}>
-                                  {scheme.category}
-                                </span>
-                                <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40 flex items-center gap-1">
-                                  <Sparkles className="w-2.5 h-2.5 text-blue-600 dark:text-blue-400" />
-                                  <span>{scheme.matchScore}</span>
-                                </span>
-                              </div>
-                              <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug">
-                                {scheme.name}
-                              </h4>
-                              {scheme.ministry && (
-                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">{scheme.ministry}</p>
-                              )}
+                        <div className="flex flex-col">
+                          {/* Card Top: Badges & Bookmark */}
+                          <div className="flex items-start justify-between gap-3 mb-4">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-white dark:bg-slate-800 border ${colors.border} ${colors.text} shadow-2xs`}>
+                                {scheme.category}
+                              </span>
+                              <span className="text-[11px] font-extrabold px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40 flex items-center gap-1.5 shadow-2xs">
+                                <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                                <span>{scheme.matchScore}</span>
+                              </span>
                             </div>
 
                             {/* Bookmark Toggle Button */}
@@ -1220,46 +1212,57 @@ export default function Profile() {
                                 handleToggleSaveMatched(scheme);
                               }}
                               title={isSaved ? tProfile.removeSchemeBtn : 'Save Scheme'}
-                              className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
+                              className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 transition-all cursor-pointer ${
                                 isSaved
-                                  ? 'bg-amber-500 border-amber-600 text-white shadow-2xs'
-                                  : 'bg-white/90 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-amber-600 hover:border-amber-300'
+                                  ? 'bg-amber-500 border-amber-600 text-white shadow-sm'
+                                  : 'bg-white/90 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-amber-600 hover:border-amber-300 shadow-2xs'
                               }`}
                             >
                               <Bookmark className="w-4 h-4" />
                             </button>
                           </div>
 
+                          {/* Scheme Title & Ministry */}
+                          <div className="mb-4">
+                            <h4 className="text-base sm:text-[17px] font-extrabold text-slate-900 dark:text-white leading-snug tracking-tight">
+                              {scheme.name}
+                            </h4>
+                            {scheme.ministry && (
+                              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 truncate">{scheme.ministry}</p>
+                            )}
+                          </div>
+
                           {/* Match Reason Tag */}
                           {scheme.matchReason && (
-                            <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-50/90 dark:bg-blue-950/50 border border-blue-200/60 dark:border-blue-800/40 rounded-xl px-3 py-2 mb-3.5 leading-relaxed">
-                              🎯 {scheme.matchReason}
-                            </p>
+                            <div className="text-xs sm:text-[12.5px] font-semibold text-blue-800 dark:text-blue-200 bg-blue-50/95 dark:bg-blue-950/60 border border-blue-200/70 dark:border-blue-800/50 rounded-2xl p-3.5 mb-4 leading-relaxed flex items-start gap-2 shadow-2xs">
+                              <span className="shrink-0 text-sm">🎯</span>
+                              <span>{scheme.matchReason}</span>
+                            </div>
                           )}
 
                           {/* Description */}
-                          <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mb-4">
+                          <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed mb-5 line-clamp-3">
                             {scheme.description}
                           </p>
 
                           {/* Benefit Badge */}
                           {scheme.benefit && (
-                            <div className="flex items-center gap-1.5 bg-white/80 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 px-3 py-1.5 rounded-xl w-fit">
+                            <div className="flex items-center gap-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl w-fit mb-6 shadow-2xs">
                               <Tag className={`w-3.5 h-3.5 ${colors.text}`} />
-                              <span className={`text-[11px] font-bold ${colors.text}`}>{scheme.benefit}</span>
+                              <span className={`text-xs font-bold ${colors.text}`}>{scheme.benefit}</span>
                             </div>
                           )}
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex items-center gap-3 pt-3.5 border-t border-slate-200/60 dark:border-slate-700">
+                        <div className="flex items-center gap-3 pt-5 border-t border-slate-200/70 dark:border-slate-700/80">
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               setActiveDeepDive(scheme);
                             }}
-                            className="flex-1 px-3.5 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                            className="flex-1 px-4 py-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
                           >
                             <BookOpen className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                             <span>{tProfile.deepDiveBtn}</span>
@@ -1277,7 +1280,7 @@ export default function Profile() {
                               e.stopPropagation();
                               notifyExtension(scheme.id, token, (i18n.language || 'en').slice(0, 2));
                             }}
-                            className="flex-1 px-3.5 py-2.5 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                            className="flex-1 px-4 py-3 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                             <span>{tProfile.applyNowBtn}</span>
@@ -1341,28 +1344,20 @@ export default function Profile() {
                     </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                     {savedSchemes.map((scheme) => {
                       const colors = CATEGORY_COLORS[scheme.category] || CATEGORY_COLORS.social;
                       return (
                         <div
                           key={scheme.id}
-                          className={`rounded-3xl border ${colors.border} ${colors.bg} p-6 sm:p-7 flex flex-col justify-between gap-5 shadow-2xs hover:shadow-md transition-all`}
+                          className={`rounded-3xl border ${colors.border} ${colors.bg} p-7 sm:p-8 flex flex-col justify-between shadow-xs hover:shadow-lg transition-all`}
                         >
-                          <div>
-                            {/* Card Header */}
-                            <div className="flex items-start justify-between gap-3 mb-3">
-                              <div className="min-w-0 flex-1">
-                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-800 border ${colors.border} ${colors.text} inline-block mb-2`}>
-                                  {scheme.category}
-                                </span>
-                                <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug">
-                                  {scheme.name}
-                                </h4>
-                                {scheme.ministry && (
-                                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">{scheme.ministry}</p>
-                                )}
-                              </div>
+                          <div className="flex flex-col">
+                            {/* Card Top: Category & Remove Button */}
+                            <div className="flex items-start justify-between gap-3 mb-4">
+                              <span className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-white dark:bg-slate-800 border ${colors.border} ${colors.text} shadow-2xs`}>
+                                {scheme.category}
+                              </span>
 
                               <button
                                 type="button"
@@ -1371,35 +1366,45 @@ export default function Profile() {
                                   handleRemoveScheme(scheme.id);
                                 }}
                                 title={tProfile.removeSchemeBtn}
-                                className="w-8 h-8 rounded-xl bg-white/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-red-600 hover:border-red-200 flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                                className="w-9 h-9 rounded-xl bg-white/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-red-600 hover:border-red-200 flex items-center justify-center shrink-0 transition-all cursor-pointer shadow-2xs"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
+                                <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
 
+                            {/* Title & Ministry */}
+                            <div className="mb-4">
+                              <h4 className="text-base sm:text-[17px] font-extrabold text-slate-900 dark:text-white leading-snug tracking-tight">
+                                {scheme.name}
+                              </h4>
+                              {scheme.ministry && (
+                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 truncate">{scheme.ministry}</p>
+                              )}
+                            </div>
+
                             {/* Description */}
-                            <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mb-4">
+                            <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed mb-5 line-clamp-3">
                               {scheme.description}
                             </p>
 
                             {/* Benefit Badge */}
                             {scheme.benefit && (
-                              <div className="flex items-center gap-1.5 bg-white/80 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 px-3 py-1.5 rounded-xl w-fit">
+                              <div className="flex items-center gap-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl w-fit mb-6 shadow-2xs">
                                 <Tag className={`w-3.5 h-3.5 ${colors.text}`} />
-                                <span className={`text-[11px] font-bold ${colors.text}`}>{scheme.benefit}</span>
+                                <span className={`text-xs font-bold ${colors.text}`}>{scheme.benefit}</span>
                               </div>
                             )}
                           </div>
 
                           {/* Action Buttons */}
-                          <div className="flex items-center gap-3 pt-3.5 border-t border-slate-200/60 dark:border-slate-700">
+                          <div className="flex items-center gap-3 pt-5 border-t border-slate-200/70 dark:border-slate-700/80">
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setActiveDeepDive(scheme);
                               }}
-                              className="flex-1 px-3.5 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                              className="flex-1 px-4 py-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
                             >
                               <BookOpen className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                               <span>{tProfile.deepDiveBtn}</span>
@@ -1417,7 +1422,7 @@ export default function Profile() {
                                 e.stopPropagation();
                                 notifyExtension(scheme.id, token, (i18n.language || 'en').slice(0, 2));
                               }}
-                              className="flex-1 px-3.5 py-2.5 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                              className="flex-1 px-4 py-3 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
                               <span>{tProfile.applyNowBtn}</span>
