@@ -85,7 +85,7 @@ const getOffTopicReply = (language = 'en') => {
 /**
  * Calls Gemini directly with the user prompt, profile, language, and conversation history.
  */
-export const suggestSchemes = async (userMessage, profile = {}, language = 'en', history = []) => {
+export const suggestSchemes = async (userMessage, profile = {}, language = 'en', history = [], excludeIds = []) => {
   const targetLanguageName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES['en'];
 
   // Off-topic guard
@@ -131,6 +131,7 @@ CRITICAL MANDATORY INSTRUCTIONS:
    - If user asks for "farming", return PM-KISAN, PMFBY, KCC, etc.
    - Do NOT return healthcare or unrelated schemes if the user asks for internships or housing!
 3. LANGUAGE: All output text (including the conversational "reply", scheme "name", "ministry", "description", "benefit", "eligibility" points, and "requiredDocs" points) MUST be written in ${targetLanguageName}.
+${excludeIds.length > 0 ? `4. EXCLUDE: Do NOT include any of these scheme IDs in your response (already shown to user): ${excludeIds.join(', ')}. Return ONLY schemes with DIFFERENT ids not in this list.` : ''}
 
 JSON SCHEMA TO RETURN:
 {

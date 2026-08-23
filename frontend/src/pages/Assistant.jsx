@@ -120,6 +120,7 @@ export default function Assistant() {
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [pendingLanguage, setPendingLanguage] = useState(null);
+  const [shownSchemeIds, setShownSchemeIds] = useState([]);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -180,7 +181,7 @@ export default function Assistant() {
     toast.success(toastMsg);
   };
 
-  const sendMessage = async (text) => {
+  const sendMessage = async (text, options = {}) => {
     if (!text.trim() || loading) return;
     const userMsg = { id: Date.now(), sender: 'user', text };
     setMessages(prev => [...prev, userMsg]);
@@ -205,6 +206,7 @@ export default function Assistant() {
           profile,
           language: currentLang,
           history,
+          excludeIds: options.excludeIds || [],
         }),
       });
 
@@ -214,13 +216,18 @@ export default function Assistant() {
       }
 
       const data = await res.json();
+      const newSchemes = data.schemes || [];
+      // Track shown scheme IDs so future 'show more' requests exclude them
+      if (newSchemes.length > 0) {
+        setShownSchemeIds(prev => [...new Set([...prev, ...newSchemes.map(s => s.id)])]);
+      }
       setMessages(prev => [
         ...prev,
         {
           id: Date.now() + 1,
           sender: 'bot',
           text: data.reply || 'Here are some schemes that might help you.',
-          schemes: data.schemes || [],
+          schemes: newSchemes,
           lastUserQuery: text,
         }
       ]);
@@ -267,7 +274,7 @@ export default function Assistant() {
     } else {
       moreQuery = lastQuery ? `Show me more government schemes related to "${lastQuery}"` : 'Show me more government schemes';
     }
-    sendMessage(moreQuery);
+    sendMessage(moreQuery, { excludeIds: shownSchemeIds });
   };
 
   const handleVoice = () => {

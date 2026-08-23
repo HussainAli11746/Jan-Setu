@@ -1,14 +1,14 @@
 import express from 'express';
-import { verifyToken } from '../middleware/auth.js';
+import { optionalAuth } from '../middleware/auth.js';
 import { suggestSchemes } from '../services/gemini.js';
 import User from '../models/User.js';
 
 const router = express.Router();
 
-// POST /api/chat — protected
-router.post('/', verifyToken, async (req, res) => {
+// POST /api/chat — optional auth (guests can also chat)
+router.post('/', optionalAuth, async (req, res) => {
   try {
-    const { message, profile, language = 'en', history = [] } = req.body;
+    const { message, profile, language = 'en', history = [], excludeIds = [] } = req.body;
 
     if (!message || !message.trim()) {
       return res.status(400).json({ error: 'Message is required' });
@@ -36,7 +36,7 @@ router.post('/', verifyToken, async (req, res) => {
       }
     }
 
-    const result = await suggestSchemes(message, enrichedProfile, language, history);
+    const result = await suggestSchemes(message, enrichedProfile, language, history, excludeIds);
 
     res.json(result);
   } catch (error) {
