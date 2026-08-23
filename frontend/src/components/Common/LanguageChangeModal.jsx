@@ -54,28 +54,28 @@ export default function LanguageChangeModal({ isOpen, onClose, onConfirm, target
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 sm:p-7 max-w-sm w-full animate-in zoom-in-95 duration-200 text-center">
+      <div className="bg-white dark:bg-[#131B2E] rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 p-6 sm:p-7 max-w-sm w-full animate-in zoom-in-95 duration-200 text-center">
         {/* Globe Icon Badge */}
-        <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 mx-auto mb-4">
+        <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-950/40 border border-orange-100 dark:border-orange-900/40 flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-4">
           <Globe className="w-6 h-6" />
         </div>
 
         {/* Title & Desc */}
-        <h3 className="text-lg font-bold text-slate-900 mb-2">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
           {text.title}
         </h3>
-        <p className="text-xs text-slate-500 leading-relaxed mb-6">
+        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-6">
           {text.desc(targetNative)}
         </p>
 
         {/* Target Language Card */}
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 mb-6 flex items-center justify-between">
+        <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 mb-6 flex items-center justify-between">
           <div className="text-left">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">New Language</p>
-            <p className="text-sm font-extrabold text-[#0B132B]">{targetNative} <span className="text-xs font-normal text-slate-500">({targetLanguage.label})</span></p>
+            <p className="text-sm font-extrabold text-[#0B132B] dark:text-white">{targetNative} <span className="text-xs font-normal text-slate-500 dark:text-slate-400">({targetLanguage.label})</span></p>
           </div>
           <div className="w-7 h-7 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-xs">
             <Check className="w-4 h-4" />
@@ -87,14 +87,14 @@ export default function LanguageChangeModal({ isOpen, onClose, onConfirm, target
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+            className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             {text.cancel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="flex-1 py-2.5 px-4 rounded-xl bg-[#0A1633] hover:bg-slate-900 text-white text-xs sm:text-sm font-bold shadow-sm transition-colors cursor-pointer"
+            className="flex-1 py-2.5 px-4 rounded-xl bg-[#0A1633] dark:bg-orange-600 hover:bg-slate-900 dark:hover:bg-orange-500 text-white text-xs sm:text-sm font-bold shadow-sm transition-colors cursor-pointer"
           >
             {text.confirm}
           </button>

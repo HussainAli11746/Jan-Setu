@@ -439,24 +439,24 @@ export default function Onboarding() {
   const firstName = user?.name ? user.name.split(' ')[0] : '';
 
   return (
-    <div className="min-h-screen bg-[#FBFBFA] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#FBFBFA] dark:bg-[#0B0F19] flex items-center justify-center px-4 py-12 transition-colors duration-200">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-orange-50/60 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-emerald-50/40 blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-orange-50/60 dark:bg-orange-500/10 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-emerald-50/40 dark:bg-emerald-500/10 blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-[#0A1633] flex items-center justify-center shadow-lg mx-auto mb-3">
+          <div className="w-12 h-12 rounded-2xl bg-[#0A1633] dark:bg-slate-800 flex items-center justify-center shadow-lg mx-auto mb-3 border border-transparent dark:border-slate-700">
             <span className="text-orange-400 font-extrabold text-xl">J</span>
             <span className="text-white font-extrabold text-xl">S</span>
           </div>
-          <h1 className="text-xl font-extrabold text-[#0B132B]">
+          <h1 className="text-xl font-extrabold text-[#0B132B] dark:text-white">
             {isLanguageStep ? 'Choose your language / अपनी भाषा चुनें' : activeDict.quickSetup(firstName)}
           </h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
             {isLanguageStep ? 'The entire platform and form will be in your chosen language' : activeDict.subTitle}
           </p>
         </div>
@@ -464,14 +464,14 @@ export default function Onboarding() {
         {/* Progress bar */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-semibold text-slate-500">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
               {isLanguageStep ? 'Step 1 of ' + totalSteps : activeDict.stepOf(step + 1, totalSteps)}
             </span>
-            <span className="text-xs font-semibold text-orange-600">
+            <span className="text-xs font-semibold text-orange-600 dark:text-orange-400">
               {activeDict.percentComplete(progress)}
             </span>
           </div>
-          <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+          <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
             <div
               className="bg-gradient-to-r from-orange-400 to-orange-600 h-full rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
@@ -480,15 +480,15 @@ export default function Onboarding() {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-xl border border-slate-200/80 p-8 min-h-[350px]">
+        <div className="bg-white dark:bg-[#131B2E] rounded-3xl shadow-xl dark:shadow-none border border-slate-200/80 dark:border-slate-700 p-8 min-h-[350px]">
           {isLanguageStep ? (
             /* Step 0: Language Selection */
             <div key="language-step" className="animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="flex items-center gap-2.5 mb-6">
-                <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center">
-                  <Globe className="w-4 h-4 text-orange-600" />
+                <div className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-950/50 flex items-center justify-center border border-transparent dark:border-orange-800/40">
+                  <Globe className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                 </div>
-                <h2 className="text-base font-bold text-slate-900">Select Preferred Language / भाषा चुनें</h2>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Select Preferred Language / भाषा चुनें</h2>
               </div>
               <div className="flex flex-col gap-2.5">
                 {LANGUAGES.map((lang) => {
@@ -499,18 +499,18 @@ export default function Onboarding() {
                       onClick={() => handleLanguageSelect(lang.value)}
                       className={`w-full text-left px-4 py-3.5 rounded-xl border text-sm font-medium transition-all cursor-pointer flex items-center justify-between group ${
                         selected
-                          ? 'bg-orange-50 border-orange-400 text-orange-900 shadow-xs'
-                          : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-orange-300 hover:bg-orange-50/50'
+                          ? 'bg-orange-50 dark:bg-orange-950/50 border-orange-400 dark:border-orange-600 text-orange-900 dark:text-orange-200 shadow-xs'
+                          : 'bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-orange-300 dark:hover:border-orange-600 hover:bg-orange-50/50 dark:hover:bg-orange-950/30'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-base font-bold text-slate-900">{lang.native}</span>
-                        <span className="text-xs text-slate-500">({lang.label})</span>
+                        <span className="text-base font-bold text-slate-900 dark:text-white">{lang.native}</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400">({lang.label})</span>
                       </div>
                       {selected ? (
                         <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0" />
                       ) : (
-                        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-orange-400 shrink-0 transition-colors" />
+                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-orange-400 shrink-0 transition-colors" />
                       )}
                     </button>
                   );
@@ -521,10 +521,10 @@ export default function Onboarding() {
             /* Demographic field steps in the selected language */
             <div key={step} className="animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="flex items-center gap-2.5 mb-6">
-                <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center">
-                  {React.createElement(currentField.icon, { className: 'w-4 h-4 text-orange-600' })}
+                <div className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-950/50 flex items-center justify-center border border-transparent dark:border-orange-800/40">
+                  {React.createElement(currentField.icon, { className: 'w-4 h-4 text-orange-600 dark:text-orange-400' })}
                 </div>
-                <h2 className="text-base font-bold text-slate-900">{currentField.label}</h2>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">{currentField.label}</h2>
               </div>
               <div className="flex flex-col gap-2.5">
                 {currentField.options.map((opt) => {
@@ -535,18 +535,18 @@ export default function Onboarding() {
                       onClick={() => handleOption(opt.value)}
                       className={`w-full text-left px-4 py-3 rounded-xl border text-sm font-medium transition-all cursor-pointer flex items-center justify-between group ${
                         selected
-                          ? 'bg-orange-50 border-orange-400 text-orange-800'
-                          : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-orange-300 hover:bg-orange-50/50'
+                          ? 'bg-orange-50 dark:bg-orange-950/50 border-orange-400 dark:border-orange-600 text-orange-800 dark:text-orange-200'
+                          : 'bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-orange-300 dark:hover:border-orange-600 hover:bg-orange-50/50 dark:hover:bg-orange-950/30'
                       }`}
                     >
                       <div>
                         <span className="font-semibold">{opt.label}</span>
-                        {opt.desc && <span className="text-xs text-slate-400 ml-2">· {opt.desc}</span>}
+                        {opt.desc && <span className="text-xs text-slate-400 dark:text-slate-400 ml-2">· {opt.desc}</span>}
                       </div>
                       {selected ? (
                         <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0" />
                       ) : (
-                        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-orange-400 shrink-0 transition-colors" />
+                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-orange-400 shrink-0 transition-colors" />
                       )}
                     </button>
                   );
@@ -557,20 +557,20 @@ export default function Onboarding() {
             /* State picker step in selected language */
             <div key="state-step" className="animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="flex items-center gap-2.5 mb-6">
-                <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center">
-                  <MapPin className="w-4 h-4 text-orange-600" />
+                <div className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-950/50 flex items-center justify-center border border-transparent dark:border-orange-800/40">
+                  <MapPin className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                 </div>
-                <h2 className="text-base font-bold text-slate-900">{activeDict.stateQuestion}</h2>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">{activeDict.stateQuestion}</h2>
               </div>
               <select
                 id="onboarding-state"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/25 focus:border-orange-500 transition-all mb-6"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500/25 focus:border-orange-500 transition-all mb-6"
               >
-                <option value="">{activeDict.statePlaceholder}</option>
+                <option value="" className="dark:bg-slate-800 dark:text-slate-300">{activeDict.statePlaceholder}</option>
                 {STATES.map((s) => (
-                  <option key={s} value={s}>{s}</option>
+                  <option key={s} value={s} className="dark:bg-slate-800 dark:text-slate-100">{s}</option>
                 ))}
               </select>
 
@@ -595,14 +595,14 @@ export default function Onboarding() {
           {step > 0 ? (
             <button
               onClick={() => setStep(Math.max(0, step - 1))}
-              className="text-xs text-slate-400 hover:text-slate-600 cursor-pointer transition-colors"
+              className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer transition-colors"
             >
               {activeDict.back}
             </button>
           ) : <div />}
           <button
             onClick={() => navigate('/')}
-            className="text-xs text-slate-400 hover:text-slate-600 cursor-pointer transition-colors underline underline-offset-2"
+            className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer transition-colors underline underline-offset-2"
           >
             {activeDict.skip}
           </button>

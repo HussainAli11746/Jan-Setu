@@ -55,7 +55,7 @@ export default function SchemeSlider({ schemes = [], onAskMore, queryText = '' }
     <div className="w-full flex flex-col gap-3 my-1.5">
       {/* Top Header Badge */}
       <div className="flex items-center justify-between px-1">
-        <span className="text-[11px] font-extrabold text-slate-700 bg-slate-100 border border-slate-200 px-3 py-1 rounded-full shadow-2xs">
+        <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1 rounded-full shadow-2xs">
           {t.countLabel(schemes.length)}
         </span>
       </div>
@@ -67,16 +67,16 @@ export default function SchemeSlider({ schemes = [], onAskMore, queryText = '' }
         ))}
 
         {/* Clean, Premium "Show More Schemes" Action Bar at Bottom */}
-        <div className="sm:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-2xs p-4 sm:p-4.5 flex flex-col sm:flex-row items-center justify-between gap-3.5 hover:shadow-xs transition-shadow">
+        <div className="sm:col-span-2 bg-white dark:bg-[#131B2E] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs p-4 sm:p-4.5 flex flex-col sm:flex-row items-center justify-between gap-3.5 hover:shadow-xs transition-shadow">
           <div className="flex items-center gap-3 text-left w-full sm:w-auto">
-            <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-200/70 text-orange-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-950/40 border border-orange-200/70 dark:border-orange-900/40 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
               <Sparkles className="w-4 h-4" />
             </div>
             <div className="min-w-0 flex-1">
-              <h4 className="text-xs sm:text-[13px] font-bold text-slate-900 leading-tight">
+              <h4 className="text-xs sm:text-[13px] font-bold text-slate-900 dark:text-slate-100 leading-tight">
                 {t.cardTitle}
               </h4>
-              <p className="text-[11px] text-slate-500 mt-0.5 leading-normal">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-normal">
                 {t.cardSubtitle}
               </p>
             </div>
@@ -89,19 +89,19 @@ export default function SchemeSlider({ schemes = [], onAskMore, queryText = '' }
                 if (onAskMore) onAskMore();
                 else navigate('/schemes');
               }}
-              className="flex-1 sm:flex-none px-4 py-2 bg-[#0A1633] hover:bg-slate-900 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+              className="flex-1 sm:flex-none px-4 py-2 bg-[#0A1633] dark:bg-orange-600 hover:bg-slate-900 dark:hover:bg-orange-500 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors"
             >
               <span>{t.showMoreBtn}</span>
-              <PlusCircle className="w-3.5 h-3.5 text-orange-400" />
+              <PlusCircle className="w-3.5 h-3.5 text-orange-400 dark:text-white" />
             </button>
 
             <button
               type="button"
               onClick={() => navigate('/schemes')}
-              className="flex-1 sm:flex-none px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+              className="flex-1 sm:flex-none px-3.5 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
             >
               <span>{t.browseAllDir}</span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-400" />
             </button>
           </div>
         </div>

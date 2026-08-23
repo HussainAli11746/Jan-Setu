@@ -44,10 +44,10 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
+      <div className="bg-white dark:bg-[#131B2E] w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-transparent dark:border-slate-700 animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
         {/* Header */}
         <div className={`${colors.bg} border-b ${colors.border} px-6 py-5`}>
           <div className="flex items-start justify-between gap-3">
@@ -55,9 +55,9 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
               <span className={`text-[10px] font-bold uppercase tracking-widest ${colors.text} mb-1 block`}>
                 {scheme.category}
               </span>
-              <h2 className="text-lg font-extrabold text-slate-900 leading-tight">{scheme.name}</h2>
+              <h2 className="text-lg font-extrabold text-slate-900 dark:text-white leading-tight">{scheme.name}</h2>
               {scheme.ministry && (
-                <p className="text-xs text-slate-500 mt-0.5">{scheme.ministry}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{scheme.ministry}</p>
               )}
             </div>
             
@@ -68,8 +68,8 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
                 title={isSaved ? labels.saved : labels.saveScheme}
                 className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer ${
                   isSaved
-                    ? 'bg-amber-100 border-amber-300 text-amber-700 shadow-xs'
-                    : 'bg-white/90 border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-white'
+                    ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 shadow-xs'
+                    : 'bg-white/90 dark:bg-slate-800/90 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
                 }`}
               >
                 {isSaved ? <BookmarkCheck className="w-4 h-4 fill-amber-500 text-amber-600" /> : <Bookmark className="w-4 h-4" />}
@@ -77,7 +77,7 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
 
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full bg-white/90 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-white transition-all cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -85,7 +85,7 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
           </div>
           
           {scheme.benefit && (
-            <div className={`mt-3 inline-block px-3 py-1 rounded-full text-xs font-bold ${colors.text} bg-white border ${colors.border}`}>
+            <div className={`mt-3 inline-block px-3 py-1 rounded-full text-xs font-bold ${colors.text} bg-white dark:bg-slate-800/90 border ${colors.border}`}>
               {labels.keyBenefit}: {scheme.benefit}
             </div>
           )}
@@ -95,14 +95,14 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
         <div className="px-6 py-5 max-h-[58vh] overflow-y-auto flex flex-col gap-5">
           {/* Description */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">{labels.about}</h3>
-            <p className="text-sm text-slate-700 leading-relaxed">{scheme.description}</p>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 mb-2">{labels.about}</h3>
+            <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{scheme.description}</p>
           </div>
 
           {/* Eligibility criteria / Qualifications */}
           {((scheme.eligibility && scheme.eligibility.length > 0) || (scheme.qualifications && scheme.qualifications.length > 0)) && (
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                 {labels.eligibility}
               </h3>
@@ -112,13 +112,13 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
                   const text = isObj ? (criterion.text || criterion.name || criterion.description) : criterion;
                   const sub = isObj ? criterion.sub : null;
                   return (
-                    <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
-                      <div className="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0 mt-0.5">
-                        <span className="text-[9px] font-bold text-emerald-600">{i + 1}</span>
+                    <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-300">
+                      <div className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400">{i + 1}</span>
                       </div>
                       <div className="flex flex-col leading-snug">
-                        <span className="font-semibold text-slate-800">{text}</span>
-                        {sub && <span className="text-xs text-slate-500 mt-0.5">{sub}</span>}
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">{text}</span>
+                        {sub && <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{sub}</span>}
                       </div>
                     </li>
                   );
@@ -130,7 +130,7 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
           {/* Required documents */}
           {scheme.requiredDocs && scheme.requiredDocs.length > 0 && (
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-blue-500" />
                 {labels.documents}
               </h3>
@@ -142,12 +142,12 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
                   return (
                     <span
                       key={i}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-xs font-medium text-blue-700"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-medium text-blue-700 dark:text-blue-300"
                     >
                       <FileText className="w-3 h-3" />
                       <span>{docName}</span>
                       {docStatus && (
-                        <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200 font-bold px-1.5 py-0.5 rounded">
                           {docStatus}
                         </span>
                       )}
@@ -159,20 +159,20 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
           )}
 
           {/* Disclaimer */}
-          <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200/60 rounded-xl p-3.5">
+          <div className="flex items-start gap-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/40 rounded-xl p-3.5">
             <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-            <p className="text-[11px] text-amber-700 leading-relaxed">
+            <p className="text-[11px] text-amber-700 dark:text-amber-300 leading-relaxed">
               {labels.disclaimer}
             </p>
           </div>
         </div>
 
         {/* Footer with Close, Save Scheme, and Apply Actions */}
-        <div className="px-6 py-4 border-t border-slate-100 flex flex-wrap sm:flex-nowrap items-center gap-2.5">
+        <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap sm:flex-nowrap items-center gap-2.5">
           <button
             type="button"
             onClick={onClose}
-            className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
           >
             {labels.close}
           </button>
@@ -183,8 +183,8 @@ export default function DeepDiveModal({ scheme, onClose, colors }) {
             onClick={handleToggleSave}
             className={`flex-1 py-2.5 rounded-xl border text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
               isSaved
-                ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-2xs'
-                : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700 hover:bg-slate-50'
+                ? 'bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 shadow-2xs'
+                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'
             }`}
           >
             {isSaved ? (

@@ -206,21 +206,21 @@ export default function MyApplications() {
     switch (status) {
       case 'approved':
         return (
-          <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 text-[11px] font-bold px-3 py-1 rounded-full border border-emerald-200">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+          <span className="inline-flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800/40">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>{t.approved}</span>
           </span>
         );
       case 'pending_verification':
         return (
-          <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-800 text-[11px] font-bold px-3 py-1 rounded-full border border-amber-200">
-            <Clock className="w-3.5 h-3.5 text-amber-600" />
+          <span className="inline-flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 text-[11px] font-bold px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/40">
+            <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
             <span>{t.pendingVerification}</span>
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 bg-orange-50 text-orange-800 text-[11px] font-bold px-3 py-1 rounded-full border border-orange-200">
+          <span className="inline-flex items-center gap-1.5 bg-orange-50 dark:bg-orange-950/50 text-orange-800 dark:text-orange-300 text-[11px] font-bold px-3 py-1 rounded-full border border-orange-200 dark:border-orange-800/40">
             <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
             <span>{t.underReview}</span>
           </span>
@@ -235,11 +235,11 @@ export default function MyApplications() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBFBFA] py-8 sm:py-12 px-4 sm:px-6">
+    <div className="min-h-screen bg-[#FBFBFA] dark:bg-[#0B0F19] py-8 sm:py-12 px-4 sm:px-6 transition-colors duration-200">
       <div className="max-w-5xl mx-auto flex flex-col gap-8">
 
         {/* ── Main Upcoming Feature Announcement Card ────────────────────────── */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-[#0A1633] via-[#0F234D] to-[#1E293B] rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-slate-700/50">
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#0A1633] via-[#0F234D] to-[#1E293B] dark:from-[#0f172a] dark:via-[#1e293b] dark:to-[#0f172a] rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-slate-700/50 dark:border-slate-700">
           {/* Subtle Background Glow */}
           <div className="absolute -top-24 -right-24 w-72 h-72 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
           <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -328,10 +328,10 @@ export default function MyApplications() {
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                 {t.sampleTitle}
               </h2>
-              <span className="text-[10px] font-black uppercase tracking-wider bg-slate-200/80 text-slate-700 px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] font-black uppercase tracking-wider bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-0.5 rounded-full border border-transparent dark:border-slate-700">
                 {t.demoTag}
               </span>
             </div>
@@ -341,25 +341,25 @@ export default function MyApplications() {
             {applications.map((app) => (
               <div
                 key={app.id}
-                className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+                className="bg-white dark:bg-[#131B2E] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-700 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">
+                    <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-400 px-2 py-0.5 rounded-md border border-transparent dark:border-slate-700">
                       {app.id}
                     </span>
                     {getStatusBadge(app.status)}
                   </div>
 
-                  <h3 className="text-sm font-bold text-slate-900 mb-1 leading-snug">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1 leading-snug">
                     {app.schemeName}
                   </h3>
 
-                  <p className="text-xs text-emerald-700 font-semibold mb-4">
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold mb-4">
                     {app.benefit}
                   </p>
 
-                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-2">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mb-2">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${getProgressBarColor(
                         app.status
@@ -369,19 +369,19 @@ export default function MyApplications() {
                   </div>
                   <div className="flex items-center justify-between text-[10px] text-slate-400 mb-4">
                     <span>{t.lastUpdated}: {app.updatedAt}</span>
-                    <span className="font-bold text-slate-600">{app.progressPercent}%</span>
+                    <span className="font-bold text-slate-600 dark:text-slate-300">{app.progressPercent}%</span>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-slate-500">
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                     {app.portal}
                   </span>
                   <a
                     href={`https://${app.portal}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-bold text-indigo-900 hover:text-orange-600 flex items-center gap-1 transition-colors"
+                    className="text-xs font-bold text-indigo-900 dark:text-orange-400 hover:text-orange-600 dark:hover:text-orange-300 flex items-center gap-1 transition-colors"
                   >
                     <span>{t.viewStatus}</span>
                     <ExternalLink className="w-3 h-3 text-slate-400" />

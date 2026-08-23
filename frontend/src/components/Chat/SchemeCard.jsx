@@ -7,14 +7,14 @@ import toast from 'react-hot-toast';
 import { notifyExtension } from '../../services/copilotHandshake';
 
 const CATEGORY_COLORS = {
-  agriculture: { bg: 'bg-emerald-50/70', border: 'border-emerald-200/80', text: 'text-emerald-700', badge: 'bg-emerald-100/70 text-emerald-800 border-emerald-300/50', dot: 'bg-emerald-500' },
-  education:   { bg: 'bg-blue-50/70',    border: 'border-blue-200/80',    text: 'text-blue-700',    badge: 'bg-blue-100/70 text-blue-800 border-blue-300/50',       dot: 'bg-blue-500' },
-  housing:     { bg: 'bg-amber-50/70',   border: 'border-amber-200/80',   text: 'text-amber-700',   badge: 'bg-amber-100/70 text-amber-800 border-amber-300/50',    dot: 'bg-amber-500' },
-  health:      { bg: 'bg-red-50/70',     border: 'border-red-200/80',     text: 'text-red-700',     badge: 'bg-red-100/70 text-red-800 border-red-300/50',          dot: 'bg-red-500' },
-  employment:  { bg: 'bg-purple-50/70',  border: 'border-purple-200/80',  text: 'text-purple-700',  badge: 'bg-purple-100/70 text-purple-800 border-purple-300/50', dot: 'bg-purple-500' },
-  business:    { bg: 'bg-cyan-50/70',    border: 'border-cyan-200/80',    text: 'text-cyan-700',    badge: 'bg-cyan-100/70 text-cyan-800 border-cyan-300/50',       dot: 'bg-cyan-500' },
-  social:      { bg: 'bg-pink-50/70',    border: 'border-pink-200/80',    text: 'text-pink-700',    badge: 'bg-pink-100/70 text-pink-800 border-pink-300/50',       dot: 'bg-pink-500' },
-  skill:       { bg: 'bg-indigo-50/70',  border: 'border-indigo-200/80',  text: 'text-indigo-700',  badge: 'bg-indigo-100/70 text-indigo-800 border-indigo-300/50', dot: 'bg-indigo-500' },
+  agriculture: { bg: 'bg-emerald-50/70 dark:bg-emerald-950/30', border: 'border-emerald-200/80 dark:border-emerald-800/50', text: 'text-emerald-700 dark:text-emerald-400', badge: 'bg-emerald-100/70 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border-emerald-300/50 dark:border-emerald-700/50', dot: 'bg-emerald-500' },
+  education:   { bg: 'bg-blue-50/70 dark:bg-blue-950/30',    border: 'border-blue-200/80 dark:border-blue-800/50',    text: 'text-blue-700 dark:text-blue-400',    badge: 'bg-blue-100/70 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 border-blue-300/50 dark:border-blue-700/50',       dot: 'bg-blue-500' },
+  housing:     { bg: 'bg-amber-50/70 dark:bg-amber-950/30',   border: 'border-amber-200/80 dark:border-amber-800/50',   text: 'text-amber-700 dark:text-amber-400',   badge: 'bg-amber-100/70 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200 border-amber-300/50 dark:border-amber-700/50',    dot: 'bg-amber-500' },
+  health:      { bg: 'bg-red-50/70 dark:bg-red-950/30',     border: 'border-red-200/80 dark:border-red-800/50',     text: 'text-red-700 dark:text-red-400',     badge: 'bg-red-100/70 dark:bg-red-900/50 text-red-800 dark:text-red-200 border-red-300/50 dark:border-red-700/50',          dot: 'bg-red-500' },
+  employment:  { bg: 'bg-purple-50/70 dark:bg-purple-950/30',  border: 'border-purple-200/80 dark:border-purple-800/50',  text: 'text-purple-700 dark:text-purple-400',  badge: 'bg-purple-100/70 dark:bg-purple-900/50 text-purple-800 dark:text-purple-200 border-purple-300/50 dark:border-purple-700/50', dot: 'bg-purple-500' },
+  business:    { bg: 'bg-cyan-50/70 dark:bg-cyan-950/30',    border: 'border-cyan-200/80 dark:border-cyan-800/50',    text: 'text-cyan-700 dark:text-cyan-400',    badge: 'bg-cyan-100/70 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-200 border-cyan-300/50 dark:border-cyan-700/50',       dot: 'bg-cyan-500' },
+  social:      { bg: 'bg-pink-50/70 dark:bg-pink-950/30',    border: 'border-pink-200/80 dark:border-pink-800/50',    text: 'text-pink-700 dark:text-pink-400',    badge: 'bg-pink-100/70 dark:bg-pink-900/50 text-pink-800 dark:text-pink-200 border-pink-300/50 dark:border-pink-700/50',       dot: 'bg-pink-500' },
+  skill:       { bg: 'bg-indigo-50/70 dark:bg-indigo-950/30',  border: 'border-indigo-200/80 dark:border-indigo-800/50',  text: 'text-indigo-700 dark:text-indigo-400',  badge: 'bg-indigo-100/70 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200 border-indigo-300/50 dark:border-indigo-700/50', dot: 'bg-indigo-500' },
 };
 
 export default function SchemeCard({ scheme }) {
@@ -86,11 +86,11 @@ export default function SchemeCard({ scheme }) {
             <div className="flex items-start gap-2 flex-1 min-w-0">
               <div className={`w-2 h-2 rounded-full ${colors.dot} mt-1.5 shrink-0`} />
               <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-bold text-slate-900 leading-snug line-clamp-2">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug line-clamp-2">
                   {scheme.name}
                 </h4>
                 {scheme.ministry && (
-                  <p className="text-[11px] text-slate-500 mt-0.5 truncate">{scheme.ministry}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">{scheme.ministry}</p>
                 )}
               </div>
             </div>
@@ -108,12 +108,12 @@ export default function SchemeCard({ scheme }) {
                 title={isSaved ? btnSaved : btnSave}
                 className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-all cursor-pointer ${
                   isSaved
-                    ? 'bg-amber-100 border-amber-300 text-amber-700 shadow-2xs'
-                    : 'bg-white border-slate-200 text-slate-400 hover:text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                    ? 'bg-amber-100 dark:bg-amber-900/50 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 shadow-2xs'
+                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'
                 }`}
               >
                 {isSaved ? (
-                  <BookmarkCheck className="w-3.5 h-3.5 fill-amber-500 text-amber-600" />
+                  <BookmarkCheck className="w-3.5 h-3.5 fill-amber-500 text-amber-600 dark:text-amber-400" />
                 ) : (
                   <Bookmark className="w-3.5 h-3.5" />
                 )}
@@ -122,13 +122,13 @@ export default function SchemeCard({ scheme }) {
           </div>
 
           {/* Description */}
-          <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 mt-0.5">
+          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2 mt-0.5">
             {scheme.description}
           </p>
 
           {/* Benefit Box */}
           {scheme.benefit && (
-            <div className="flex items-start gap-2 p-2.5 rounded-xl bg-white/80 border border-slate-200/70 text-xs font-semibold text-slate-800 leading-snug">
+            <div className="flex items-start gap-2 p-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/70 text-xs font-semibold text-slate-800 dark:text-slate-200 leading-snug">
               <Tag className={`w-3.5 h-3.5 ${colors.text} shrink-0 mt-0.5`} />
               <span className={`text-[11px] font-bold ${colors.text} leading-relaxed`}>
                 {scheme.benefit}
@@ -137,15 +137,15 @@ export default function SchemeCard({ scheme }) {
           )}
         </div>
 
-        {/* Action Buttons Row — perfectly contained with zero overflow */}
-        <div className="flex items-center gap-2 pt-2 border-t border-slate-200/60 w-full">
+        {/* Action Buttons Row */}
+        <div className="flex items-center gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 w-full">
           {/* Deep Dive Action */}
           <button
             type="button"
             onClick={() => setShowModal(true)}
-            className="flex-1 min-w-0 flex items-center justify-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-2xs"
+            className="flex-1 min-w-0 flex items-center justify-center gap-1.5 px-3 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-2xs"
           >
-            <BookOpen className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+            <BookOpen className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
             <span className="truncate">{btnDeepDive}</span>
           </button>
 

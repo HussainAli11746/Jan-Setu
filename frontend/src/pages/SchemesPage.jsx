@@ -138,14 +138,14 @@ const SCHEMES_PAGE_I18N = {
 };
 
 const CATEGORY_COLORS = {
-  agriculture: { badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', border: 'border-t-emerald-600', icon: 'bg-emerald-100 text-emerald-700' },
-  education: { badge: 'bg-blue-50 text-blue-700 border-blue-200', border: 'border-t-blue-600', icon: 'bg-blue-100 text-blue-700' },
-  housing: { badge: 'bg-amber-50 text-amber-700 border-amber-200', border: 'border-t-amber-600', icon: 'bg-amber-100 text-amber-700' },
-  health: { badge: 'bg-rose-50 text-rose-700 border-rose-200', border: 'border-t-rose-600', icon: 'bg-rose-100 text-rose-700' },
-  business: { badge: 'bg-indigo-50 text-indigo-700 border-indigo-200', border: 'border-t-indigo-600', icon: 'bg-indigo-100 text-indigo-700' },
-  skill: { badge: 'bg-purple-50 text-purple-700 border-purple-200', border: 'border-t-purple-600', icon: 'bg-purple-100 text-purple-700' },
-  social: { badge: 'bg-cyan-50 text-cyan-700 border-cyan-200', border: 'border-t-cyan-600', icon: 'bg-cyan-100 text-cyan-700' },
-  employment: { badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', border: 'border-t-emerald-600', icon: 'bg-emerald-100 text-emerald-700' },
+  agriculture: { badge: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/40', border: 'border-t-emerald-600', icon: 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300' },
+  education: { badge: 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/40', border: 'border-t-blue-600', icon: 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300' },
+  housing: { badge: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/40', border: 'border-t-amber-600', icon: 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300' },
+  health: { badge: 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800/40', border: 'border-t-rose-600', icon: 'bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300' },
+  business: { badge: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800/40', border: 'border-t-indigo-600', icon: 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' },
+  skill: { badge: 'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/40', border: 'border-t-purple-600', icon: 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300' },
+  social: { badge: 'bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800/40', border: 'border-t-cyan-600', icon: 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300' },
+  employment: { badge: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/40', border: 'border-t-emerald-600', icon: 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300' },
 };
 
 function getCategoryIcon(cat) {
@@ -236,20 +236,20 @@ export default function SchemesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#FBFBFA] dark:bg-[#0B0F19] py-10 px-4 sm:px-6 transition-colors duration-200">
       <div className="max-w-6xl mx-auto flex flex-col gap-8">
 
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/80 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-orange-700 text-xs font-bold mb-2">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800/40 text-orange-700 dark:text-orange-300 text-xs font-bold mb-2">
+              <Sparkles className="w-3.5 h-3.5 text-orange-500" />
               <span>{tPage.badge}</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#0B132B] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-[#0B132B] dark:text-white tracking-tight">
               {tPage.title}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
               {tPage.subtitle}
             </p>
           </div>
@@ -262,7 +262,7 @@ export default function SchemesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={tPage.searchPlaceholder}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-2xs"
+              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-2xs"
             />
           </div>
         </div>
@@ -278,8 +278,8 @@ export default function SchemesPage() {
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer shadow-2xs shrink-0 ${
                   isSelected
-                    ? 'bg-[#0A1633] text-white shadow-md'
-                    : 'bg-white border border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                    ? 'bg-[#0A1633] dark:bg-orange-600 text-white shadow-md'
+                    : 'bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -293,17 +293,17 @@ export default function SchemesPage() {
         {initialLoading ? (
           <div className="py-20 flex flex-col items-center justify-center gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
-            <span className="text-xs text-slate-500 font-semibold">{tPage.loading}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{tPage.loading}</span>
           </div>
         ) : schemes.length === 0 ? (
           /* Empty State */
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 shadow-2xs max-w-md mx-auto my-8">
-            <Sparkles className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-slate-800 mb-1">{tPage.emptyTitle}</h3>
-            <p className="text-xs text-slate-500 mb-4">{tPage.emptySubtitle}</p>
+          <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-12 text-center border border-slate-200/80 dark:border-slate-700 shadow-2xs max-w-md mx-auto my-8">
+            <Sparkles className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-slate-800 dark:text-white mb-1">{tPage.emptyTitle}</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">{tPage.emptySubtitle}</p>
             <button
               onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition-colors cursor-pointer"
             >
               {tPage.resetFilters}
             </button>
@@ -318,7 +318,7 @@ export default function SchemesPage() {
                 return (
                   <div
                     key={scheme.id}
-                    className={`bg-white rounded-2xl p-6 border border-slate-200/80 shadow-2xs flex flex-col justify-between transition-all hover:shadow-md hover:-translate-y-0.5 ${catStyle.border} border-t-4`}
+                    className={`bg-white dark:bg-[#131B2E] rounded-2xl p-6 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex flex-col justify-between transition-all hover:shadow-md hover:-translate-y-0.5 ${catStyle.border} border-t-4`}
                   >
                     <div>
                       {/* Top Bar: Icon + Category Badge */}
@@ -333,13 +333,13 @@ export default function SchemesPage() {
 
                       {/* Ministry */}
                       {scheme.ministry && (
-                        <p className="text-[11px] font-semibold text-slate-400 mb-1 line-clamp-1">
+                        <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-400 mb-1 line-clamp-1">
                           {scheme.ministry}
                         </p>
                       )}
 
                       {/* Title */}
-                      <h3 className="text-base font-bold text-slate-900 leading-snug mb-2">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white leading-snug mb-2">
                         {scheme.name}
                       </h3>
 

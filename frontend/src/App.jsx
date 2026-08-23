@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
 import Home from './pages/Home';
@@ -45,7 +46,7 @@ function AppShell() {
   const isAuthPage = AUTH_PAGES.some(p => location.pathname.startsWith(p));
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FBFBFA]">
+    <div className="flex flex-col min-h-screen bg-[#FBFBFA] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {!isAuthPage && <Navbar />}
       <main className="flex-1 flex flex-col">
         <Routes>
@@ -58,25 +59,23 @@ function AppShell() {
           <Route path="/schemes/:id" element={<SchemeDetails />} />
           <Route path="/about" element={<About />} />
 
-          {/* Requires login but not onboarding */}
+          {/* Protected routes */}
           <Route path="/onboarding" element={
             <ProtectedRoute><Onboarding /></ProtectedRoute>
           } />
-
-          {/* Requires login */}
           <Route path="/assistant" element={
-            <ProtectedRoute><Assistant /></ProtectedRoute>
+            <OnboardingRoute><Assistant /></OnboardingRoute>
+          } />
+          <Route path="/profile" element={
+            <OnboardingRoute><Profile /></OnboardingRoute>
+          } />
+          <Route path="/applications" element={
+            <OnboardingRoute><MyApplications /></OnboardingRoute>
           } />
           <Route path="/apply/:schemeId" element={
             <ProtectedRoute><ApplyPage /></ProtectedRoute>
           } />
-          <Route path="/applications" element={
-            <ProtectedRoute><MyApplications /></ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute><Profile /></ProtectedRoute>
-          } />
-          <Route path="/track/:applicationId" element={
+          <Route path="/track/:id" element={
             <ProtectedRoute><ApplicationStatus /></ProtectedRoute>
           } />
 
@@ -105,9 +104,11 @@ function AppShell() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppShell />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppShell />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

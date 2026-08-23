@@ -13,18 +13,31 @@
     --orange-primary: #EA580C;
     --orange-hover: #C2410C;
     --orange-gradient: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
-    --bg-page: #F8FAFC;
+    --bg-page: #FAFAF9;
     --card-bg: #FFFFFF;
     --border-light: #E2E8F0;
     --text-main: #0F172A;
     --text-muted: #64748B;
   }
 
+  .dark {
+    --navy-dark: #030712;
+    --navy-brand: #0B0F19;
+    --navy-blue: #111827;
+    --navy-accent: #1D4ED8;
+    --bg-page: #0B0F19;
+    --card-bg: #131B2E;
+    --border-light: #1E293B;
+    --text-main: #F8FAFC;
+    --text-muted: #94A3B8;
+  }
+
   body {
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #FAFAF9;
-    color: #0F172A;
+    background-color: var(--bg-page);
+    color: var(--text-main);
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 

@@ -318,19 +318,19 @@ export default function Assistant() {
     : 'Ask about any government scheme…';
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FBFBFA]">
+    <div className="flex flex-col min-h-screen bg-[#FBFBFA] dark:bg-[#0B0F19] transition-colors duration-200">
 
       {/* Top bar */}
-      <div className="sticky top-0 z-20 bg-white border-b border-slate-200/90 px-4 py-3">
+      <div className="sticky top-0 z-20 bg-white dark:bg-[#0B0F19] border-b border-slate-200/90 dark:border-slate-800 px-4 py-3 transition-colors duration-200">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#0A1633] flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-[#0A1633] dark:bg-slate-800 border border-transparent dark:border-slate-700 flex items-center justify-center shadow-sm">
               <Bot className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-900">JanSetu AI</p>
+              <p className="text-sm font-bold text-slate-900 dark:text-white">JanSetu AI</p>
               {profileSummary && (
-                <p className="text-[11px] text-slate-400">Profile: {profileSummary}</p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-400">Profile: {profileSummary}</p>
               )}
             </div>
           </div>
@@ -341,17 +341,17 @@ export default function Assistant() {
               <button
                 type="button"
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-200/90 dark:hover:bg-slate-700/90 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 transition-all cursor-pointer shadow-2xs"
                 title="Change language (restarts chat)"
               >
-                <Globe className="w-3.5 h-3.5 text-orange-600" />
+                <Globe className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
                 <span>{activeLangObj.native}</span>
                 <ChevronDown className="w-3 h-3 text-slate-400" />
               </button>
 
               {langDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-1">
-                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#131B2E] rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-1.5 z-50 animate-in fade-in slide-in-from-top-1">
+                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 mb-1">
                     Select Language
                   </div>
                   {LANGUAGES.map((lang) => {
@@ -362,13 +362,13 @@ export default function Assistant() {
                         onClick={() => handleSelectLanguage(lang)}
                         className={`w-full text-left px-3.5 py-2.5 text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
                           isActive
-                            ? 'bg-orange-50 text-orange-600'
-                            : 'text-slate-700 hover:bg-slate-50'
+                            ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400'
+                            : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                         }`}
                       >
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold">{lang.native}</span>
-                          <span className="text-[10px] text-slate-400">{lang.label}</span>
+                          <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{lang.native}</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-400">{lang.label}</span>
                         </div>
                         {isActive && <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />}
                       </button>
@@ -381,7 +381,7 @@ export default function Assistant() {
             {/* Restart Button */}
             <button
               onClick={handleReset}
-              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700 transition-all cursor-pointer"
+              className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 hover:text-slate-700 dark:hover:text-white transition-all cursor-pointer"
               title="Restart conversation"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -398,8 +398,8 @@ export default function Assistant() {
 
             {/* Bot avatar */}
             {msg.sender === 'bot' && (
-              <div className="w-8 h-8 rounded-xl bg-[#0A1633] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm">
-                <Sparkles className="w-3.5 h-3.5" />
+              <div className="w-8 h-8 rounded-xl bg-[#0A1633] dark:bg-slate-800 border border-transparent dark:border-slate-700 flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-orange-400" />
               </div>
             )}
 
@@ -408,10 +408,10 @@ export default function Assistant() {
               <div
                 className={`rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
                   msg.sender === 'user'
-                    ? 'bg-[#1E293B] text-white rounded-tr-none'
+                    ? 'bg-[#1E293B] dark:bg-orange-600 text-white rounded-tr-none'
                     : msg.isError
-                    ? 'bg-red-50 border border-red-200 text-red-700 rounded-tl-none'
-                    : 'bg-white border border-slate-200/80 text-slate-800 rounded-tl-none'
+                    ? 'bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-tl-none'
+                    : 'bg-white dark:bg-[#131B2E] border border-slate-200/80 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-tl-none'
                 }`}
               >
                 {msg.text.split('\n').map((line, i) => (
@@ -436,7 +436,7 @@ export default function Assistant() {
 
             {/* User avatar */}
             {msg.sender === 'user' && (
-              <div className="w-8 h-8 rounded-xl bg-slate-600 flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm">
+              <div className="w-8 h-8 rounded-xl bg-slate-600 dark:bg-slate-700 flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm">
                 <User className="w-3.5 h-3.5" />
               </div>
             )}
@@ -446,12 +446,12 @@ export default function Assistant() {
         {/* Loading indicator */}
         {loading && (
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-[#0A1633] flex items-center justify-center text-white shrink-0 shadow-sm">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="w-8 h-8 rounded-xl bg-[#0A1633] dark:bg-slate-800 flex items-center justify-center text-white shrink-0 shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-orange-400" />
             </div>
-            <div className="bg-white border border-slate-200/80 rounded-2xl rounded-tl-none px-5 py-3.5 flex items-center gap-2.5">
+            <div className="bg-white dark:bg-[#131B2E] border border-slate-200/80 dark:border-slate-700 rounded-2xl rounded-tl-none px-5 py-3.5 flex items-center gap-2.5">
               <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-slate-500 dark:text-slate-400">
                 {currentLang === 'hi'
                   ? 'जन-सेतु AI योजनाएँ खोज रहा है...'
                   : 'JanSetu AI is finding schemes…'}
@@ -467,7 +467,7 @@ export default function Assistant() {
               <button
                 key={prompt}
                 onClick={() => sendMessage(prompt)}
-                className="text-xs bg-white border border-slate-200 text-slate-600 font-medium px-3.5 py-2 rounded-full hover:border-orange-300 hover:text-orange-700 hover:bg-orange-50/50 transition-all cursor-pointer shadow-sm text-left"
+                className="text-xs bg-white dark:bg-[#131B2E] border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium px-3.5 py-2 rounded-full hover:border-orange-300 dark:hover:border-orange-500 hover:text-orange-700 dark:hover:text-orange-400 hover:bg-orange-50/50 dark:hover:bg-slate-800 transition-all cursor-pointer shadow-sm text-left"
               >
                 {prompt}
               </button>
@@ -479,7 +479,7 @@ export default function Assistant() {
       </div>
 
       {/* Input bar */}
-      <div className="sticky bottom-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-4 py-4">
+      <div className="sticky bottom-0 bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800 px-4 py-4 transition-colors duration-200">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
           {/* Mic button */}
           <button
@@ -505,12 +505,12 @@ export default function Assistant() {
               onChange={(e) => setInput(e.target.value)}
               placeholder={placeholderText}
               disabled={loading}
-              className="flex-1 bg-slate-100/90 border border-slate-200 text-sm text-slate-800 placeholder-slate-400 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all disabled:opacity-60"
+              className="flex-1 bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all disabled:opacity-60"
             />
             <button
               type="submit"
               disabled={!input.trim() || loading}
-              className="w-11 h-11 rounded-xl bg-[#1E293B] hover:bg-slate-900 disabled:opacity-40 text-white flex items-center justify-center shadow-sm shrink-0 transition-colors cursor-pointer"
+              className="w-11 h-11 rounded-xl bg-[#1E293B] dark:bg-orange-600 hover:bg-slate-900 dark:hover:bg-orange-500 disabled:opacity-40 text-white flex items-center justify-center shadow-sm shrink-0 transition-colors cursor-pointer"
             >
               <Send className="w-4 h-4" />
             </button>
