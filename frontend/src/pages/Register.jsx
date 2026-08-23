@@ -182,18 +182,18 @@ export default function Register() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-4 py-10 bg-[#F8FAFC] dark:bg-[#0B0F19] transition-colors duration-200">
-      <div className="w-full max-w-[420px] bg-white dark:bg-[#131B2E] rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 p-8 sm:p-9 text-center">
+    <div className="flex-1 flex flex-col items-center justify-center px-4 py-10 bg-[#F8FAFC] transition-colors duration-200">
+      <div className="w-full max-w-[420px] bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-8 sm:p-9 text-center">
         {/* Top Icon Badge */}
-        <div className="w-12 h-12 rounded-full bg-[#EEF2FF] dark:bg-blue-950/60 flex items-center justify-center text-[#1E3A8A] dark:text-blue-400 mx-auto mb-4 border border-transparent dark:border-blue-800/40">
-          <UserCheck className="w-5 h-5 text-[#1E3A8A] dark:text-blue-400" />
+        <div className="w-12 h-12 rounded-full bg-[#EEF2FF] flex items-center justify-center text-[#1E3A8A] mx-auto mb-4 border border-blue-100">
+          <UserCheck className="w-5 h-5 text-[#1E3A8A]" />
         </div>
 
         {/* Title & Subtitle */}
-        <h1 className="text-2xl font-bold text-[#0B132B] dark:text-white tracking-tight mb-1.5">
+        <h1 className="text-2xl font-bold text-[#0B132B] tracking-tight mb-1.5">
           {t.title}
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+        <p className="text-xs text-slate-500 mb-6 leading-relaxed">
           {t.subtitle}
         </p>
 
@@ -201,7 +201,7 @@ export default function Register() {
         <form onSubmit={handleSubmit} className="text-left flex flex-col gap-3.5">
           {/* Full Name */}
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
               {t.nameLabel}
             </label>
             <input
@@ -211,13 +211,13 @@ export default function Register() {
               onChange={handleChange}
               placeholder={t.namePlaceholder}
               required
-              className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-900/10 dark:focus:ring-orange-500/20 focus:border-blue-900 dark:focus:border-orange-500 transition-all"
+              className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all"
             />
           </div>
 
           {/* Email Address */}
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
               {t.emailLabel}
             </label>
             <input
@@ -227,13 +227,13 @@ export default function Register() {
               onChange={handleChange}
               placeholder={t.emailPlaceholder}
               required
-              className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-900/10 dark:focus:ring-orange-500/20 focus:border-blue-900 dark:focus:border-orange-500 transition-all"
+              className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all"
             />
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
               {t.passwordLabel}
             </label>
             <div className="relative">
@@ -244,12 +244,12 @@ export default function Register() {
                 onChange={handleChange}
                 placeholder={t.passwordPlaceholder}
                 required
-                className="w-full pl-4 pr-10 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-900/10 dark:focus:ring-orange-500/20 focus:border-blue-900 dark:focus:border-orange-500 transition-all"
+                className="w-full pl-4 pr-10 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all"
               />
               <button
                 type="button"
                 onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
               >
                 {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -258,7 +258,7 @@ export default function Register() {
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
               {t.confirmLabel}
             </label>
             <div className="relative">
@@ -269,12 +269,12 @@ export default function Register() {
                 onChange={handleChange}
                 placeholder={t.confirmPlaceholder}
                 required
-                className="w-full pl-4 pr-10 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-900/10 dark:focus:ring-orange-500/20 focus:border-blue-900 dark:focus:border-orange-500 transition-all"
+                className="w-full pl-4 pr-10 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
               >
                 {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -282,21 +282,21 @@ export default function Register() {
           </div>
 
           {/* Terms checkbox */}
-          <div className="flex items-start gap-2 pt-1 text-[11px] text-slate-600 dark:text-slate-400">
+          <div className="flex items-start gap-2 pt-1 text-[11px] text-slate-600">
             <input
               type="checkbox"
               id="terms"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-0.5 rounded-sm border-slate-300 dark:border-slate-600 text-blue-950 dark:text-orange-500 focus:ring-blue-900 cursor-pointer"
+              className="mt-0.5 rounded-sm border-slate-300 text-blue-950 focus:ring-blue-900 cursor-pointer"
             />
             <label htmlFor="terms" className="leading-snug cursor-pointer">
               {t.termsText}{' '}
-              <Link to="/about" className="text-orange-600 dark:text-orange-400 font-bold hover:underline">
+              <Link to="/about" className="text-orange-600 font-bold hover:underline">
                 {t.termsLink}
               </Link>{' '}
               {t.andText}{' '}
-              <Link to="/about" className="text-orange-600 dark:text-orange-400 font-bold hover:underline">
+              <Link to="/about" className="text-orange-600 font-bold hover:underline">
                 {t.privacyLink}
               </Link>
               {t.agreeText}
@@ -307,11 +307,11 @@ export default function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 bg-[#0A1633] dark:bg-orange-600 hover:bg-slate-900 dark:hover:bg-orange-500 text-white font-bold text-xs sm:text-sm py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+            className="w-full mt-2 bg-[#0A1633] hover:bg-slate-900 text-white font-bold text-xs sm:text-sm py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-orange-400 dark:text-white" />
+                <Loader2 className="w-4 h-4 animate-spin text-orange-400" />
                 <span>{t.creatingBtn}</span>
               </>
             ) : (
@@ -321,9 +321,9 @@ export default function Register() {
         </form>
 
         {/* Bottom Link */}
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-6">
+        <p className="text-xs text-slate-500 mt-6">
           {t.hasAccount}{' '}
-          <Link to="/login" className="text-orange-600 dark:text-orange-400 font-bold hover:underline">
+          <Link to="/login" className="text-orange-600 font-bold hover:underline">
             {t.signInLink}
           </Link>
         </p>

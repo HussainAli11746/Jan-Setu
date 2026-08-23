@@ -88,37 +88,37 @@ export default function RegisterWall() {
   const t = WALL_I18N[currentLang] || WALL_I18N['en'];
 
   return (
-    <div className="min-h-screen bg-[#FBFBFA] dark:bg-[#0B0F19] flex items-center justify-center px-4 py-12 transition-colors duration-200">
+    <div className="min-h-screen bg-[#FBFBFA] flex items-center justify-center px-4 py-12 transition-colors duration-200">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-orange-100/40 dark:bg-orange-500/10 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-blue-100/30 dark:bg-blue-600/10 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-purple-50/20 dark:bg-purple-900/10 blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-orange-100/40 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-blue-100/30 blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-purple-50/20 blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-md text-center">
         {/* Logo */}
         <div className="inline-flex items-center gap-2 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-[#0A1633] dark:bg-slate-800 flex items-center justify-center shadow-xl border border-transparent dark:border-slate-700">
+          <div className="w-12 h-12 rounded-2xl bg-[#0A1633] flex items-center justify-center shadow-xl border border-transparent">
             <span className="text-orange-400 font-extrabold text-xl">J</span>
             <span className="text-white font-extrabold text-xl">S</span>
           </div>
         </div>
 
         {/* Badge */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDE9FE]/80 dark:bg-purple-950/60 border border-[#DDD6FE] dark:border-purple-800/50 text-[#6D28D9] dark:text-purple-300 text-xs font-semibold mb-5">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDE9FE]/80 border border-[#DDD6FE] text-[#6D28D9] text-xs font-semibold mb-5">
           <Sparkles className="w-3 h-3" />
           <span>{t.badge}</span>
         </div>
 
         {/* Heading */}
-        <h1 className="text-3xl font-extrabold text-[#0B132B] dark:text-white tracking-tight mb-3">
+        <h1 className="text-3xl font-extrabold text-[#0B132B] tracking-tight mb-3">
           {t.title1}<br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-700 dark:from-orange-400 dark:to-orange-500">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-700">
             {t.title2}
           </span>
         </h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-8 max-w-sm mx-auto">
+        <p className="text-slate-500 text-sm leading-relaxed mb-8 max-w-sm mx-auto">
           {t.subtitle}
         </p>
 
@@ -129,7 +129,7 @@ export default function RegisterWall() {
             { icon: ShieldCheck, text: t.feat2 },
             { icon: Users, text: t.feat3 },
           ].map(({ icon: Icon, text }) => (
-            <div key={text} className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800/80 rounded-full border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 shadow-sm">
+            <div key={text} className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-slate-200 text-xs font-medium text-slate-600 shadow-sm">
               <Icon className="w-3 h-3 text-orange-500" />
               <span>{text}</span>
             </div>
@@ -137,19 +137,19 @@ export default function RegisterWall() {
         </div>
 
         {/* Card */}
-        <div className="bg-white dark:bg-[#131B2E] rounded-3xl shadow-xl dark:shadow-none border border-slate-200/80 dark:border-slate-700 p-8 flex flex-col gap-4">
+        <div className="bg-white rounded-3xl shadow-xl border border-slate-200/80 p-8 flex flex-col gap-4">
           {/* Chat preview */}
-          <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-100 dark:border-slate-700/60 text-left">
+          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left">
             <div className="flex items-start gap-2.5 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-[#0A1633] dark:bg-slate-700 flex items-center justify-center shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-[#0A1633] flex items-center justify-center shrink-0">
                 <MessageSquare className="w-3.5 h-3.5 text-white" />
               </div>
-              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl rounded-tl-none px-3 py-2 text-xs text-slate-700 dark:text-slate-200">
+              <div className="bg-white border border-slate-200 rounded-xl rounded-tl-none px-3 py-2 text-xs text-slate-700">
                 {t.chatSampleUser}
               </div>
             </div>
             <div className="flex items-start gap-2.5 justify-end">
-              <div className="bg-orange-50 dark:bg-orange-950/40 border border-orange-200/60 dark:border-orange-800/40 rounded-xl rounded-tr-none px-3 py-2 text-xs text-orange-800 dark:text-orange-200 max-w-[240px]">
+              <div className="bg-orange-50 border border-orange-200/60 rounded-xl rounded-tr-none px-3 py-2 text-xs text-orange-800 max-w-[240px]">
                 {t.chatSampleBot}
               </div>
               <div className="w-7 h-7 rounded-lg bg-orange-500 flex items-center justify-center shrink-0">
@@ -167,16 +167,16 @@ export default function RegisterWall() {
             <ArrowRight className="w-4 h-4" />
           </button>
 
-          <div className="text-center text-sm text-slate-500 dark:text-slate-400">
+          <div className="text-center text-sm text-slate-500">
             {t.hasAccount}{' '}
-            <Link to="/login" className="text-orange-600 dark:text-orange-400 font-semibold hover:text-orange-700 dark:hover:text-orange-300 transition-colors">
+            <Link to="/login" className="text-orange-600 font-semibold hover:text-orange-700 transition-colors">
               {t.signInLink}
             </Link>
           </div>
         </div>
 
         <div className="mt-5">
-          <Link to="/" className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+          <Link to="/" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
             {t.backHome}
           </Link>
         </div>

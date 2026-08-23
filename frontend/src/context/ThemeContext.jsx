@@ -9,15 +9,12 @@ const ThemeContext = createContext({
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
-    // 1. Check local storage
+    // 1. Check local storage if user explicitly set a preference
     const savedTheme = localStorage.getItem('jansetu_theme');
     if (savedTheme === 'dark' || savedTheme === 'light') {
       return savedTheme;
     }
-    // 2. Check system preference
-    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
+    // Default to light theme everywhere
     return 'light';
   });
 
@@ -30,20 +27,6 @@ export function ThemeProvider({ children }) {
     }
     localStorage.setItem('jansetu_theme', theme);
   }, [theme]);
-
-  // Listen for system theme changes if user hasn't explicitly set preference
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => {
-      const savedTheme = localStorage.getItem('jansetu_theme_manual');
-      if (!savedTheme) {
-        setThemeState(e.matches ? 'dark' : 'light');
-      }
-    };
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
 
   const setTheme = (newTheme) => {
     if (newTheme === 'dark' || newTheme === 'light') {
