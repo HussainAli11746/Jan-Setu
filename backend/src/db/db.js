@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://alihussain11746_db_user:q61WuCZm1vgw8ywt@cluster0.ehyemo8.mongodb.net/jansetu';
+const MONGO_URI = process.env.MONGO_URI;
 
 let cachedConnection = null;
 
