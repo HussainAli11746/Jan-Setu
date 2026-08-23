@@ -121,6 +121,8 @@ export default function Assistant() {
   const [isListening, setIsListening] = useState(false);
   const [pendingLanguage, setPendingLanguage] = useState(null);
   const [shownSchemeIds, setShownSchemeIds] = useState([]);
+  // Also track by normalised name for client-side dedup (Gemini sometimes ignores excludeIds)
+  const shownSchemeNamesRef = useRef(new Set());
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -207,6 +209,7 @@ export default function Assistant() {
           language: currentLang,
           history,
           excludeIds: options.excludeIds || [],
+          excludeNames: [...shownSchemeNamesRef.current],
         }),
       });
 
@@ -216,18 +219,43 @@ export default function Assistant() {
       }
 
       const data = await res.json();
-      const newSchemes = data.schemes || [];
-      // Track shown scheme IDs so future 'show more' requests exclude them
-      if (newSchemes.length > 0) {
-        setShownSchemeIds(prev => [...new Set([...prev, ...newSchemes.map(s => s.id)])]);
+      const rawSchemes = data.schemes || [];
+
+      // ── Client-side deduplication (by normalised name) ────────────────────
+      // This guarantees fresh results even if Gemini ignores the excludeIds instruction.
+      const normaliseName = (n = '') => n.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const freshSchemes = rawSchemes.filter(
+        s => !shownSchemeNamesRef.current.has(normaliseName(s.name))
+      );
+
+      // Update tracking sets
+      rawSchemes.forEach(s => {
+        shownSchemeNamesRef.current.add(normaliseName(s.name));
+      });
+      if (rawSchemes.length > 0) {
+        setShownSchemeIds(prev => [...new Set([...prev, ...rawSchemes.map(s => s.id)])]);
       }
+
+      // If all schemes were dupes, show a nudge message instead of empty list
+      const schemesToShow = freshSchemes.length > 0
+        ? freshSchemes
+        : options.excludeIds?.length > 0
+          ? [] // signal that we've exhausted schemes for this topic
+          : rawSchemes;
+
+      const replyText = schemesToShow.length === 0 && options.excludeIds?.length > 0
+        ? (currentLang === 'hi'
+            ? 'इस विषय पर सभी उपलब्ध योजनाएँ दिखाई जा चुकी हैं। कृपया कोई अलग विषय पूछें।'
+            : 'All available schemes for this topic have been shown. Please ask about a different topic!')
+        : (data.reply || 'Here are some schemes that might help you.');
+
       setMessages(prev => [
         ...prev,
         {
           id: Date.now() + 1,
           sender: 'bot',
-          text: data.reply || 'Here are some schemes that might help you.',
-          schemes: newSchemes,
+          text: replyText,
+          schemes: schemesToShow,
           lastUserQuery: text,
         }
       ]);
