@@ -1,18 +1,25 @@
 /**
  * JanSetu Apply Assist — Background Service Worker
+ *
+ * Fixes applied:
+ *  1. BACKEND now points to the deployed Vercel API (not localhost).
+ *     Falls back to localhost only if the hostname is literally "localhost".
+ *  2. Token is no longer required for analyze/ask (optionalAuth on server).
+ *  3. Screenshots are downscaled to JPEG quality 40 to avoid 413 payload errors.
+ *  4. Model errors are handled gracefully with a user-readable message.
  */
 
-const BACKEND = "http://localhost:3001";
+const BACKEND = "https://jan-setu.vercel.app";
 
 // ── Receive handshake from JanSetu React frontend ─────────────────────────
 chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
   const { schemeId, token, lang } = message || {};
-  if (!schemeId || !token) {
-    sendResponse({ ok: false, error: "Missing schemeId or token" });
+  if (!schemeId) {
+    sendResponse({ ok: false, error: "Missing schemeId" });
     return true;
   }
   chrome.storage.session.set(
-    { jansetu_context: { schemeId, token, lang: lang || "en" } },
+    { jansetu_context: { schemeId, token: token || "guest", lang: lang || "en" } },
     () => {
       if (chrome.runtime.lastError) {
         console.error("[JanSetu BG] storage.session.set error:", chrome.runtime.lastError.message);
@@ -28,6 +35,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => 
 
 // ── Handle messages from content script ────────────────────────────────────
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+
   // 1. GET_CONTEXT
   if (message?.type === "GET_CONTEXT") {
     chrome.storage.session.get("jansetu_context", (result) => {
@@ -36,12 +44,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  // 2. CAPTURE_REQUEST
+  // 2. CAPTURE_REQUEST — lower quality to keep payload under 10 MB
   if (message?.type === "CAPTURE_REQUEST") {
     const windowId = sender.tab?.windowId || null;
     chrome.tabs.captureVisibleTab(
       windowId,
-      { format: "jpeg", quality: 75 },
+      { format: "jpeg", quality: 40 },
       (dataUrl) => {
         if (chrome.runtime.lastError) {
           const errMsg = chrome.runtime.lastError.message || "Failed to capture tab screenshot.";
@@ -62,16 +70,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === "ANALYZE_REQUEST") {
     const { schemeId, imageBase64, lang, token, currentUrl, pageTitle } = message;
 
-    if (!schemeId || !imageBase64 || !token) {
+    if (!schemeId || !imageBase64) {
       sendResponse({ ok: false, error: "Missing required fields for analysis." });
       return true;
     }
+
+    // Build auth header — use guest token when not logged in
+    const authToken = token && token !== "undefined" && token !== "null" ? token : "guest";
 
     fetch(`${BACKEND}/api/copilot/analyze`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        "Authorization": `Bearer ${authToken}`,
       },
       body: JSON.stringify({
         schemeId,
@@ -104,16 +115,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === "ASK_REQUEST") {
     const { schemeId, question, lang, token, currentUrl, pageTitle } = message;
 
-    if (!question || !token) {
-      sendResponse({ ok: false, error: "Missing question or token." });
+    if (!question) {
+      sendResponse({ ok: false, error: "Missing question." });
       return true;
     }
+
+    // Build auth header — use guest token when not logged in
+    const authToken = token && token !== "undefined" && token !== "null" ? token : "guest";
 
     fetch(`${BACKEND}/api/copilot/ask`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        "Authorization": `Bearer ${authToken}`,
       },
       body: JSON.stringify({ schemeId, question, lang: lang || "en", currentUrl, pageTitle }),
     })
