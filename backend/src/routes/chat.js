@@ -8,7 +8,7 @@ const router = express.Router();
 // POST /api/chat — optional auth (guests can also chat)
 router.post('/', optionalAuth, async (req, res) => {
   try {
-    const { message, profile, language = 'en', history = [], excludeIds = [], excludeNames = [] } = req.body;
+    const { message, profile, language = 'en', history = [] } = req.body;
 
     if (!message || !message.trim()) {
       return res.status(400).json({ error: 'Message is required' });
@@ -36,7 +36,7 @@ router.post('/', optionalAuth, async (req, res) => {
       }
     }
 
-    const result = await suggestSchemes(message, enrichedProfile, language, history, excludeIds, excludeNames);
+    const result = await suggestSchemes(message, enrichedProfile, language, history);
 
     res.json(result);
   } catch (error) {
