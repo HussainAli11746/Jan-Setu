@@ -385,6 +385,6 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 ---
 
 <p align="center">
-  <b>Built with ❤️ for 1.4+ Billion Indian Citizens 🇮🇳</b><br />
-  <i>Empowering Every Citizen to Access Their Entitlements with Dignity & Ease.</i>
+  <b>JanSetu (जन-सेतु) — Empowering Bharat with Next-Gen AI</b><br />
+  <i>Democratizing Access to Public Welfare Entitlements with Dignity, Transparency & Ease.</i>
 </p>
