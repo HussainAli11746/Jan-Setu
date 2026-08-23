@@ -1,3 +1,4 @@
+
 // Real Client store and scheme definitions synced with rules engine & catalog
 export const INITIAL_SCHEMES = [
   {
