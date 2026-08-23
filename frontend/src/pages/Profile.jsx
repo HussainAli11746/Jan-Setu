@@ -912,16 +912,16 @@ export default function Profile() {
   }
 
   return (
-    <div className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0F19] py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
-      <div className="max-w-6xl mx-auto flex flex-col gap-8">
+    <div className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0F19] py-10 sm:py-16 px-4 sm:px-8 lg:px-12 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto flex flex-col gap-10">
 
         {/* 1. Top Stat Cards (4 columns) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {/* Matched Schemes (Clickable to view Matched Schemes tab) */}
           <button
             type="button"
             onClick={() => setActiveTab('matched')}
-            className={`bg-white dark:bg-[#131B2E] rounded-2xl p-5 border shadow-2xs flex items-center justify-between text-left transition-all cursor-pointer hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 ${
+            className={`bg-white dark:bg-[#131B2E] rounded-3xl p-6 sm:p-7 border shadow-2xs flex items-center justify-between text-left transition-all cursor-pointer hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 ${
               activeTab === 'matched' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-slate-200/80 dark:border-slate-700'
             }`}
           >
@@ -929,14 +929,14 @@ export default function Profile() {
               <p className="text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-400 uppercase">
                 {tProfile.matchedSchemes}
               </p>
-              <div className="flex items-center gap-2 mt-1">
-                <h3 className="text-2xl font-extrabold text-[#0B132B] dark:text-white">{activeMatchedSchemes.length}</h3>
+              <div className="flex items-center gap-2 mt-1.5">
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0B132B] dark:text-white">{activeMatchedSchemes.length}</h3>
                 {matchingSchemesLoading && (
                   <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
                 )}
               </div>
             </div>
-            <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-transparent dark:border-blue-800/40">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-transparent dark:border-blue-800/40 shrink-0">
               <Award className="w-5 h-5" />
             </div>
           </button>
@@ -945,7 +945,7 @@ export default function Profile() {
           <button
             type="button"
             onClick={() => setActiveTab('saved')}
-            className={`bg-white dark:bg-[#131B2E] rounded-2xl p-5 border shadow-2xs flex items-center justify-between text-left transition-all cursor-pointer hover:shadow-md hover:border-amber-300 dark:hover:border-amber-500 ${
+            className={`bg-white dark:bg-[#131B2E] rounded-3xl p-6 sm:p-7 border shadow-2xs flex items-center justify-between text-left transition-all cursor-pointer hover:shadow-md hover:border-amber-300 dark:hover:border-amber-500 ${
               activeTab === 'saved' ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-slate-200/80 dark:border-slate-700'
             }`}
           >
@@ -953,37 +953,37 @@ export default function Profile() {
               <p className="text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-400 uppercase">
                 {tProfile.savedSchemes}
               </p>
-              <h3 className="text-2xl font-extrabold text-[#0B132B] dark:text-white mt-1">{savedSchemes.length}</h3>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0B132B] dark:text-white mt-1.5">{savedSchemes.length}</h3>
             </div>
-            <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-transparent dark:border-amber-800/40">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-transparent dark:border-amber-800/40 shrink-0">
               <Bookmark className="w-5 h-5" />
             </div>
           </button>
 
           {/* Total Applications */}
-          <div className="bg-white dark:bg-[#131B2E] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex items-center justify-between">
+          <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-400 uppercase">
                 {tProfile.totalApplications}
               </p>
-              <h3 className="text-2xl font-extrabold text-[#0B132B] dark:text-white mt-1">{appCount}</h3>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0B132B] dark:text-white mt-1.5">{appCount}</h3>
             </div>
-            <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-transparent dark:border-emerald-800/40">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-transparent dark:border-emerald-800/40 shrink-0">
               <FileText className="w-5 h-5" />
             </div>
           </div>
 
           {/* Profile Completeness */}
-          <div className="bg-white dark:bg-[#131B2E] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex flex-col justify-between">
+          <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <p className="text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-400 uppercase">
                 {tProfile.profileCompleteness}
               </p>
               <PieChart className="w-4 h-4 text-[#1E3A8A] dark:text-blue-400" />
             </div>
-            <div className="mt-2">
+            <div className="mt-2.5">
               <div className="flex items-baseline justify-between mb-1.5">
-                <span className="text-2xl font-extrabold text-[#0B132B] dark:text-white">{completeness}%</span>
+                <span className="text-2xl sm:text-3xl font-extrabold text-[#0B132B] dark:text-white">{completeness}%</span>
                 <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">{tProfile.activeStatus}</span>
               </div>
               <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
@@ -997,14 +997,14 @@ export default function Profile() {
         </div>
 
         {/* 2. Main Profile Grid (Sidebar + Content) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
 
           {/* Left Column: User Summary & Navigation */}
           <div className="lg:col-span-4 flex flex-col gap-6">
 
             {/* Profile Identity Card */}
-            <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex flex-col items-center text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#0E1B48] to-[#0A1128] dark:from-slate-700 dark:to-slate-800 text-white flex items-center justify-center text-2xl font-black shadow-md mb-4 ring-4 ring-slate-100 dark:ring-slate-700">
+            <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-8 sm:p-9 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex flex-col items-center text-center">
+              <div className="w-22 h-22 rounded-full bg-gradient-to-br from-[#0E1B48] to-[#0A1128] dark:from-slate-700 dark:to-slate-800 text-white flex items-center justify-center text-3xl font-black shadow-md mb-4 ring-4 ring-slate-100 dark:ring-slate-700">
                 {name ? name.charAt(0).toUpperCase() : 'U'}
               </div>
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">{name || 'JanSetu Citizen'}</h2>
@@ -1020,11 +1020,11 @@ export default function Profile() {
             </div>
 
             {/* Navigation Tabs Card */}
-            <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-3 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex flex-col gap-1">
+            <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-3.5 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex flex-col gap-1.5">
               <button
                 type="button"
                 onClick={() => setActiveTab('overview')}
-                className={`w-full text-left px-4 py-3 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center gap-3 cursor-pointer ${
+                className={`w-full text-left px-4.5 py-3.5 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center gap-3 cursor-pointer ${
                   activeTab === 'overview'
                     ? 'bg-[#EEF2F6] dark:bg-slate-800 text-[#0A1128] dark:text-white'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
@@ -1038,7 +1038,7 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={() => setActiveTab('matched')}
-                className={`w-full text-left px-4 py-3 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center justify-between cursor-pointer ${
+                className={`w-full text-left px-4.5 py-3.5 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center justify-between cursor-pointer ${
                   activeTab === 'matched'
                     ? 'bg-[#EEF2F6] dark:bg-slate-800 text-[#0A1128] dark:text-white'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
@@ -1057,7 +1057,7 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={() => setActiveTab('saved')}
-                className={`w-full text-left px-4 py-3 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center justify-between cursor-pointer ${
+                className={`w-full text-left px-4.5 py-3.5 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center justify-between cursor-pointer ${
                   activeTab === 'saved'
                     ? 'bg-[#EEF2F6] dark:bg-slate-800 text-[#0A1128] dark:text-white'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
@@ -1077,7 +1077,7 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={() => setActiveTab('account')}
-                className={`w-full text-left px-4 py-3 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center gap-3 cursor-pointer ${
+                className={`w-full text-left px-4.5 py-3.5 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center gap-3 cursor-pointer ${
                   activeTab === 'account'
                     ? 'bg-[#EEF2F6] dark:bg-slate-800 text-[#0A1128] dark:text-white'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
@@ -1090,7 +1090,7 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={() => setActiveTab('preferences')}
-                className={`w-full text-left px-4 py-3 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center gap-3 cursor-pointer ${
+                className={`w-full text-left px-4.5 py-3.5 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center gap-3 cursor-pointer ${
                   activeTab === 'preferences'
                     ? 'bg-[#EEF2F6] dark:bg-slate-800 text-[#0A1128] dark:text-white'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
@@ -1103,7 +1103,7 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={() => setActiveTab('demographic')}
-                className={`w-full text-left px-4 py-3 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center gap-3 cursor-pointer ${
+                className={`w-full text-left px-4.5 py-3.5 rounded-2xl text-xs sm:text-[13px] font-bold transition-all flex items-center gap-3 cursor-pointer ${
                   activeTab === 'demographic'
                     ? 'bg-[#EEF2F6] dark:bg-slate-800 text-[#0A1128] dark:text-white'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
@@ -1118,7 +1118,7 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={() => setShowSignOutModal(true)}
-                className="w-full text-left px-4 py-3 rounded-2xl text-xs sm:text-[13px] font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all flex items-center gap-3 cursor-pointer"
+                className="w-full text-left px-4.5 py-3.5 rounded-2xl text-xs sm:text-[13px] font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all flex items-center gap-3 cursor-pointer"
               >
                 <LogOut className="w-4 h-4 text-red-500" />
                 <span>{tProfile.signOut}</span>
@@ -1128,30 +1128,30 @@ export default function Profile() {
           </div>
 
           {/* Right Column: Dynamic Tab View */}
-          <div className="lg:col-span-8 flex flex-col gap-6">
+          <div className="lg:col-span-8 flex flex-col gap-8">
 
             {/* TAB VIEW 1: MATCHED SCHEMES */}
             {activeTab === 'matched' && (
-              <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex flex-col gap-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-7 sm:p-10 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex flex-col gap-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5 flex-wrap">
                       <Award className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                      <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">{tProfile.secMatchedTitle}</h3>
+                      <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">{tProfile.secMatchedTitle}</h3>
                       <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/40 text-blue-800 dark:text-blue-300 flex items-center gap-1">
                         <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                         <span>{activeMatchedSchemes.length} Matched</span>
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{tProfile.secMatchedDesc}</p>
+                    <p className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">{tProfile.secMatchedDesc}</p>
                   </div>
 
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2.5 flex-wrap">
                     <button
                       type="button"
                       disabled={matchingSchemesLoading}
                       onClick={() => fetchMatchedSchemes && fetchMatchedSchemes()}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/50 text-blue-800 dark:text-blue-300 text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shadow-2xs"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/50 text-blue-800 dark:text-blue-300 text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shadow-2xs"
                     >
                       {matchingSchemesLoading ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600 dark:text-blue-400" />
@@ -1163,7 +1163,7 @@ export default function Profile() {
 
                     <Link
                       to="/schemes"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all w-fit cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all w-fit cursor-pointer"
                     >
                       <span>{tProfile.exploreSchemesBtn}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -1172,7 +1172,7 @@ export default function Profile() {
                 </div>
 
                 {matchingSchemesLoading && (
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-200 dark:border-blue-800/40 rounded-2xl flex items-center gap-3 animate-pulse">
+                  <div className="p-4.5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-200 dark:border-blue-800/40 rounded-2xl flex items-center gap-3 animate-pulse">
                     <Loader2 className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-spin shrink-0" />
                     <div>
                       <p className="text-xs font-bold text-blue-900 dark:text-blue-200">JanSetu AI is analyzing your updated demographic profile...</p>
@@ -1182,33 +1182,33 @@ export default function Profile() {
                 )}
 
                 {/* Matched Schemes Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
                   {activeMatchedSchemes.map((scheme) => {
                     const colors = CATEGORY_COLORS[scheme.category] || CATEGORY_COLORS.social;
                     const isSaved = isSchemeSaved ? isSchemeSaved(scheme.id) : savedSchemes.some(s => s.id === scheme.id);
                     return (
                       <div
                         key={scheme.id}
-                        className={`rounded-2xl border ${colors.border} ${colors.bg} p-4.5 flex flex-col justify-between gap-3 shadow-2xs hover:shadow-md transition-all`}
+                        className={`rounded-3xl border ${colors.border} ${colors.bg} p-6 sm:p-7 flex flex-col justify-between gap-5 shadow-2xs hover:shadow-md transition-all`}
                       >
                         <div>
                           {/* Card Header */}
-                          <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-start justify-between gap-3 mb-3">
                             <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
-                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 border ${colors.border} ${colors.text} inline-block`}>
+                              <div className="flex items-center gap-2 flex-wrap mb-2">
+                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-800 border ${colors.border} ${colors.text} inline-block`}>
                                   {scheme.category}
                                 </span>
-                                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40 flex items-center gap-1">
+                                <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40 flex items-center gap-1">
                                   <Sparkles className="w-2.5 h-2.5 text-blue-600 dark:text-blue-400" />
                                   <span>{scheme.matchScore}</span>
                                 </span>
                               </div>
-                              <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                              <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug">
                                 {scheme.name}
                               </h4>
                               {scheme.ministry && (
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">{scheme.ministry}</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">{scheme.ministry}</p>
                               )}
                             </div>
 
@@ -1220,7 +1220,7 @@ export default function Profile() {
                                 handleToggleSaveMatched(scheme);
                               }}
                               title={isSaved ? tProfile.removeSchemeBtn : 'Save Scheme'}
-                              className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
+                              className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
                                 isSaved
                                   ? 'bg-amber-500 border-amber-600 text-white shadow-2xs'
                                   : 'bg-white/90 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-amber-600 hover:border-amber-300'
@@ -1232,34 +1232,34 @@ export default function Profile() {
 
                           {/* Match Reason Tag */}
                           {scheme.matchReason && (
-                            <p className="text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-50/90 dark:bg-blue-950/50 border border-blue-200/60 dark:border-blue-800/40 rounded-lg px-2.5 py-1 mb-2.5">
+                            <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-50/90 dark:bg-blue-950/50 border border-blue-200/60 dark:border-blue-800/40 rounded-xl px-3 py-2 mb-3.5 leading-relaxed">
                               🎯 {scheme.matchReason}
                             </p>
                           )}
 
                           {/* Description */}
-                          <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mb-3">
+                          <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mb-4">
                             {scheme.description}
                           </p>
 
                           {/* Benefit Badge */}
                           {scheme.benefit && (
-                            <div className="flex items-center gap-1.5 bg-white/80 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 px-2.5 py-1 rounded-lg w-fit">
-                              <Tag className={`w-3 h-3 ${colors.text}`} />
+                            <div className="flex items-center gap-1.5 bg-white/80 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 px-3 py-1.5 rounded-xl w-fit">
+                              <Tag className={`w-3.5 h-3.5 ${colors.text}`} />
                               <span className={`text-[11px] font-bold ${colors.text}`}>{scheme.benefit}</span>
                             </div>
                           )}
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex items-center gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700">
+                        <div className="flex items-center gap-3 pt-3.5 border-t border-slate-200/60 dark:border-slate-700">
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               setActiveDeepDive(scheme);
                             }}
-                            className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                            className="flex-1 px-3.5 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                           >
                             <BookOpen className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                             <span>{tProfile.deepDiveBtn}</span>
@@ -1277,7 +1277,7 @@ export default function Profile() {
                               e.stopPropagation();
                               notifyExtension(scheme.id, token, (i18n.language || 'en').slice(0, 2));
                             }}
-                            className="flex-1 px-3 py-2 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                            className="flex-1 px-3.5 py-2.5 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                             <span>{tProfile.applyNowBtn}</span>
@@ -1292,22 +1292,22 @@ export default function Profile() {
 
             {/* TAB VIEW 2: SAVED SCHEMES */}
             {activeTab === 'saved' && (
-              <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex flex-col gap-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-7 sm:p-10 border border-slate-200/80 dark:border-slate-700 shadow-2xs flex flex-col gap-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5 flex-wrap">
                       <Bookmark className="w-5 h-5 text-amber-500" />
-                      <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">{tProfile.secSavedTitle}</h3>
+                      <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">{tProfile.secSavedTitle}</h3>
                       <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/40 text-amber-800 dark:text-amber-300">
                         {savedSchemes.length}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{tProfile.secSavedDesc}</p>
+                    <p className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">{tProfile.secSavedDesc}</p>
                   </div>
 
                   <Link
                     to="/schemes"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all w-fit cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all w-fit cursor-pointer"
                   >
                     <span>{tProfile.exploreSchemesBtn}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -1316,24 +1316,24 @@ export default function Profile() {
 
                 {/* Saved Schemes List or Empty State */}
                 {savedSchemes.length === 0 ? (
-                  <div className="py-12 flex flex-col items-center justify-center text-center max-w-md mx-auto">
-                    <div className="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/70 dark:border-amber-800/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4 shadow-2xs">
-                      <Bookmark className="w-7 h-7" />
+                  <div className="py-14 sm:py-16 flex flex-col items-center justify-center text-center max-w-md mx-auto">
+                    <div className="w-18 h-18 rounded-3xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/70 dark:border-amber-800/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-5 shadow-2xs">
+                      <Bookmark className="w-8 h-8" />
                     </div>
-                    <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1.5">{tProfile.noSavedTitle}</h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-6">{tProfile.noSavedDesc}</p>
-                    <div className="flex items-center gap-3">
+                    <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{tProfile.noSavedTitle}</h4>
+                    <p className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed mb-7 max-w-sm">{tProfile.noSavedDesc}</p>
+                    <div className="flex items-center gap-3.5 flex-wrap justify-center">
                       <button
                         type="button"
                         onClick={() => navigate('/schemes')}
-                        className="px-5 py-2.5 bg-[#0A1633] dark:bg-orange-600 hover:bg-slate-900 dark:hover:bg-orange-500 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
+                        className="px-5 py-3 bg-[#0A1633] dark:bg-orange-600 hover:bg-slate-900 dark:hover:bg-orange-500 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
                       >
                         {tProfile.exploreSchemesBtn}
                       </button>
                       <button
                         type="button"
                         onClick={() => navigate('/assistant')}
-                        className="px-4 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold rounded-xl shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="px-5 py-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold rounded-xl shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                       >
                         <Sparkles className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
                         <span>{tProfile.askAiBtn}</span>
@@ -1341,26 +1341,26 @@ export default function Profile() {
                     </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
                     {savedSchemes.map((scheme) => {
                       const colors = CATEGORY_COLORS[scheme.category] || CATEGORY_COLORS.social;
                       return (
                         <div
                           key={scheme.id}
-                          className={`rounded-2xl border ${colors.border} ${colors.bg} p-4.5 flex flex-col justify-between gap-3 shadow-2xs hover:shadow-md transition-all`}
+                          className={`rounded-3xl border ${colors.border} ${colors.bg} p-6 sm:p-7 flex flex-col justify-between gap-5 shadow-2xs hover:shadow-md transition-all`}
                         >
                           <div>
                             {/* Card Header */}
-                            <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="flex items-start justify-between gap-3 mb-3">
                               <div className="min-w-0 flex-1">
-                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 border ${colors.border} ${colors.text} inline-block mb-1.5`}>
+                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-800 border ${colors.border} ${colors.text} inline-block mb-2`}>
                                   {scheme.category}
                                 </span>
-                                <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                                <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug">
                                   {scheme.name}
                                 </h4>
                                 {scheme.ministry && (
-                                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">{scheme.ministry}</p>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">{scheme.ministry}</p>
                                 )}
                               </div>
 
@@ -1371,35 +1371,35 @@ export default function Profile() {
                                   handleRemoveScheme(scheme.id);
                                 }}
                                 title={tProfile.removeSchemeBtn}
-                                className="w-7 h-7 rounded-lg bg-white/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-red-600 hover:border-red-200 flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                                className="w-8 h-8 rounded-xl bg-white/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-red-600 hover:border-red-200 flex items-center justify-center shrink-0 transition-colors cursor-pointer"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
 
                             {/* Description */}
-                            <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mb-3">
+                            <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mb-4">
                               {scheme.description}
                             </p>
 
                             {/* Benefit Badge */}
                             {scheme.benefit && (
-                              <div className="flex items-center gap-1.5 bg-white/80 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 px-2.5 py-1 rounded-lg w-fit">
-                                <Tag className={`w-3 h-3 ${colors.text}`} />
+                              <div className="flex items-center gap-1.5 bg-white/80 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 px-3 py-1.5 rounded-xl w-fit">
+                                <Tag className={`w-3.5 h-3.5 ${colors.text}`} />
                                 <span className={`text-[11px] font-bold ${colors.text}`}>{scheme.benefit}</span>
                               </div>
                             )}
                           </div>
 
                           {/* Action Buttons */}
-                          <div className="flex items-center gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700">
+                          <div className="flex items-center gap-3 pt-3.5 border-t border-slate-200/60 dark:border-slate-700">
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setActiveDeepDive(scheme);
                               }}
-                              className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                              className="flex-1 px-3.5 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                             >
                               <BookOpen className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                               <span>{tProfile.deepDiveBtn}</span>
@@ -1417,7 +1417,7 @@ export default function Profile() {
                                 e.stopPropagation();
                                 notifyExtension(scheme.id, token, (i18n.language || 'en').slice(0, 2));
                               }}
-                              className="flex-1 px-3 py-2 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                              className="flex-1 px-3.5 py-2.5 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
                               <span>{tProfile.applyNowBtn}</span>
@@ -1436,16 +1436,16 @@ export default function Profile() {
               <>
                 {/* Section 1: Basic Account Info */}
                 {(activeTab === 'overview' || activeTab === 'account') && (
-                  <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white">{tProfile.secAccountTitle}</h3>
+                  <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-7 sm:p-10 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
+                    <div className="flex items-center justify-between mb-7">
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">{tProfile.secAccountTitle}</h3>
                       <Edit3 className="w-4 h-4 text-slate-400" />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
                       {/* Full Name */}
                       <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                           {tProfile.fullNameLabel}
                         </label>
                         <input
@@ -1453,29 +1453,29 @@ export default function Profile() {
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           placeholder="Your Name"
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all"
+                          className="w-full px-4.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all"
                         />
                       </div>
 
                       {/* Email Address */}
                       <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                           {tProfile.emailLabel}
                         </label>
                         <input
                           type="email"
                           value={email}
                           disabled
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 cursor-not-allowed"
+                          className="w-full px-4.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 cursor-not-allowed"
                         />
                       </div>
 
                       {/* Member Since */}
                       <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                           {tProfile.memberSinceLabel}
                         </label>
-                        <div className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                        <div className="w-full px-4.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 flex items-center gap-2.5">
                           <Calendar className="w-4 h-4 text-slate-400" />
                           <span>{tProfile.memberSinceVal}</span>
                         </div>
@@ -1483,15 +1483,15 @@ export default function Profile() {
 
                       {/* Change Password */}
                       <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                           {tProfile.securityLabel}
                         </label>
                         <button
                           type="button"
                           onClick={handlePasswordReset}
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                          className="w-full px-4.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
                         >
-                          <Key className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                          <Key className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                           <span>{tProfile.changePasswordBtn}</span>
                         </button>
                       </div>
@@ -1501,33 +1501,33 @@ export default function Profile() {
 
                 {/* Section 2: Preferences & Language */}
                 {(activeTab === 'overview' || activeTab === 'preferences') && (
-                  <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
+                  <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-7 sm:p-10 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white">{tProfile.secPrefTitle}</h3>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">{tProfile.secPrefTitle}</h3>
                       <Globe className="w-4 h-4 text-slate-400" />
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                    <p className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 mb-7 leading-relaxed">
                       {tProfile.secPrefDesc}
                     </p>
 
                     <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3.5">
                         {tProfile.prefLangLabel}
                       </label>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
                         {LANGUAGES.map((lang) => (
                           <button
                             key={lang.code}
                             type="button"
                             onClick={() => handleLanguageClick(lang)}
-                            className={`p-3.5 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                            className={`p-4 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
                               selectedLang === lang.code
                                 ? 'bg-gradient-to-br from-blue-950 to-[#0A1633] dark:from-orange-600 dark:to-orange-700 text-white border-blue-950 dark:border-orange-600 shadow-md ring-2 ring-blue-900/20 dark:ring-orange-500/20'
                                 : 'bg-slate-50/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'
                             }`}
                           >
-                            <span className="text-sm font-black">{lang.native}</span>
-                            <span className={`text-[10px] font-semibold ${selectedLang === lang.code ? 'text-slate-300 dark:text-orange-100' : 'text-slate-400 dark:text-slate-400'}`}>
+                            <span className="text-base font-black">{lang.native}</span>
+                            <span className={`text-[11px] font-semibold ${selectedLang === lang.code ? 'text-slate-300 dark:text-orange-100' : 'text-slate-400 dark:text-slate-400'}`}>
                               {lang.label}
                             </span>
                           </button>
@@ -1539,27 +1539,27 @@ export default function Profile() {
 
                 {/* Section 3: Demographic Profile Form */}
                 {(activeTab === 'overview' || activeTab === 'demographic') && (
-                  <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
+                  <div className="bg-white dark:bg-[#131B2E] rounded-3xl p-7 sm:p-10 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white">{tProfile.secDemoTitle}</h3>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">{tProfile.secDemoTitle}</h3>
                       <Briefcase className="w-4 h-4 text-slate-400" />
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                    <p className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 mb-7 leading-relaxed">
                       {tProfile.secDemoDesc}
                     </p>
 
-                    <form onSubmit={handleSave} className="flex flex-col gap-5">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                    <form onSubmit={handleSave} className="flex flex-col gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
 
                         {/* Age Category */}
                         <div>
-                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                             {tProfile.ageLabel}
                           </label>
                           <select
                             value={ageCategory}
                             onChange={(e) => setAgeCategory(e.target.value)}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
+                            className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
                           >
                             {tProfile.ageOptions.map((opt) => (
                               <option key={opt.value} value={opt.value} className="dark:bg-slate-800 dark:text-slate-100">{opt.label}</option>
@@ -1569,13 +1569,13 @@ export default function Profile() {
 
                         {/* Gender */}
                         <div>
-                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                             {tProfile.genderLabel}
                           </label>
                           <select
                             value={gender}
                             onChange={(e) => setGender(e.target.value)}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
+                            className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
                           >
                             {tProfile.genderOptions.map((g) => (
                               <option key={g.value} value={g.value} className="dark:bg-slate-800 dark:text-slate-100">{g.label}</option>
@@ -1585,13 +1585,13 @@ export default function Profile() {
 
                         {/* Residential State */}
                         <div>
-                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                             {tProfile.stateLabel}
                           </label>
                           <select
                             value={state}
                             onChange={(e) => setState(e.target.value)}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
+                            className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
                           >
                             {STATES.map((s) => (
                               <option key={s} value={s} className="dark:bg-slate-800 dark:text-slate-100">{s}</option>
@@ -1601,13 +1601,13 @@ export default function Profile() {
 
                         {/* Annual Family Income Bracket */}
                         <div>
-                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                             {tProfile.incomeLabel}
                           </label>
                           <select
                             value={incomeBracket}
                             onChange={(e) => setIncomeBracket(e.target.value)}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
+                            className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
                           >
                             {tProfile.incomeOptions.map((inc) => (
                               <option key={inc.value} value={inc.value} className="dark:bg-slate-800 dark:text-slate-100">{inc.label}</option>
@@ -1617,13 +1617,13 @@ export default function Profile() {
 
                         {/* Primary Occupation */}
                         <div>
-                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                             {tProfile.occupationLabel}
                           </label>
                           <select
                             value={occupation}
                             onChange={(e) => setOccupation(e.target.value)}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
+                            className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
                           >
                             {tProfile.occOptions.map((occ) => (
                               <option key={occ.value} value={occ.value} className="dark:bg-slate-800 dark:text-slate-100">{occ.label}</option>
@@ -1633,13 +1633,13 @@ export default function Profile() {
 
                         {/* Employment Status */}
                         <div>
-                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                             {tProfile.employmentLabel}
                           </label>
                           <select
                             value={employmentStatus}
                             onChange={(e) => setEmploymentStatus(e.target.value)}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
+                            className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all cursor-pointer"
                           >
                             {tProfile.empOptions.map((emp) => (
                               <option key={emp.value} value={emp.value} className="dark:bg-slate-800 dark:text-slate-100">{emp.label}</option>
