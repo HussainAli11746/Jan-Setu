@@ -61,15 +61,22 @@ const OFF_TOPIC_PATTERNS = [
   // Finance (non-government)
   /\b(stock|crypto|bitcoin|share market|trading|nifty|sensex|mutual fund|sip)\b/i,
 
-  // Weather & geography
-  /\b(weather|temperature|rain|forecast|climate|monsoon|flood|earthquake)\b/i,
+  // Weather (pure forecast queries only)
+  /^(what is the (weather|temperature|forecast)|today('s)? (weather|forecast))/i,
 
   // Relationships & personal
-  /\b(girlfriend|boyfriend|love|marriage|wedding|divorce|breakup|dating)\b/i,
-  /\b(joke|funny|comedy|meme|roast|troll)\b/i,
+  /\b(girlfriend|boyfriend|love|marriage advice|wedding planner|divorce lawyer|breakup|dating advice)\b/i,
+  /\b(tell me a joke|funny joke|comedy|meme|roast me|troll)\b/i,
 ];
 
-const isOffTopic = (msg) => OFF_TOPIC_PATTERNS.some((p) => p.test(msg));
+// Always allow civic, welfare, disaster relief, and scheme keywords
+const ALWAYS_ON_TOPIC_REGEX = /\b(scheme|schemes|yojana|yojna|relief|aid|grant|subsidy|insurance|claim|damage|loss|flood|cyclone|drought|calamity|disaster|compensation|muavza|rahat|fund|government|sarkar|sarkari|portal|apply|benefit|eligibility|kisan|farmer|housing|scholarship|student|pension|hospital|health|loan|rashan|ration)\b/i;
+
+const isOffTopic = (msg) => {
+  if (!msg || typeof msg !== 'string') return false;
+  if (ALWAYS_ON_TOPIC_REGEX.test(msg)) return false;
+  return OFF_TOPIC_PATTERNS.some((p) => p.test(msg));
+};
 
 const getOffTopicReply = (language = 'en') => {
   const msgs = {
