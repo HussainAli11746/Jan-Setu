@@ -22,7 +22,8 @@
     "matches": [
       "http://localhost:5173/*",
       "http://localhost:3000/*",
-      "https://jan-setu.vercel.app/*"
+      "https://jan-setu-cyan.vercel.app/*",
+      "https://jan-setu-qv9x.vercel.app/*"
     ]
   },
   "content_scripts": [

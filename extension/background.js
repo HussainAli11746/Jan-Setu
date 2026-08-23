@@ -9,7 +9,7 @@
  *  4. Model errors are handled gracefully with a user-readable message.
  */
 
-const BACKEND = "https://jan-setu.vercel.app";
+const BACKEND = "https://jan-setu-cyan.vercel.app";
 
 // ── Receive handshake from JanSetu React frontend ─────────────────────────
 chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
